@@ -1,0 +1,96 @@
+export const CATEGORY = {
+  IT: 'COMPUTER / IT / TECHNOLOGY',
+  BIZ: 'BUSINESS / FINANCE / MANAGEMENT',
+  HEALTH: 'HEALTH / MEDICAL',
+  EDU: 'EDUCATION',
+  SOCSCI: 'CRIMINOLOGY / SOCIAL SCIENCE',
+  ARTS: 'ARTS / DESIGN / MEDIA',
+  AGRI: 'AGRICULTURE / ENVIRONMENT',
+  HOSP: 'HOSPITALITY / TOURISM',
+  SCI: 'PURE & APPLIED SCIENCES',
+};
+
+const recommendations = {
+  [CATEGORY.IT]: [
+    'BS Computer Science',
+    'BS Information Technology',
+    'BS Information Systems',
+    'BS Computer Engineering',
+    'BS Software Engineering',
+    'BS Data Science',
+    'BS Cybersecurity',
+    'BS Multimedia Computing',
+    'BS Game Development',
+  ],
+  [CATEGORY.BIZ]: [
+    'BS Accountancy',
+    'BS Management Accounting',
+    'BS Business Administration (Marketing / Finance / Operations / HR)',
+    'BS Entrepreneurship',
+    'BS Economics',
+    'BS Office Administration',
+    'BS Customs Administration',
+  ],
+  [CATEGORY.HEALTH]: [
+    'BS Nursing',
+    'BS Medical Technology',
+    'BS Radiologic Technology',
+    'BS Pharmacy',
+    'BS Physical Therapy',
+    'BS Occupational Therapy',
+    'BS Nutrition and Dietetics',
+    'BS Midwifery',
+    'BS Public Health',
+  ],
+  [CATEGORY.EDU]: [
+    'BS Elementary Education',
+    'BS Secondary Education (English / Math / Science / Filipino / Social Studies)',
+    'BS Special Needs Education',
+    'BS Physical Education',
+  ],
+  [CATEGORY.SOCSCI]: [
+    'BS Criminology',
+    'BS Psychology',
+    'BS Political Science',
+    'BS Social Work',
+    'BS Sociology',
+    'BS Public Administration',
+    'BS International Studies',
+  ],
+  [CATEGORY.ARTS]: [
+    'BS Architecture',
+    'BS Interior Design',
+    'BS Industrial Design',
+    'BS Fine Arts',
+    'BS Multimedia Arts',
+    'BS Animation',
+    'BS Film',
+    'BS Fashion Design',
+  ],
+  [CATEGORY.AGRI]: [
+    'BS Agriculture',
+    'BS Agribusiness',
+    'BS Agricultural Engineering',
+    'BS Fisheries',
+    'BS Forestry',
+    'BS Environmental Science',
+  ],
+  [CATEGORY.HOSP]: [
+    'BS Hospitality Management',
+    'BS Hotel and Restaurant Management',
+    'BS Tourism Management',
+    'BS Culinary Arts',
+  ],
+  [CATEGORY.SCI]: [
+    'BS Biology',
+    'BS Chemistry',
+    'BS Physics',
+    'BS Mathematics',
+    'BS Applied Mathematics',
+    'BS Statistics',
+  ],
+};
+
+export function getRecommendedPrograms(category) {
+  return recommendations[category] || [];
+}

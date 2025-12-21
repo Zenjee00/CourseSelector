@@ -1,27 +1,88 @@
 import '../FrontendCSS/Home.css';
 
-import { useState } from 'react';
+import {
+  useEffect,
+  useState,
+} from 'react';
 
+import {
+  onAuthStateChanged,
+  signOut,
+} from 'firebase/auth';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+
+import {
+  auth,
+  db,
+} from '../BackendFbase/Firebase';
 
 function Home() {
     const navigate = useNavigate();
-    const [user, setUser] = useState({ email: 'user@example.com' }); // Replace with actual user data from Firebase
+    const [user, setUser] = useState(null);
+    const [savedPrograms, setSavedPrograms] = useState([]);
+    const [loadingPrograms, setLoadingPrograms] = useState(false);
+
+    useEffect(() => {
+        // Listen for authentication state changes
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+                fetchSavedPrograms(currentUser.uid);
+            } else {
+                navigate('/login');
+            }
+        });
+
+        return () => unsubscribe();
+    }, [navigate]);
+
+    const fetchSavedPrograms = async (userId) => {
+        setLoadingPrograms(true);
+        try {
+            const q = query(
+                collection(db, 'Programs'), 
+                where('userId', '==', userId)
+            );
+            const querySnapshot = await getDocs(q);
+            const programs = [];
+            querySnapshot.forEach((doc) => {
+                programs.push({ id: doc.id, ...doc.data() });
+            });
+            setSavedPrograms(programs);
+            console.log('Saved programs:', programs);
+        } catch (error) {
+            console.error('Error fetching programs:', error);
+        } finally {
+            setLoadingPrograms(false);
+        }
+    };
 
     const handleStartQuiz = () => {
         navigate('/quiz');
     };
 
     const handleViewRecommendations = () => {
-        navigate('/results');
+        if (savedPrograms.length > 0) {
+            navigate('/results');
+        } else {
+            alert('No saved recommendations yet. Take the quiz first!');
+        }
     };
 
-    const handleLogout = () => {
-        // Add Firebase logout logic here
-        console.log('User logged out');
-        // Clear user state or Firebase auth
-        setUser(null);
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            console.log('User logged out');
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
     };
 
     return (
@@ -54,6 +115,13 @@ function Home() {
                         <div className="card-icon">💾</div>
                         <h3>Saved Recommendations</h3>
                         <p>View your previously saved course recommendations and results.</p>
+                        {loadingPrograms ? (
+                            <p style={{ fontSize: '14px', color: '#666' }}>Loading...</p>
+                        ) : (
+                            <p style={{ fontSize: '14px', color: '#667eea', fontWeight: 'bold' }}>
+                                {savedPrograms.length} saved {savedPrograms.length === 1 ? 'recommendation' : 'recommendations'}
+                            </p>
+                        )}
                         <button onClick={handleViewRecommendations} className="card-btn secondary">
                             View Recommendations
                         </button>

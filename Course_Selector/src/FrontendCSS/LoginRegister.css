@@ -1,0 +1,192 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* I-hide ang scrollbar sa buong page */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Tinatanggal ang scrollbar */
+    height: 100%;
+}
+
+.login-register-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6; /* Light gray background para lumutang ang puting form */
+    font-family: 'Inter', sans-serif;
+}
+
+.form-wrapper {
+    background: #ffffff; /* Solid White background */
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 12px;
+    /* Subtle shadow para sa modern depth */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.form-wrapper h2 {
+    color: #111827;
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.error-message {
+    background-color: #fee2e2;
+    border: 1px solid #ef4444;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"] {
+    padding: 10px 14px;
+    border: 1px solid #d1d5db; /* Clean border */
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #1f2937;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Pag nag-click sa input */
+.form-group input:focus {
+    border-color: #4f46e5; /* Indigo focus color */
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Checkbox alignment */
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.checkbox-group input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 24px;
+    background-color: #4f46e5; /* Primary Indigo */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+    background-color: #4338ca;
+}
+
+.toggle-mode {
+    margin-top: 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.toggle-link {
+    color: #4f46e5;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.toggle-link:hover {
+    text-decoration: underline;
+}
+
+/* Google Sign-In Button Styles */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.divider span {
+    padding: 0 16px;
+    color: #666;
+    font-size: 14px;
+    background: white;
+}
+
+.google-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.google-btn:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #dadce0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.google-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
