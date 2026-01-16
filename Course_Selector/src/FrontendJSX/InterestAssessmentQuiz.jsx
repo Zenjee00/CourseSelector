@@ -1,4 +1,18 @@
-import React, { useState } from 'react';
+import '../FrontendCSS/InterestAssessmentQuiz.css';
+
+import {
+  useEffect,
+  useState,
+} from 'react';
+
+import { useNavigate } from 'react-router-dom';
+
+import {
+  CATEGORY,
+  getRecommendedPrograms,
+  saveQuizResults,
+} from '../BackendFbase/courseRecommendations';
+import { auth } from '../BackendFbase/Firebase';
 
 const quizQuestions = [
   { id: 'q1', text: '1. I enjoy setting up, configuring, and maintaining computer networks or systems.', category: 'COMPUTER / IT / TECHNOLOGY' },
@@ -36,37 +50,184 @@ const quizQuestions = [
 function InterestAssessmentQuiz() {
   const [answers, setAnswers] = useState({});
   const [current, setCurrent] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [results, setResults] = useState(null);
+  const [animationClass, setAnimationClass] = useState('');
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const navigate = useNavigate();
+
+  const progress = ((current + 1) / quizQuestions.length) * 100;
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const handleBackHome = () => navigate('/home');
 
   const handleAnswer = (value) => {
     setAnswers({ ...answers, [quizQuestions[current].id]: value });
-    if (current < quizQuestions.length - 1) setCurrent(current + 1);
+  };
+
+  const triggerAnimation = (dir) => {
+    setAnimationClass(dir === 'next' ? 'slide-next' : 'slide-prev');
+    setTimeout(() => setAnimationClass(''), 500);
   };
 
   const handlePrev = () => {
-    if (current > 0) setCurrent(current - 1);
+    if (current > 0) {
+      triggerAnimation('prev');
+      setCurrent(current - 1);
+    }
   };
 
-  return (
-    <div className="quiz-container">
-      <h2>Interest Assessment Quiz</h2>
-      <div className="quiz-question">
-        <p>{quizQuestions[current].text}</p>
-        <div className="quiz-options">
-          {[1,2,3,4,5].map((val) => (
-            <button
-              key={val}
-              className={answers[quizQuestions[current].id] === val ? 'selected' : ''}
-              onClick={() => handleAnswer(val)}
-            >
-              {val}
-            </button>
-          ))}
+  const handleNext = async () => {
+    if (current === quizQuestions.length - 1) {
+      // Auto submit on last question
+      await handleSubmitQuiz();
+    } else {
+      triggerAnimation('next');
+      setCurrent(current + 1);
+    }
+  };
+
+  const calculateResults = () => {
+    const categoryScores = {};
+    Object.values(CATEGORY).forEach(cat => categoryScores[cat] = 0);
+
+    quizQuestions.forEach(q => {
+      const val = answers[q.id];
+      if (val && q.category !== 'General/Soft Skills') {
+        categoryScores[q.category] += val;
+      }
+    });
+
+    const topCategory = Object.keys(categoryScores).reduce((a, b) => 
+      categoryScores[a] > categoryScores[b] ? a : b
+    );
+
+    return { scores: categoryScores, recommendedCategory: topCategory };
+  };
+
+  const handleSubmitQuiz = async () => {
+    if (Object.keys(answers).length < quizQuestions.length) {
+      alert('Pakisagot muna ang lahat ng katanungan.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (!auth.currentUser) throw new Error('Mangyaring mag-login muna.');
+      
+      const quizRes = calculateResults();
+      const recommendedPrograms = await getRecommendedPrograms(quizRes.recommendedCategory);
+      
+      await saveQuizResults(auth.currentUser.uid, answers, quizRes.recommendedCategory, recommendedPrograms);
+      
+      setResults({ ...quizRes, recommendedPrograms });
+      setQuizCompleted(true);
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (quizCompleted && results) {
+    return (
+      <div className="quiz-page">
+        <div className="quiz-container">
+          <div className="quiz-results">
+            <h2 style={{ textAlign: 'center', color: 'var(--primary)' }}>🎉 Quiz Completed!</h2>
+            <div className="recommended-field">
+              <h3 style={{ margin: 0, color: 'var(--text-main)' }}>Recommended Field:</h3>
+              <p className="field-name">{results.recommendedCategory}</p>
+            </div>
+            
+            <div className="category-scores">
+              <h3>Interest Breakdown:</h3>
+              {Object.entries(results.scores).sort(([,a],[,b]) => b-a).map(([cat, score]) => (
+                <div key={cat} className="score-item">
+                  <span>{cat}</span>
+                  <strong>{score}/15</strong>
+                </div>
+              ))}
+            </div>
+
+            <div className="quiz-nav">
+              <button onClick={() => navigate('/home')} className="nav-btn prev-btn">Home</button>
+              <button onClick={() => {
+                  setQuizCompleted(false);
+                  setCurrent(0);
+                  setAnswers({});
+              }} className="nav-btn next-btn">Retake</button>
+            </div>
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="quiz-page">
+      <div className="quiz-container">
+        <div className="back-row">
+          <button className="back-home" onClick={handleBackHome}>
+            ← Back to Home
+          </button>
+        </div>
+        {/* Progress Tracker */}
+        <div className="progress-wrapper">
+          <div className="progress-info">
+            <span>Question {current + 1} of {quizQuestions.length}</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <div className="progress-bar-bg">
+            <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+          </div>
+        </div>
+
+        {/* Animated Question Card */}
+        <div className={`quiz-card ${animationClass}`}>
+          <p className="question-text">{quizQuestions[current].text}</p>
+          
+          <div className="quiz-scale">
+            <span>Hindi Sumasang-ayon</span>
+            <span>Lubos na Sumasang-ayon</span>
+          </div>
+
+          <div className="quiz-options">
+            {[1, 2, 3, 4, 5].map((val) => (
+              <button
+                key={val}
+                className={`option-btn ${answers[quizQuestions[current].id] === val ? 'selected' : ''}`}
+                onClick={() => handleAnswer(val)}
+              >
+                {val}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Navigation Footer */}
         <div className="quiz-nav">
-          <button onClick={handlePrev} disabled={current === 0}>Previous</button>
-          <span>
-            {current + 1} / {quizQuestions.length}
-          </span>
+          <button 
+            className="nav-btn prev-btn" 
+            onClick={handlePrev} 
+            disabled={current === 0 || isSubmitting}
+          >
+            Previous
+          </button>
+
+          <button 
+            className="nav-btn next-btn" 
+            onClick={handleNext}
+            disabled={!answers[quizQuestions[current].id] || isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : (current === quizQuestions.length - 1 ? 'Finish' : 'Next')}
+          </button>
         </div>
       </div>
     </div>

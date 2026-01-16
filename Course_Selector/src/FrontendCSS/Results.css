@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --primary-soft: #eef2ff;
+    --secondary: #0ea5e9;
+    --accent: #f43f5e;
+    --bg-main: #f8fafc;
+    --white: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+/* 1. CUSTOM MAIN SCROLLBAR (Para sa buong Browser) */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+    border: 3px solid var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-light);
+}
+
+.results-page-wrapper {
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding: 2rem 1rem;
+}
+
+.results-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* HEADER SECTION */
+.results-header {
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.back-btn {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 14px;
+    color: var(--text-main);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.back-btn:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+    transform: translateX(-5px);
+}
+
+/* 2. INTERNAL SCROLLABLE AREA */
+.results-grid-full {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    max-height: 70vh; /* Nilimitahan ang height para mag-scroll */
+    overflow-y: auto; /* Dito lalabas ang scrollbar */
+    padding-right: 15px; /* Space para sa scrollbar */
+    animation: fadeInUp 0.6s ease-out;
+    
+    /* Custom Scrollbar para sa Grid mismo */
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-light) transparent;
+}
+
+/* Scrollbar styling para sa grid (Chrome/Safari) */
+.results-grid-full::-webkit-scrollbar {
+    width: 6px;
+}
+.results-grid-full::-webkit-scrollbar-thumb {
+    background-color: var(--primary-light);
+    border-radius: 20px;
+}
+
+/* DETAILED CARD DESIGN */
+.detailed-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.detailed-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-light);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.count {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    background: var(--primary-soft);
+    padding: 6px 14px;
+    border-radius: 100px;
+}
+
+.score-box {
+    font-size: 0.9rem;
+    color: #059669;
+    background: #f0fdf4;
+    padding: 8px 16px;
+    border-radius: 12px;
+}
+
+.detailed-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.card-mid {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 18px;
+    margin-bottom: 1.5rem;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.tag {
+    background: var(--white);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+}
+
+.card-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+    .results-grid-full { max-height: none; overflow-y: visible; padding-right: 0; }
+}

@@ -14,15 +14,13 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f3f4f6; /* Light gray background para lumutang ang puting form */
     font-family: 'Inter', sans-serif;
 }
 
 .form-wrapper {
     background: #ffffff; /* Solid White background */
     padding: 40px;
-    width: 100%;
-    max-width: 420px;
+    width: 420px;
     border-radius: 12px;
     /* Subtle shadow para sa modern depth */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);

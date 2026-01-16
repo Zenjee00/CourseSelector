@@ -55,10 +55,15 @@ function LoginRegister() {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 
                 // Save user data to Firestore Users collection
-                await setDoc(doc(db, 'Users', userCredential.user.uid), {
-                    Email: email,
-                    createdAt: new Date().toISOString()
-                });
+                try {
+                    await setDoc(doc(db, 'Users', userCredential.user.uid), {
+                        Email: email,
+                        createdAt: new Date().toISOString()
+                    });
+                } catch (dbError) {
+                    console.error("Database save failed:", dbError);
+                    // Continue anyway since auth succeeded
+                }
                 
                 console.log('Registration successful!');
                 navigate('/home');
@@ -83,7 +88,7 @@ function LoginRegister() {
                     setError('Incorrect password');
                     break;
                 default:
-                    setError('An error occurred. Please try again.');
+                    setError(error.message || 'An error occurred. Please try again.');
             }
         } finally {
             setLoading(false);
@@ -98,19 +103,30 @@ function LoginRegister() {
             const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
             
-            // Save user data to Firestore if new user
-            await setDoc(doc(db, 'Users', user.uid), {
-                Email: user.email,
-                Name: user.displayName,
-                PhotoURL: user.photoURL,
-                createdAt: new Date().toISOString()
-            }, { merge: true }); // merge: true prevents overwriting existing data
+            // Try to save user data, but catch errors so login doesn't fail
+            // if permission is denied for updates
+            try {
+                await setDoc(doc(db, 'Users', user.uid), {
+                    Email: user.email,
+                    Name: user.displayName,
+                    PhotoURL: user.photoURL,
+                    lastLogin: new Date().toISOString() // Updated field name for tracking
+                }, { merge: true }); 
+            } catch (firestoreError) {
+                console.warn("Could not update user data in Firestore (Permission issue?):", firestoreError);
+                // We ignore this error and proceed to login because the user IS authenticated
+            }
             
             console.log('Google sign-in successful!');
             navigate('/home');
         } catch (error) {
             console.error('Google sign-in error:', error);
-            setError('Failed to sign in with Google. Please try again.');
+            if (error.code === 'auth/popup-closed-by-user') {
+                setError('Sign-in cancelled.');
+            } else {
+                // Show the actual error message to help debug
+                setError(`Google Sign In failed: ${error.message}`);
+            }
         } finally {
             setLoading(false);
         }

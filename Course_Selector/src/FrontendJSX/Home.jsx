@@ -9,27 +9,22 @@ import {
   onAuthStateChanged,
   signOut,
 } from 'firebase/auth';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  auth,
-  db,
-} from '../BackendFbase/Firebase';
+import { getUserSavedPrograms } from '../BackendFbase/courseRecommendations';
+import { auth } from '../BackendFbase/Firebase';
 
 function Home() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [loadingPrograms, setLoadingPrograms] = useState(false);
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem('theme') || 'light';
+    });
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     useEffect(() => {
-        // Listen for authentication state changes
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
@@ -38,24 +33,20 @@ function Home() {
                 navigate('/login');
             }
         });
-
         return () => unsubscribe();
     }, [navigate]);
+
+    useEffect(() => {
+        localStorage.setItem('theme', theme);
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.setAttribute('data-theme', theme);
+    }, [theme]);
 
     const fetchSavedPrograms = async (userId) => {
         setLoadingPrograms(true);
         try {
-            const q = query(
-                collection(db, 'Programs'), 
-                where('userId', '==', userId)
-            );
-            const querySnapshot = await getDocs(q);
-            const programs = [];
-            querySnapshot.forEach((doc) => {
-                programs.push({ id: doc.id, ...doc.data() });
-            });
+            const programs = await getUserSavedPrograms(userId);
             setSavedPrograms(programs);
-            console.log('Saved programs:', programs);
         } catch (error) {
             console.error('Error fetching programs:', error);
         } finally {
@@ -63,71 +54,95 @@ function Home() {
         }
     };
 
-    const handleStartQuiz = () => {
-        navigate('/quiz');
-    };
-
-    const handleViewRecommendations = () => {
+    const handleStartQuiz = () => navigate('/quiz');
+    
+    // Function to navigate to the Results page
+    const handleViewResults = () => {
         if (savedPrograms.length > 0) {
             navigate('/results');
         } else {
-            alert('No saved recommendations yet. Take the quiz first!');
+            alert('No saved results found. Please take the quiz first!');
         }
     };
 
-    const handleLogout = async () => {
+    const toggleTheme = () => {
+        setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    };
+
+    const handleLogoutConfirm = async () => {
         try {
             await signOut(auth);
-            console.log('User logged out');
             navigate('/login');
         } catch (error) {
             console.error('Logout error:', error);
+        } finally {
+            setShowLogoutConfirm(false);
         }
     };
+
+    const handleOpenLogout = () => setShowLogoutConfirm(true);
+    const handleCloseLogout = () => setShowLogoutConfirm(false);
 
     return (
         <div className="home-container">
             <nav className="home-navbar">
-                <h2 className="logo">Course Selector</h2>
+                <div className="nav-brand">
+                    <h2 className="logo">Course<span>Selector</span></h2>
+                </div>
                 <div className="user-section">
-                    <span className="user-email">{user?.email}</span>
-                    <button onClick={handleLogout} className="logout-btn">
-                        Logout
+                    <div className="divider-v"></div>
+                    <button onClick={toggleTheme} className="theme-toggle-btn" title="Toggle theme">
+                        {theme === 'light' ? '🌙' : '☀️'}
                     </button>
+                    <span className="user-email">{user?.email}</span>
+                    <button onClick={handleOpenLogout} className="logout-btn">Logout</button>
                 </div>
             </nav>
 
             <div className="home-content">
-                <h1>Welcome to the Course Selector</h1>
-                <p>Discover the best courses based on your interests and goals.</p>
+                <header className="hero-section">
+                    <h1>Start Your <span>Dream Course</span></h1>
+                    <p>Discover the right path for your future career.</p>
+                </header>
 
-                <div className="action-cards">
-                    <div className="card">
+                {/* ACTION CARDS - ROW LAYOUT */}
+                <div className="action-cards-row">
+                    <div className="card quiz-card">
                         <div className="card-icon">📝</div>
-                        <h3>Interest Assessment Quiz</h3>
-                        <p>Take our quiz to find courses that match your interests and strengths.</p>
+                        <h3>Interest Quiz</h3>
+                        <p>Begin the assessment to receive your personalized recommendations.</p>
                         <button onClick={handleStartQuiz} className="card-btn primary">
                             Start Quiz
                         </button>
                     </div>
 
-                    <div className="card">
+                    <div className="card history-card">
                         <div className="card-icon">💾</div>
-                        <h3>Saved Recommendations</h3>
-                        <p>View your previously saved course recommendations and results.</p>
-                        {loadingPrograms ? (
-                            <p style={{ fontSize: '14px', color: '#666' }}>Loading...</p>
-                        ) : (
-                            <p style={{ fontSize: '14px', color: '#667eea', fontWeight: 'bold' }}>
-                                {savedPrograms.length} saved {savedPrograms.length === 1 ? 'recommendation' : 'recommendations'}
-                            </p>
-                        )}
-                        <button onClick={handleViewRecommendations} className="card-btn secondary">
-                            View Recommendations
+                        <h3>Saved History</h3>
+                        <p>View and manage your previous assessment results.</p>
+                        <button 
+                            onClick={handleViewResults} 
+                            className="card-btn secondary"
+                            disabled={savedPrograms.length === 0}
+                        >
+                            View Results ({savedPrograms.length})
                         </button>
                     </div>
                 </div>
             </div>
+
+            {showLogoutConfirm && (
+                <div className="modal-overlay" role="dialog" aria-modal="true">
+                    <div className="modal-card">
+                        <h3>Log out?</h3>
+                        <p className="modal-text">You will be signed out of CourseSelector.</p>
+                        <div className="modal-actions">
+                            <button className="modal-btn ghost" onClick={handleCloseLogout}>Cancel</button>
+                            <button className="modal-btn danger" onClick={handleLogoutConfirm}>Logout</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
