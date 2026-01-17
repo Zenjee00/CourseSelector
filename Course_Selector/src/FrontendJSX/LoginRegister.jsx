@@ -4,8 +4,10 @@ import { useState } from 'react';
 
 import {
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
 } from 'firebase/auth';
 import {
   doc,
@@ -28,16 +30,24 @@ function LoginRegister() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [infoMessage, setInfoMessage] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setInfoMessage('');
         setLoading(true);
         
         try {
             if (isLogin) {
-                // Login logic
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                if (!userCredential.user.emailVerified) {
+                    await sendEmailVerification(userCredential.user);
+                    setError('Please verify your email. We sent a new verification link.');
+                    await signOut(auth);
+                    return;
+                }
+
                 console.log('Login successful!');
                 navigate('/home');
             } else {
@@ -64,9 +74,21 @@ function LoginRegister() {
                     console.error("Database save failed:", dbError);
                     // Continue anyway since auth succeeded
                 }
-                
-                console.log('Registration successful!');
-                navigate('/home');
+
+                try {
+                    await sendEmailVerification(userCredential.user);
+                    setInfoMessage('Registration successful! Verification email sent. Please verify then log in.');
+                } catch (verifyError) {
+                    setError('Account created, but sending the verification email failed. Please try logging in to resend.');
+                }
+
+                await signOut(auth);
+                setIsLogin(true);
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+                setShowPassword(false);
+                console.log('Registration successful! Verification email sent.');
             }
         } catch (error) {
             console.error('Authentication error:', error);
@@ -86,6 +108,9 @@ function LoginRegister() {
                     break;
                 case 'auth/wrong-password':
                     setError('Incorrect password');
+                    break;
+                case 'auth/operation-not-allowed':
+                    setError('Email/Password sign-in is disabled in Firebase. Enable Email/Password provider in Firebase Console > Authentication > Sign-in method.');
                     break;
                 default:
                     setError(error.message || 'An error occurred. Please try again.');
@@ -138,6 +163,8 @@ function LoginRegister() {
         setPassword('');
         setConfirmPassword('');
         setShowPassword(false);
+        setError('');
+        setInfoMessage('');
     };
 
     return (
@@ -147,6 +174,7 @@ function LoginRegister() {
                 
                 <form className="login-form" onSubmit={handleSubmit}>
                     {error && <div className="error-message">{error}</div>}
+                    {infoMessage && <div className="info-message">{infoMessage}</div>}
                     
                     <div className="form-group">
                         <label htmlFor="email">Email</label>

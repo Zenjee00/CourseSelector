@@ -45,6 +45,17 @@ html, body {
     text-align: center;
 }
 
+.info-message {
+    background-color: #ecfdf3;
+    border: 1px solid #34d399;
+    color: #065f46;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
 .form-group {
     margin-bottom: 16px;
     display: flex;
