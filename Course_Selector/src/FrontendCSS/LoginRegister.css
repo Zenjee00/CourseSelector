@@ -5,8 +5,9 @@
 html, body {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Tinatanggal ang scrollbar */
     height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto; /* Payagan ang vertical scroll sa ibang pages */
 }
 
 .login-register-container {

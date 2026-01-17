@@ -13,6 +13,7 @@ import {
   saveQuizResults,
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
+import { useToast } from '../context/ToastContext';
 
 const quizQuestions = [
   { id: 'q1', text: '1. I enjoy setting up, configuring, and maintaining computer networks or systems.', category: 'COMPUTER / IT / TECHNOLOGY' },
@@ -56,6 +57,7 @@ function InterestAssessmentQuiz() {
   const [animationClass, setAnimationClass] = useState('');
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const navigate = useNavigate();
+  const showToast = useToast();
 
   const progress = ((current + 1) / quizQuestions.length) * 100;
 
@@ -113,7 +115,7 @@ function InterestAssessmentQuiz() {
 
   const handleSubmitQuiz = async () => {
     if (Object.keys(answers).length < quizQuestions.length) {
-      alert('Pakisagot muna ang lahat ng katanungan.');
+      showToast('Pakisagot muna ang lahat ng katanungan.', 'warning');
       return;
     }
 
@@ -128,8 +130,9 @@ function InterestAssessmentQuiz() {
       
       setResults({ ...quizRes, recommendedPrograms });
       setQuizCompleted(true);
+      showToast('Quiz results saved successfully.', 'success');
     } catch (error) {
-      alert(error.message);
+      showToast(error.message || 'Hindi ma-save ang iyong resulta.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -174,7 +177,7 @@ function InterestAssessmentQuiz() {
     <div className="quiz-page">
       <div className="quiz-container">
         <div className="back-row">
-          <button className="back-home" onClick={handleBackHome}>
+          <button className="back-home" onClick={handleBackHome} aria-label="Go back to home">
             ← Back to Home
           </button>
         </div>
@@ -182,7 +185,7 @@ function InterestAssessmentQuiz() {
         <div className="progress-wrapper">
           <div className="progress-info">
             <span>Question {current + 1} of {quizQuestions.length}</span>
-            <span>{Math.round(progress)}%</span>
+            <span aria-live="polite">{Math.round(progress)}%</span>
           </div>
           <div className="progress-bar-bg">
             <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
@@ -203,6 +206,8 @@ function InterestAssessmentQuiz() {
               <button
                 key={val}
                 className={`option-btn ${answers[quizQuestions[current].id] === val ? 'selected' : ''}`}
+                aria-pressed={answers[quizQuestions[current].id] === val}
+                aria-label={`Select score ${val}`}
                 onClick={() => handleAnswer(val)}
               >
                 {val}
@@ -217,6 +222,7 @@ function InterestAssessmentQuiz() {
             className="nav-btn prev-btn" 
             onClick={handlePrev} 
             disabled={current === 0 || isSubmitting}
+            aria-label="Previous question"
           >
             Previous
           </button>
@@ -225,6 +231,7 @@ function InterestAssessmentQuiz() {
             className="nav-btn next-btn" 
             onClick={handleNext}
             disabled={!answers[quizQuestions[current].id] || isSubmitting}
+            aria-label={current === quizQuestions.length - 1 ? 'Finish quiz' : 'Next question'}
           >
             {isSubmitting ? 'Submitting...' : (current === quizQuestions.length - 1 ? 'Finish' : 'Next')}
           </button>
