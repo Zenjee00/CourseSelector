@@ -54,12 +54,32 @@ function InterestAssessmentQuiz() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [results, setResults] = useState(null);
+  const [stage, setStage] = useState('main');
+  const [tieCategories, setTieCategories] = useState([]);
+  const [tieQuestions, setTieQuestions] = useState([]);
+  const [tieAnswers, setTieAnswers] = useState({});
+  const [tieCurrent, setTieCurrent] = useState(0);
+  const [baseResults, setBaseResults] = useState(null);
   const [animationClass, setAnimationClass] = useState('');
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const navigate = useNavigate();
   const showToast = useToast();
 
-  const progress = ((current + 1) / quizQuestions.length) * 100;
+  const isTieBreaker = stage === 'tiebreaker';
+  const questions = isTieBreaker ? tieQuestions : quizQuestions;
+  const currentIndex = isTieBreaker ? tieCurrent : current;
+  const activeAnswers = isTieBreaker ? tieAnswers : answers;
+  const currentQuestion = questions[currentIndex];
+  const isLastQuestion = questions.length ? currentIndex === questions.length - 1 : false;
+  const progress = questions.length ? ((currentIndex + 1) / questions.length) * 100 : 0;
+  const nextLabel = isSubmitting
+    ? 'Submitting...'
+    : isLastQuestion
+      ? (isTieBreaker ? 'Finish Tie-Breaker' : 'Finish')
+      : 'Next';
+  const nextAriaLabel = isLastQuestion
+    ? (isTieBreaker ? 'Finish tie-breaker quiz' : 'Finish quiz')
+    : 'Next question';
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
@@ -70,7 +90,9 @@ function InterestAssessmentQuiz() {
   const handleBackHome = () => navigate('/home');
 
   const handleAnswer = (value) => {
-    setAnswers({ ...answers, [quizQuestions[current].id]: value });
+    if (!currentQuestion) return;
+    const setter = isTieBreaker ? setTieAnswers : setAnswers;
+    setter((prev) => ({ ...prev, [currentQuestion.id]: value }));
   };
 
   const triggerAnimation = (dir) => {
@@ -79,38 +101,61 @@ function InterestAssessmentQuiz() {
   };
 
   const handlePrev = () => {
-    if (current > 0) {
+    if (currentIndex > 0) {
       triggerAnimation('prev');
-      setCurrent(current - 1);
+      if (isTieBreaker) {
+        setTieCurrent((prev) => prev - 1);
+      } else {
+        setCurrent((prev) => prev - 1);
+      }
     }
   };
 
   const handleNext = async () => {
-    if (current === quizQuestions.length - 1) {
-      // Auto submit on last question
-      await handleSubmitQuiz();
+    if (!currentQuestion) return;
+
+    if (currentIndex === questions.length - 1) {
+      if (isTieBreaker) {
+        await handleSubmitTieBreaker();
+      } else {
+        await handleSubmitQuiz();
+      }
     } else {
       triggerAnimation('next');
-      setCurrent(current + 1);
+      if (isTieBreaker) {
+        setTieCurrent((prev) => prev + 1);
+      } else {
+        setCurrent((prev) => prev + 1);
+      }
     }
   };
 
-  const calculateResults = () => {
+  const calculateResults = (questionsList, answersMap, limitedCategories = null) => {
     const categoryScores = {};
-    Object.values(CATEGORY).forEach(cat => categoryScores[cat] = 0);
+    Object.values(CATEGORY).forEach((cat) => { categoryScores[cat] = 0; });
 
-    quizQuestions.forEach(q => {
-      const val = answers[q.id];
-      if (val && q.category !== 'General/Soft Skills') {
+    questionsList.forEach((q) => {
+      if (q.category === 'General/Soft Skills') return;
+      if (limitedCategories && !limitedCategories.includes(q.category)) return;
+
+      const val = answersMap[q.id];
+      if (val) {
         categoryScores[q.category] += val;
       }
     });
 
-    const topCategory = Object.keys(categoryScores).reduce((a, b) => 
-      categoryScores[a] > categoryScores[b] ? a : b
-    );
+    const relevantEntries = limitedCategories
+      ? limitedCategories.map((cat) => [cat, categoryScores[cat]])
+      : Object.entries(categoryScores);
 
-    return { scores: categoryScores, recommendedCategory: topCategory };
+    const entries = relevantEntries.length ? relevantEntries : Object.entries(categoryScores);
+    const topScore = Math.max(...entries.map(([, score]) => score));
+    const topCategories = entries
+      .filter(([, score]) => score === topScore)
+      .map(([cat]) => cat);
+    const recommendedCategory = topCategories[0];
+
+    return { scores: categoryScores, recommendedCategory, topCategories, topScore };
   };
 
   const handleSubmitQuiz = async () => {
@@ -122,14 +167,28 @@ function InterestAssessmentQuiz() {
     setIsSubmitting(true);
     try {
       if (!auth.currentUser) throw new Error('Mangyaring mag-login muna.');
-      
-      const quizRes = calculateResults();
+
+      const quizRes = calculateResults(quizQuestions, answers);
+
+      if (quizRes.topCategories.length > 1) {
+        const tiedQs = quizQuestions.filter((q) => quizRes.topCategories.includes(q.category));
+        setBaseResults(quizRes);
+        setTieCategories(quizRes.topCategories);
+        setTieQuestions(tiedQs);
+        setTieAnswers({});
+        setTieCurrent(0);
+        setStage('tiebreaker');
+        showToast('Tie detected. Answer the tie-breaker questions for the tied fields.', 'warning');
+        return;
+      }
+
       const recommendedPrograms = await getRecommendedPrograms(quizRes.recommendedCategory);
-      
+
       await saveQuizResults(auth.currentUser.uid, answers, quizRes.recommendedCategory, recommendedPrograms);
-      
-      setResults({ ...quizRes, recommendedPrograms });
+
+      setResults({ ...quizRes, recommendedPrograms, tieBreakerUsed: false });
       setQuizCompleted(true);
+      setBaseResults(null);
       showToast('Quiz results saved successfully.', 'success');
     } catch (error) {
       showToast(error.message || 'Hindi ma-save ang iyong resulta.', 'error');
@@ -138,7 +197,59 @@ function InterestAssessmentQuiz() {
     }
   };
 
+  const handleSubmitTieBreaker = async () => {
+    if (Object.keys(tieAnswers).length < tieQuestions.length) {
+      showToast('Sagutin muna ang lahat ng tie-breaker questions.', 'warning');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (!auth.currentUser) throw new Error('Mangyaring mag-login muna.');
+
+      const tieRes = calculateResults(tieQuestions, tieAnswers, tieCategories);
+      const winningCategories = tieRes.topCategories;
+      const finalCategory = winningCategories[0];
+
+      if (winningCategories.length > 1) {
+        showToast('Pantay pa rin ang scores. Pinili ang unang field bilang default.', 'warning');
+      }
+
+      const finalScores = { ...(baseResults?.scores || {}) };
+      tieCategories.forEach((cat) => {
+        finalScores[cat] = tieRes.scores[cat];
+      });
+
+      const recommendedPrograms = await getRecommendedPrograms(finalCategory);
+
+      await saveQuizResults(
+        auth.currentUser.uid,
+        { ...answers, ...tieAnswers },
+        finalCategory,
+        recommendedPrograms,
+      );
+
+      setResults({
+        scores: finalScores,
+        recommendedCategory: finalCategory,
+        recommendedPrograms,
+        tieBreakerUsed: true,
+        tieBreakerCategories: tieCategories,
+      });
+      setQuizCompleted(true);
+      setStage('main');
+      setBaseResults(null);
+      showToast('Tie-breaker completed. Results saved.', 'success');
+    } catch (error) {
+      showToast(error.message || 'Hindi ma-save ang iyong tie-breaker resulta.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (quizCompleted && results) {
+    const topScoreValue = Math.max(...Object.values(results.scores || {}));
+
     return (
       <div className="quiz-page">
         <div className="quiz-container">
@@ -148,6 +259,10 @@ function InterestAssessmentQuiz() {
               <h3 style={{ margin: 0, color: 'var(--text-main)' }}>Recommended Field:</h3>
               <p className="field-name">{results.recommendedCategory}</p>
             </div>
+            {results.tieBreakerUsed && results.tieBreakerCategories && (
+              <p className="tie-note">Tie-breaker applied for {results.tieBreakerCategories.join(' • ')}.</p>
+            )}
+            <p className="top-score">Highest score: {topScoreValue}/15</p>
             
             <div className="category-scores">
               <h3>Interest Breakdown:</h3>
@@ -165,6 +280,12 @@ function InterestAssessmentQuiz() {
                   setQuizCompleted(false);
                   setCurrent(0);
                   setAnswers({});
+                  setTieAnswers({});
+                  setTieCategories([]);
+                  setTieQuestions([]);
+                  setTieCurrent(0);
+                  setStage('main');
+                  setBaseResults(null);
               }} className="nav-btn next-btn">Retake</button>
             </div>
           </div>
@@ -181,10 +302,16 @@ function InterestAssessmentQuiz() {
             ← Back to Home
           </button>
         </div>
+        {isTieBreaker && (
+          <div className="tie-banner">
+            <div className="tie-banner-title">Tie-breaker round</div>
+            <div className="tie-banner-body">Fields: {tieCategories.join(' • ')}</div>
+          </div>
+        )}
         {/* Progress Tracker */}
         <div className="progress-wrapper">
           <div className="progress-info">
-            <span>Question {current + 1} of {quizQuestions.length}</span>
+            <span>Question {questions.length ? currentIndex + 1 : 0} of {questions.length}</span>
             <span aria-live="polite">{Math.round(progress)}%</span>
           </div>
           <div className="progress-bar-bg">
@@ -194,7 +321,7 @@ function InterestAssessmentQuiz() {
 
         {/* Animated Question Card */}
         <div className={`quiz-card ${animationClass}`}>
-          <p className="question-text">{quizQuestions[current].text}</p>
+          <p className="question-text">{currentQuestion?.text}</p>
           
           <div className="quiz-scale">
             <span>Hindi Sumasang-ayon</span>
@@ -205,8 +332,8 @@ function InterestAssessmentQuiz() {
             {[1, 2, 3, 4, 5].map((val) => (
               <button
                 key={val}
-                className={`option-btn ${answers[quizQuestions[current].id] === val ? 'selected' : ''}`}
-                aria-pressed={answers[quizQuestions[current].id] === val}
+                className={`option-btn ${currentQuestion && activeAnswers[currentQuestion.id] === val ? 'selected' : ''}`}
+                aria-pressed={currentQuestion ? activeAnswers[currentQuestion.id] === val : false}
                 aria-label={`Select score ${val}`}
                 onClick={() => handleAnswer(val)}
               >
@@ -221,7 +348,7 @@ function InterestAssessmentQuiz() {
           <button 
             className="nav-btn prev-btn" 
             onClick={handlePrev} 
-            disabled={current === 0 || isSubmitting}
+            disabled={currentIndex === 0 || isSubmitting}
             aria-label="Previous question"
           >
             Previous
@@ -230,10 +357,10 @@ function InterestAssessmentQuiz() {
           <button 
             className="nav-btn next-btn" 
             onClick={handleNext}
-            disabled={!answers[quizQuestions[current].id] || isSubmitting}
-            aria-label={current === quizQuestions.length - 1 ? 'Finish quiz' : 'Next question'}
+            disabled={!currentQuestion || !activeAnswers[currentQuestion.id] || isSubmitting}
+            aria-label={nextAriaLabel}
           >
-            {isSubmitting ? 'Submitting...' : (current === quizQuestions.length - 1 ? 'Finish' : 'Next')}
+            {nextLabel}
           </button>
         </div>
       </div>

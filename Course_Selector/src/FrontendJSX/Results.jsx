@@ -1,13 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../FrontendCSS/Results.css';
-import { getUserSavedPrograms } from '../BackendFbase/courseRecommendations';
+
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import { useNavigate } from 'react-router-dom';
+
+import {
+  deleteUserProgram,
+  getUserSavedPrograms,
+} from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
 
 function Results() {
     const navigate = useNavigate();
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState(null);
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -26,6 +36,22 @@ function Results() {
         };
         fetchResults();
     }, [navigate]);
+
+    const handleDelete = async (programId) => {
+        if (!programId) return;
+        const confirmed = window.confirm('Delete this record?');
+        if (!confirmed) return;
+        try {
+            setDeletingId(programId);
+            await deleteUserProgram(programId, auth.currentUser?.uid);
+            setSavedPrograms((prev) => prev.filter((p) => p.id !== programId));
+        } catch (err) {
+            console.error(err);
+            alert('Could not delete this history item.');
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     return (
         <div className="results-page-wrapper">
@@ -47,41 +73,60 @@ function Results() {
                 ) : (
                     <div className="results-grid-full">
                         {savedPrograms.length > 0 ? (
-                            savedPrograms.map((program, index) => (
-                                <div key={program.id || index} className="detailed-card">
-                                    <div className="card-top">
-                                        <span className="count">RECORD #{savedPrograms.length - index}</span>
-                                        <div className="score-box">
-                                            Score: <b>{program.Score}</b>
+                            savedPrograms.map((program, index) => {
+                                const primary = program.recommendedPrograms?.[0];
+                                const suggestions = program.recommendedPrograms?.slice(1) || [];
+                                return (
+                                    <div key={program.id || index} className="detailed-card">
+                                        <div className="card-top">
+                                            <span className="count">RECORD #{savedPrograms.length - index}</span>
+                                            <div className="score-box">
+                                                Score: <b>{program.Score}</b>
+                                            </div>
+                                            <button
+                                                className="delete-btn"
+                                                onClick={() => handleDelete(program.id)}
+                                                disabled={deletingId === program.id}
+                                            >
+                                                {deletingId === program.id ? 'Deleting…' : 'Delete'}
+                                            </button>
+                                        </div>
+                                        
+                                        <h3>{program.Recommended_Field || 'Recommended Program'}</h3>
+
+                                        <div className="card-mid">
+                                            {primary && (
+                                                <div className="primary-rec">
+                                                    <p className="label">Recommended Program</p>
+                                                    <span className="tag primary-tag">{primary}</span>
+                                                </div>
+                                            )}
+                                            {suggestions.length > 0 && (
+                                                <div className="suggestions">
+                                                    <p className="label">Other Suggestions</p>
+                                                    <div className="tags">
+                                                        {suggestions.map((p, i) => (
+                                                            <span key={i} className="tag">{p}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="card-bottom">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                            </svg>
+                                            {program.timestamp && new Date(program.timestamp.toDate()).toLocaleString('en-US', {
+                                                month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                                            })}
                                         </div>
                                     </div>
-                                    
-                                    <h3>{program.User_Program}</h3>
-                                    
-                                    <div className="card-mid">
-                                        <p style={{fontSize: '0.75rem', fontWeight: '800', color: '#94a3b8', letterSpacing: '0.5px', marginBottom: '12px', textTransform: 'uppercase'}}>
-                                            Recommended Courses
-                                        </p>
-                                        <div className="tags">
-                                            {program.recommendedPrograms?.map((p, i) => (
-                                                <span key={i} className="tag">{p}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="card-bottom">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                                        </svg>
-                                        {program.timestamp && new Date(program.timestamp.toDate()).toLocaleString('en-US', {
-                                            month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                                        })}
-                                    </div>
-                                </div>
-                            ))
+                                );
+                            })
                         ) : (
                             <div style={{textAlign: 'center', padding: '4rem', color: '#94a3b8'}}>
                                 <p>No records found yet. Start your journey today!</p>

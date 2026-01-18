@@ -1,7 +1,9 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   setDoc,
@@ -219,5 +221,20 @@ export async function getUserSavedPrograms(userId) {
   } catch (error) {
     console.error('Error fetching user programs:', error);
     return [];
+  }
+}
+
+// Delete a saved program by document id (verifies ownership before delete)
+export async function deleteUserProgram(docId, userId) {
+  try {
+    const ref = doc(db, 'Programs', docId);
+    const snapshot = await getDoc(ref);
+    if (!snapshot.exists()) return;
+    const data = snapshot.data();
+    if (data.userId !== userId) throw new Error('Unauthorized delete attempt.');
+    await deleteDoc(ref);
+  } catch (error) {
+    console.error('Error deleting user program:', error);
+    throw error;
   }
 }

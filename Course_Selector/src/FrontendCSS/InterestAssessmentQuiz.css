@@ -267,6 +267,39 @@ body {
     color: var(--primary);
 }
 
+.tie-banner {
+    background: var(--primary-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.tie-banner-title {
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+}
+
+.tie-banner-body {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.tie-note {
+    margin: -10px 0 18px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.top-score {
+    margin: -6px 0 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
 .score-item {
     display: flex;
     justify-content: space-between;
