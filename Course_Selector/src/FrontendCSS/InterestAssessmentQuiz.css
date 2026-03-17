@@ -300,6 +300,73 @@ body {
     color: var(--text-dark);
 }
 
+.recommended-programs {
+    margin-bottom: 24px;
+    padding: 20px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+}
+
+.recommended-programs h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--text-dark);
+}
+
+.program-list {
+    display: grid;
+    gap: 14px;
+}
+
+.program-card {
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--primary-bg);
+}
+
+.program-title {
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+.program-schools {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.program-schools li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+}
+
+.school-name {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.school-location {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.no-schools {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
 .score-item {
     display: flex;
     justify-content: space-between;

@@ -14,6 +14,7 @@ import {
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
 import { useToast } from '../context/ToastContext';
+import { universities } from '../data/universities';
 
 const quizQuestions = [
   { id: 'q1', text: '1. I enjoy setting up, configuring, and maintaining computer networks or systems.', category: 'COMPUTER / IT / TECHNOLOGY' },
@@ -80,6 +81,11 @@ function InterestAssessmentQuiz() {
   const nextAriaLabel = isLastQuestion
     ? (isTieBreaker ? 'Finish tie-breaker quiz' : 'Finish quiz')
     : 'Next question';
+
+  const getUniversitiesForProgram = (programName) => {
+    if (!programName) return [];
+    return universities.filter((university) => university.programs.includes(programName));
+  };
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
@@ -263,6 +269,33 @@ function InterestAssessmentQuiz() {
               <p className="tie-note">Tie-breaker applied for {results.tieBreakerCategories.join(' • ')}.</p>
             )}
             <p className="top-score">Highest score: {topScoreValue}/15</p>
+
+            <div className="recommended-programs">
+              <h3>Recommended Programs and Schools</h3>
+              {results.recommendedPrograms?.length ? (
+                <div className="program-list">
+                  {results.recommendedPrograms.map((programName) => (
+                    <div key={`program-${programName}`} className="program-card">
+                      <div className="program-title">{programName}</div>
+                      {getUniversitiesForProgram(programName).length ? (
+                        <ul className="program-schools">
+                          {getUniversitiesForProgram(programName).map((school) => (
+                            <li key={`${programName}-${school.name}`}>
+                              <span className="school-name">{school.name}</span>
+                              <span className="school-location">{school.location}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="no-schools">No school matches yet.</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="no-schools">No recommended programs found.</p>
+              )}
+            </div>
             
             <div className="category-scores">
               <h3>Interest Breakdown:</h3>

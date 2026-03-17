@@ -12,12 +12,18 @@ import {
   getUserSavedPrograms,
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
+import { universities } from '../data/universities';
 
 function Results() {
     const navigate = useNavigate();
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deletingId, setDeletingId] = useState(null);
+
+    const getUniversitiesForProgram = (programName) => {
+        if (!programName) return [];
+        return universities.filter((university) => university.programs.includes(programName));
+    };
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -99,6 +105,21 @@ function Results() {
                                                 <div className="primary-rec">
                                                     <p className="label">Recommended Program</p>
                                                     <span className="tag primary-tag">{primary}</span>
+                                                    <div className="program-universities">
+                                                        <p className="program-label">Recommended Schools</p>
+                                                        {getUniversitiesForProgram(primary).length > 0 ? (
+                                                            <ul className="university-list">
+                                                                {getUniversitiesForProgram(primary).map((school) => (
+                                                                    <li key={`${primary}-${school.name}`}>
+                                                                        <span className="school-name">{school.name}</span>
+                                                                        <span className="school-location">{school.location}</span>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        ) : (
+                                                            <p className="no-schools">No school matches yet.</p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             )}
                                             {suggestions.length > 0 && (
@@ -107,6 +128,26 @@ function Results() {
                                                     <div className="tags">
                                                         {suggestions.map((p, i) => (
                                                             <span key={i} className="tag">{p}</span>
+                                                        ))}
+                                                    </div>
+                                                    <div className="program-universities">
+                                                        <p className="program-label">Recommended Schools per Suggestion</p>
+                                                        {suggestions.map((programName) => (
+                                                            <div key={`schools-${programName}`} className="suggestion-schools">
+                                                                <span className="suggestion-name">{programName}</span>
+                                                                {getUniversitiesForProgram(programName).length > 0 ? (
+                                                                    <ul className="university-list">
+                                                                        {getUniversitiesForProgram(programName).map((school) => (
+                                                                            <li key={`${programName}-${school.name}`}>
+                                                                                <span className="school-name">{school.name}</span>
+                                                                                <span className="school-location">{school.location}</span>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                ) : (
+                                                                    <p className="no-schools">No school matches yet.</p>
+                                                                )}
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 </div>
