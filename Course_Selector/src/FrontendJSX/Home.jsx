@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react';
 
+import confetti from 'canvas-confetti';
 import {
   onAuthStateChanged,
   signOut,
@@ -92,6 +93,19 @@ function Home() {
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
 
+    const handleLogoConfetti = () => {
+        const confettiConfig = {
+            particleCount: 150,
+            spread: 120,
+            startVelocity: 55,
+            gravity: 0.95,
+            scalar: 0.9,
+            ticks: 200
+        };
+
+        confetti({ ...confettiConfig, origin: { x: 0.5, y: 0.3 } });
+    };
+
     const handleLogoutConfirm = async () => {
         try {
             await signOut(auth);
@@ -173,7 +187,7 @@ function Home() {
         <div className="home-container">
             <nav className="home-navbar" role="navigation" aria-label="Primary">
                 <div className="nav-brand" aria-label="CourseSelector home">
-                    <h2 className="logo">Course<span>Selector</span></h2>
+                    <h2 className="logo" onClick={handleLogoConfetti}>Course<span>Selector</span></h2>
                 </div>
 
                 <button
