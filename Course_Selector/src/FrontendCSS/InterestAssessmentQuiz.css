@@ -316,7 +316,7 @@ body {
 
 .program-list {
     display: grid;
-    gap: 15px;
+    gap: 14px;
 }
 
 .program-card {
