@@ -281,19 +281,19 @@ function InterestAssessmentQuiz() {
                         <ul className="program-schools">
                           {getUniversitiesForProgram(programName).map((school) => (
                             <li key={`${programName}-${school.name}`}>
-                              <span className="school-name">{school.name}</span>
-                              <span className="school-location">{school.location}</span>
+                              <span className="quiz-school-name">{school.name}</span>
+                              <span className="quiz-school-location">{school.location}</span>
                             </li>
                           ))}
                         </ul>
                       ) : (
-                        <p className="no-schools">No school matches yet.</p>
+                        <p className="quiz-no-schools">No school matches yet.</p>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="no-schools">No recommended programs found.</p>
+                <p className="quiz-no-schools">No recommended programs found.</p>
               )}
             </div>
             

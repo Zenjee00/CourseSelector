@@ -343,6 +343,7 @@ body {
 .program-schools li {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
     gap: 6px;
     align-items: center;
     padding: 8px 10px;
@@ -351,20 +352,28 @@ body {
     border: 1px solid var(--border);
 }
 
-.school-name {
+.quiz-school-name {
     font-weight: 700;
     color: var(--text-dark);
 }
 
-.school-location {
+.quiz-school-location {
     font-size: 0.85rem;
     color: var(--text-muted);
 }
 
-.no-schools {
+.quiz-no-schools {
     margin: 0;
     color: var(--text-muted);
     font-size: 0.9rem;
+}
+
+:root[data-theme='dark'] .quiz-school-name {
+    color: #e5e7eb;
+}
+
+:root[data-theme='dark'] .quiz-school-location {
+    color: #cbd5e1;
 }
 
 .score-item {

@@ -71,8 +71,21 @@ export const universities = [
         ],
     },
     {
-        name: 'University of Perpetual Help System DALTA (UPHSD)',
-        location: 'Binan and Calamba, Laguna',
+        name: 'University of Perpetual Help System DALTA (UPHSD) - Binan Campus',
+        location: 'Binan, Laguna',
+        programs: [
+            'BS Nursing',
+            'BS Medical Technology',
+            'BS Radiologic Technology',
+            'BS Pharmacy',
+            'BS Physical Therapy',
+            'BS Occupational Therapy',
+            'BS Midwifery',
+        ],
+    },
+    {
+        name: 'University of Perpetual Help System DALTA (UPHSD) - Calamba Campus',
+        location: 'Calamba, Laguna',
         programs: [
             'BS Nursing',
             'BS Medical Technology',
@@ -107,8 +120,34 @@ export const universities = [
         ],
     },
     {
-        name: 'Lyceum of the Philippines University (LPU)',
-        location: 'Cavite, Laguna, and Batangas',
+        name: 'Lyceum of the Philippines University (LPU) - Cavite Campus',
+        location: 'General Trias, Cavite',
+        programs: [
+            'BS Hospitality Management',
+            'BS Hotel and Restaurant Management',
+            'BS Tourism Management',
+            'BS Culinary Arts',
+            'BS Criminology',
+            'BS Business Administration (Marketing / Finance / Operations / HR)',
+            'BS Entrepreneurship',
+        ],
+    },
+    {
+        name: 'Lyceum of the Philippines University (LPU) - Laguna Campus',
+        location: 'Calamba, Laguna',
+        programs: [
+            'BS Hospitality Management',
+            'BS Hotel and Restaurant Management',
+            'BS Tourism Management',
+            'BS Culinary Arts',
+            'BS Criminology',
+            'BS Business Administration (Marketing / Finance / Operations / HR)',
+            'BS Entrepreneurship',
+        ],
+    },
+    {
+        name: 'Lyceum of the Philippines University (LPU) - Batangas Campus',
+        location: 'Batangas City, Batangas',
         programs: [
             'BS Hospitality Management',
             'BS Hotel and Restaurant Management',
@@ -134,8 +173,18 @@ export const universities = [
         ],
     },
     {
-        name: 'FEU Alabang / Cavite',
-        location: 'Alabang and Silang',
+        name: 'FEU Alabang',
+        location: 'Alabang, Muntinlupa',
+        programs: [
+            'BS Information Technology',
+            'BS Computer Science',
+            'BS Business Administration (Marketing / Finance / Operations / HR)',
+            'BS Accountancy',
+        ],
+    },
+    {
+        name: 'FEU Cavite',
+        location: 'Silang, Cavite',
         programs: [
             'BS Information Technology',
             'BS Computer Science',
