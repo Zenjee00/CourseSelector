@@ -22,6 +22,7 @@ import folderIcon from '../Photos/Folder.png';
 function Home() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [loadingPrograms, setLoadingPrograms] = useState(false);
     const [theme, setTheme] = useState(() => {
@@ -52,6 +53,7 @@ function Home() {
             } else {
                 navigate('/login');
             }
+            setIsInitialLoading(false);
         });
         return () => unsubscribe();
     }, [navigate]);
@@ -183,6 +185,50 @@ function Home() {
     const avatarLetter = displayName.charAt(0).toUpperCase();
     const avatarSrc = user?.photoURL || '';
 
+    // Skeleton Loader Component
+    const SkeletonLoader = () => (
+        <div className="home-container skeleton-container">
+            <nav className="home-navbar skeleton-nav">
+                <div className="nav-brand">
+                    <div className="skeleton-text skeleton-logo"></div>
+                </div>
+                <button className="menu-toggle" disabled aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div className="user-section">
+                    <div className="skeleton-icon"></div>
+                    <div className="skeleton-chip">
+                        <div className="skeleton-avatar"></div>
+                        <div className="skeleton-text skeleton-name"></div>
+                    </div>
+                    <div className="skeleton-icon"></div>
+                </div>
+            </nav>
+
+            <div className="home-content">
+                <header className="hero-section">
+                    <div className="skeleton-text skeleton-title"></div>
+                    <div className="skeleton-text skeleton-subtitle"></div>
+                </header>
+
+                <div className="action-cards-row">
+                    <div className="card skeleton-card">
+                        <div className="skeleton-icon-large"></div>
+                        <div className="skeleton-text skeleton-card-title"></div>
+                        <div className="skeleton-text skeleton-card-text"></div>
+                        <div className="skeleton-button"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    if (isInitialLoading) {
+        return <SkeletonLoader />;
+    }
+
     return (
         <div className="home-container">
             <nav className="home-navbar" role="navigation" aria-label="Primary">
@@ -206,10 +252,14 @@ function Home() {
                         className="nav-icon-btn saved-btn"
                         onClick={handleViewResults}
                         aria-label={`Saved history (${savedPrograms.length})`}
-                        disabled={savedPrograms.length === 0}
+                        disabled={loadingPrograms || savedPrograms.length === 0}
                     >
                         <img src={folderIcon} alt="Saved history" />
-                        <span className="saved-count">{savedPrograms.length}</span>
+                        {loadingPrograms ? (
+                            <span className="skeleton-circle"></span>
+                        ) : (
+                            <span className="saved-count">{savedPrograms.length}</span>
+                        )}
                     </button>
                     <button className="profile-chip" onClick={handleOpenProfile} aria-label="View profile">
                         <span className="avatar-circle" aria-hidden="true">

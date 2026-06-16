@@ -82,9 +82,33 @@ function InterestAssessmentQuiz() {
     ? (isTieBreaker ? 'Finish tie-breaker quiz' : 'Finish quiz')
     : 'Next question';
 
+    // Skeleton Loader Component
+    const SkeletonLoader = () => (
+        <div className="quiz-container">
+            <div className="quiz-header">
+                <div className="skeleton-text skeleton-title"></div>
+                <div className="progress-bar">
+                    <div className="progress-bar-inner" style={{ width: '0%' }}></div>
+                </div>
+            </div>
+            <div className="quiz-card">
+                <div className="skeleton-text skeleton-question"></div>
+                <div className="skeleton-options">
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className="skeleton-button"></div>
+                    ))}
+                </div>
+            </div>
+            <div className="quiz-footer">
+                <div className="skeleton-button"></div>
+                <div className="skeleton-button"></div>
+            </div>
+        </div>
+    );
+
   const getUniversitiesForProgram = (programName) => {
-    if (!programName) return [];
-    return universities.filter((university) => university.programs.includes(programName));
+      if (!programName) return [];
+      return universities.filter((uni) => uni.programs.includes(programName));
   };
 
   useEffect(() => {
@@ -327,6 +351,10 @@ function InterestAssessmentQuiz() {
     );
   }
 
+    if (!currentQuestion) {
+        return <SkeletonLoader />;
+    }
+
   return (
     <div className="quiz-page">
       <div className="quiz-container">
@@ -357,8 +385,8 @@ function InterestAssessmentQuiz() {
           <p className="question-text">{currentQuestion?.text}</p>
           
           <div className="quiz-scale">
-            <span>Hindi Sumasang-ayon</span>
-            <span>Lubos na Sumasang-ayon</span>
+            <span>Agree</span>
+            <span>Disagree</span>
           </div>
 
           <div className="quiz-options">

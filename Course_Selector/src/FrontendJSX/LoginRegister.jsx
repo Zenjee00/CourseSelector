@@ -32,6 +32,20 @@ function LoginRegister() {
     const [error, setError] = useState('');
     const [infoMessage, setInfoMessage] = useState('');
 
+    // Skeleton Loader Component
+    const SkeletonLoader = () => (
+        <div className="login-register-container">
+            <div className="form-wrapper skeleton-form">
+                <div className="skeleton-text skeleton-title"></div>
+                <div className="skeleton-text skeleton-line"></div>
+                <div className="skeleton-text skeleton-line"></div>
+                <div className="skeleton-button"></div>
+                <div className="skeleton-divider"></div>
+                <div className="skeleton-button"></div>
+            </div>
+        </div>
+    );
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -166,6 +180,10 @@ function LoginRegister() {
         setError('');
         setInfoMessage('');
     };
+
+    if (loading) {
+        return <SkeletonLoader />;
+    }
 
     return (
         <div className="login-register-container">

@@ -68,6 +68,28 @@ function Results() {
 
     const originKey = getOriginKey(userLocation);
 
+    // Skeleton Loader Component
+    const SkeletonLoader = () => (
+        <div className="results-grid-full">
+            {[...Array(2)].map((_, i) => (
+                <div key={i} className="result-card skeleton-card">
+                    <div className="card-header">
+                        <div className="skeleton-text skeleton-title"></div>
+                        <div className="skeleton-text skeleton-subtitle"></div>
+                    </div>
+                    <div className="card-body">
+                        <div className="skeleton-text skeleton-line"></div>
+                        <div className="skeleton-text skeleton-line"></div>
+                        <div className="skeleton-text skeleton-line"></div>
+                    </div>
+                    <div className="card-footer">
+                        <div className="skeleton-button"></div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+
     useEffect(() => {
         localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(geocodeCache));
     }, [geocodeCache]);
@@ -318,9 +340,7 @@ function Results() {
                 </header>
 
                 {loading ? (
-                    <div className="loading" style={{textAlign: 'center', padding: '3rem', color: '#6366f1', fontWeight: '700'}}>
-                        ✨ Optimizing your records...
-                    </div>
+                    <SkeletonLoader />
                 ) : (
                     <div className="results-grid-full">
                         {savedPrograms.length > 0 ? (

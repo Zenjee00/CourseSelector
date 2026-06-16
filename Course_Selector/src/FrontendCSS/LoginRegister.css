@@ -200,3 +200,57 @@ html, body {
     width: 20px;
     height: 20px;
 }
+
+/* --- SKELETON LOADER --- */
+.skeleton-form {
+    padding: 40px;
+    width: 420px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.skeleton-text {
+    background: linear-gradient(90deg, #f0f0f0, #e0e0e0, #f0f0f0);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: 8px;
+    height: 16px;
+}
+
+.skeleton-title {
+    width: 50%;
+    height: 28px;
+    margin: 0 auto 24px;
+}
+
+.skeleton-line {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 16px;
+}
+
+.skeleton-button {
+    width: 100%;
+    height: 48px;
+    margin-top: 24px;
+    background: linear-gradient(90deg, #f0f0f0, #e0e0e0, #f0f0f0);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+.skeleton-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 20px 0;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}

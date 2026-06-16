@@ -411,3 +411,53 @@ body {
     .option-btn { height: 60px; font-size: 1.2rem; }
     .nav-btn { height: 56px; }
 }
+
+/* --- SKELETON LOADER --- */
+.skeleton-text {
+    background: linear-gradient(90deg, var(--border), var(--card-bg), var(--border));
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: 8px;
+    height: 16px;
+}
+
+.skeleton-title {
+    width: 60%;
+    height: 28px;
+    margin-bottom: 1rem;
+}
+
+.skeleton-question {
+    width: 80%;
+    height: 40px;
+    margin: 0 auto 2rem;
+}
+
+.skeleton-options {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 2rem;
+}
+
+.skeleton-button {
+    flex: 1;
+    height: 78px;
+    background: linear-gradient(90deg, var(--border), var(--card-bg), var(--border));
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: 18px;
+}
+
+.quiz-footer .skeleton-button {
+    height: 54px;
+    border-radius: 14px;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
