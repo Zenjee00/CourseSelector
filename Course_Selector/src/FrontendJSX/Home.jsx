@@ -188,36 +188,31 @@ function Home() {
     // Skeleton Loader Component
     const SkeletonLoader = () => (
         <div className="home-container skeleton-container">
-            <nav className="home-navbar skeleton-nav">
+            <nav className="home-navbar">
                 <div className="nav-brand">
-                    <div className="skeleton-text skeleton-logo"></div>
+                    <div className="skeleton-logo"></div>
                 </div>
-                <button className="menu-toggle" disabled aria-label="Toggle navigation menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <div className="user-section">
-                    <div className="skeleton-icon"></div>
-                    <div className="skeleton-chip">
+                <div className="user-section visible" style={{ display: 'flex' }}>
+                    <div className="skeleton-icon" style={{ width: '40px', height: '40px' }}></div>
+                    <div className="skeleton-chip" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: 'var(--primary-soft)', borderRadius: '100px' }}>
                         <div className="skeleton-avatar"></div>
-                        <div className="skeleton-text skeleton-name"></div>
+                        <div className="skeleton-text" style={{ width: '80px', height: '14px' }}></div>
                     </div>
-                    <div className="skeleton-icon"></div>
+                    <div className="skeleton-icon" style={{ width: '32px', height: '32px' }}></div>
                 </div>
             </nav>
 
             <div className="home-content">
                 <header className="hero-section">
-                    <div className="skeleton-text skeleton-title"></div>
-                    <div className="skeleton-text skeleton-subtitle"></div>
+                    <div className="skeleton-text" style={{ width: '60%', height: '48px', margin: '0 auto 16px', borderRadius: '12px' }}></div>
+                    <div className="skeleton-text" style={{ width: '40%', height: '20px', margin: '0 auto', borderRadius: '8px' }}></div>
                 </header>
 
                 <div className="action-cards-row">
-                    <div className="card skeleton-card">
-                        <div className="skeleton-icon-large"></div>
-                        <div className="skeleton-text skeleton-card-title"></div>
-                        <div className="skeleton-text skeleton-card-text"></div>
+                    <div className="card quiz-card" style={{ cursor: 'default' }}>
+                        <div className="skeleton-icon-large" style={{ width: '64px', height: '64px', margin: '0 auto 24px', borderRadius: '16px' }}></div>
+                        <div className="skeleton-text" style={{ width: '50%', height: '24px', margin: '0 auto 16px' }}></div>
+                        <div className="skeleton-text" style={{ width: '80%', height: '14px', margin: '0 auto 24px' }}></div>
                         <div className="skeleton-button"></div>
                     </div>
                 </div>

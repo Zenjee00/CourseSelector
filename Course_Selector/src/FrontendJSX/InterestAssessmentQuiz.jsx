@@ -84,24 +84,42 @@ function InterestAssessmentQuiz() {
 
     // Skeleton Loader Component
     const SkeletonLoader = () => (
-        <div className="quiz-container">
-            <div className="quiz-header">
-                <div className="skeleton-text skeleton-title"></div>
-                <div className="progress-bar">
-                    <div className="progress-bar-inner" style={{ width: '0%' }}></div>
+        <div className="quiz-page">
+            <div className="quiz-container">
+                <div className="back-row" style={{ marginBottom: '20px' }}>
+                    <div className="skeleton-text" style={{ width: '120px', height: '40px', borderRadius: '12px' }}></div>
                 </div>
-            </div>
-            <div className="quiz-card">
-                <div className="skeleton-text skeleton-question"></div>
-                <div className="skeleton-options">
-                    {[...Array(4)].map((_, i) => (
-                        <div key={i} className="skeleton-button"></div>
-                    ))}
+
+                <div className="progress-wrapper">
+                    <div className="progress-info">
+                        <div className="skeleton-text" style={{ width: '150px', height: '16px' }}></div>
+                        <div className="skeleton-text" style={{ width: '60px', height: '32px' }}></div>
+                    </div>
+                    <div className="progress-bar-bg">
+                        <div className="skeleton-text" style={{ width: '100%', height: '100%', borderRadius: '20px' }}></div>
+                    </div>
                 </div>
-            </div>
-            <div className="quiz-footer">
-                <div className="skeleton-button"></div>
-                <div className="skeleton-button"></div>
+
+                <div className="quiz-card" style={{ minHeight: '280px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div className="skeleton-text" style={{ width: '90%', height: '32px', marginBottom: '12px' }}></div>
+                    <div className="skeleton-text" style={{ width: '70%', height: '32px', marginBottom: '36px' }}></div>
+                    
+                    <div className="quiz-scale">
+                        <div className="skeleton-text" style={{ width: '120px', height: '12px' }}></div>
+                        <div className="skeleton-text" style={{ width: '150px', height: '12px' }}></div>
+                    </div>
+
+                    <div className="quiz-options">
+                        {[1, 2, 3, 4, 5].map((val) => (
+                            <div key={val} className="skeleton-text" style={{ flex: 1, height: '78px', borderRadius: '18px' }}></div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="quiz-nav">
+                    <div className="skeleton-text" style={{ flex: 1, height: '54px', borderRadius: '14px' }}></div>
+                    <div className="skeleton-text" style={{ flex: 1, height: '54px', borderRadius: '14px' }}></div>
+                </div>
             </div>
         </div>
     );

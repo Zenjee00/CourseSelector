@@ -72,18 +72,28 @@ function Results() {
     const SkeletonLoader = () => (
         <div className="results-grid-full">
             {[...Array(2)].map((_, i) => (
-                <div key={i} className="result-card skeleton-card">
-                    <div className="card-header">
-                        <div className="skeleton-text skeleton-title"></div>
-                        <div className="skeleton-text skeleton-subtitle"></div>
+                <div key={i} className="detailed-card skeleton-card">
+                    <div className="card-top">
+                        <div className="skeleton-text" style={{ width: '100px', height: '24px', borderRadius: '100px' }}></div>
+                        <div className="skeleton-text" style={{ width: '80px', height: '24px', borderRadius: '12px' }}></div>
+                        <div className="skeleton-text" style={{ width: '60px', height: '32px', borderRadius: '10px' }}></div>
                     </div>
-                    <div className="card-body">
-                        <div className="skeleton-text skeleton-line"></div>
-                        <div className="skeleton-text skeleton-line"></div>
-                        <div className="skeleton-text skeleton-line"></div>
+                    
+                    <div className="skeleton-text" style={{ width: '70%', height: '32px', margin: '0 0 1.5rem 0' }}></div>
+
+                    <div className="card-mid">
+                        <div className="skeleton-text" style={{ width: '120px', height: '12px', margin: '0 0 10px 0' }}></div>
+                        <div className="skeleton-text" style={{ width: '200px', height: '36px', borderRadius: '10px', margin: '0 0 1rem 0' }}></div>
+                        <div className="program-universities">
+                             <div className="skeleton-text" style={{ width: '150px', height: '12px', margin: '0 0 12px 0' }}></div>
+                             {[...Array(2)].map((_, j) => (
+                                 <div key={j} className="skeleton-text" style={{ width: '100%', height: '40px', borderRadius: '12px', margin: '0 0 8px 0' }}></div>
+                             ))}
+                        </div>
                     </div>
-                    <div className="card-footer">
-                        <div className="skeleton-button"></div>
+                    
+                    <div className="card-bottom">
+                        <div className="skeleton-text" style={{ width: '150px', height: '14px' }}></div>
                     </div>
                 </div>
             ))}

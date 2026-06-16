@@ -35,13 +35,27 @@ function LoginRegister() {
     // Skeleton Loader Component
     const SkeletonLoader = () => (
         <div className="login-register-container">
-            <div className="form-wrapper skeleton-form">
-                <div className="skeleton-text skeleton-title"></div>
-                <div className="skeleton-text skeleton-line"></div>
-                <div className="skeleton-text skeleton-line"></div>
-                <div className="skeleton-button"></div>
-                <div className="skeleton-divider"></div>
-                <div className="skeleton-button"></div>
+            <div className="form-wrapper">
+                <div className="skeleton-text" style={{ width: '120px', height: '32px', margin: '0 auto 24px' }}></div>
+                
+                <div className="form-group">
+                    <div className="skeleton-text" style={{ width: '60px', height: '12px', marginBottom: '8px' }}></div>
+                    <div className="skeleton-text" style={{ width: '100%', height: '48px', borderRadius: '8px' }}></div>
+                </div>
+
+                <div className="form-group">
+                    <div className="skeleton-text" style={{ width: '80px', height: '12px', marginBottom: '8px' }}></div>
+                    <div className="skeleton-text" style={{ width: '100%', height: '48px', borderRadius: '8px' }}></div>
+                </div>
+
+                <div className="skeleton-button" style={{ marginTop: '24px', width: '100%' }}></div>
+                
+                <div className="divider" style={{ margin: '24px 0' }}>
+                    <div className="skeleton-text" style={{ width: '100%', height: '1px' }}></div>
+                </div>
+
+                <div className="skeleton-button" style={{ width: '100%', background: 'var(--bg-secondary)' }}></div>
+                <div className="skeleton-text" style={{ width: '180px', height: '12px', margin: '24px auto 0' }}></div>
             </div>
         </div>
     );
