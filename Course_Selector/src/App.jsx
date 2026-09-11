@@ -16,6 +16,7 @@ import {
 import { auth } from './BackendFbase/Firebase';
 import { ToastProvider } from './context/ToastContext';
 import CareerLibrary from './FrontendJSX/CareerLibrary';
+import GameModePlaceholder from './FrontendJSX/GameModePlaceholder';
 import Home from './FrontendJSX/Home';
 import InterestAssessmentQuiz from './FrontendJSX/InterestAssessmentQuiz';
 import LoginRegister from './FrontendJSX/LoginRegister';
@@ -67,7 +68,22 @@ function App() {
             <Route path="/home" element={user ? <Home /> : <Navigate to="/login" replace />} />
             <Route path="/library" element={user ? <CareerLibrary /> : <Navigate to="/login" replace />} />
             <Route path="/results" element={user ? <Results /> : <Navigate to="/login" replace />} />
-            <Route path="/quiz" element={user ? <InterestAssessmentQuiz /> : <Navigate to="/login" replace />} />
+            <Route path="/who-am-i" element={user ? <InterestAssessmentQuiz /> : <Navigate to="/login" replace />} />
+            <Route path="/quiz" element={<Navigate to="/who-am-i" replace />} />
+            <Route path="/swipe-match" element={user ? (
+              <GameModePlaceholder
+                title="Swipe Match"
+                description="Quickly explore work values, environments, and daily activities by choosing Interested or Not for Me."
+                icon="💫"
+              />
+            ) : <Navigate to="/login" replace />} />
+            <Route path="/day-in-the-life" element={user ? (
+              <GameModePlaceholder
+                title="Day in the Life"
+                description="Step into real-world career scenarios and decide how you would respond to each challenge."
+                icon="🎬"
+              />
+            ) : <Navigate to="/login" replace />} />
             <Route path="*" element={<Navigate to={user ? '/home' : '/login'} replace />} />
           </Routes>
         </div>

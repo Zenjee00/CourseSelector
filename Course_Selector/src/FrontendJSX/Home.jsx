@@ -76,9 +76,14 @@ function Home() {
         }
     };
 
-    const handleStartQuiz = () => {
+    const handleStartWhoAmI = () => {
         setMobileMenuOpen(false);
-        navigate('/quiz');
+        navigate('/who-am-i');
+    };
+
+    const handleStartMode = (path) => {
+        setMobileMenuOpen(false);
+        navigate(path);
     };
     
     // Function to navigate to the Results page
@@ -309,13 +314,29 @@ function Home() {
                 </header>
 
                 {/* ACTION CARDS - ROW LAYOUT */}
-                <div className="action-cards-row">
-                    <div className="card quiz-card">
+                <div className="action-cards-row mode-cards-row">
+                    <div className="card quiz-card mode-card">
                         <div className="card-icon">📝</div>
-                        <h3>Interest Quiz</h3>
-                        <p>Begin the assessment to receive your personalized recommendations.</p>
-                        <button onClick={handleStartQuiz} className="card-btn primary" aria-label="Start the interest quiz">
-                            Start Quiz
+                        <h3>Who am I</h3>
+                        <p>Discover your strongest interests and receive personalized course recommendations.</p>
+                        <button onClick={handleStartWhoAmI} className="card-btn primary" aria-label="Start Who am I">
+                            Start Who am I
+                        </button>
+                    </div>
+                    <div className="card mode-card">
+                        <div className="card-icon">💫</div>
+                        <h3>Swipe Match</h3>
+                        <p>Swipe through work values, environments, and everyday activities.</p>
+                        <button onClick={() => handleStartMode('/swipe-match')} className="card-btn primary" aria-label="Open Swipe Match">
+                            Explore Mode
+                        </button>
+                    </div>
+                    <div className="card mode-card">
+                        <div className="card-icon">🎬</div>
+                        <h3>Day in the Life</h3>
+                        <p>Respond to real-world career scenarios and workplace challenges.</p>
+                        <button onClick={() => handleStartMode('/day-in-the-life')} className="card-btn primary" aria-label="Open Day in the Life">
+                            Explore Mode
                         </button>
                     </div>
                 </div>

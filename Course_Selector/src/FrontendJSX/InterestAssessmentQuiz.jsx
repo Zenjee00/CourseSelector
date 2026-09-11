@@ -15,6 +15,7 @@ import {
 import { auth } from '../BackendFbase/Firebase';
 import { useToast } from '../context/ToastContext';
 import { universities } from '../data/universities';
+import { CareerInfo } from './CareerLibrary';
 
 const quizQuestions = [
   { id: 'q1', text: '1. I enjoy setting up, configuring, and maintaining computer networks or systems.', category: 'COMPUTER / IT / TECHNOLOGY' },
@@ -49,6 +50,31 @@ const quizQuestions = [
   { id: 'q30', text: '30. I adapt quickly to new tools and environments and value continuous learning and self-improvement.', category: 'General/Soft Skills' },
 ];
 
+const getTieBreakerQuestions = (categories, round) => categories.flatMap((category) => {
+  const categoryQuestions = quizQuestions.filter((question) => question.category === category);
+  if (!categoryQuestions.length) return [];
+  return [categoryQuestions[round % categoryQuestions.length]];
+});
+
+const makeUniqueScores = (scores) => {
+  const groupedScores = Object.entries(scores).reduce((groups, [category, score]) => {
+    const key = String(score);
+    groups[key] = groups[key] || [];
+    groups[key].push(category);
+    return groups;
+  }, {});
+
+  return Object.entries(scores).reduce((uniqueScores, [category, score]) => {
+    const group = groupedScores[String(score)].sort((left, right) => left.localeCompare(right));
+    const position = group.indexOf(category);
+    const precisionAdjustment = (group.length - position) * 0.001;
+    uniqueScores[category] = Number((score + precisionAdjustment).toFixed(3));
+    return uniqueScores;
+  }, {});
+};
+
+const formatScore = (score) => Number(score).toFixed(3).replace(/0+$/, '').replace(/\.$/, '');
+
 function InterestAssessmentQuiz() {
   const [answers, setAnswers] = useState({});
   const [current, setCurrent] = useState(0);
@@ -60,6 +86,7 @@ function InterestAssessmentQuiz() {
   const [tieQuestions, setTieQuestions] = useState([]);
   const [tieAnswers, setTieAnswers] = useState({});
   const [tieCurrent, setTieCurrent] = useState(0);
+  const [tieRound, setTieRound] = useState(0);
   const [baseResults, setBaseResults] = useState(null);
   const [animationClass, setAnimationClass] = useState('');
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
@@ -76,10 +103,10 @@ function InterestAssessmentQuiz() {
   const nextLabel = isSubmitting
     ? 'Submitting...'
     : isLastQuestion
-      ? (isTieBreaker ? 'Finish Tie-Breaker' : 'Finish')
+      ? (isTieBreaker ? 'Finish Tie-Breaker' : 'Finish Who am I')
       : 'Next';
   const nextAriaLabel = isLastQuestion
-    ? (isTieBreaker ? 'Finish tie-breaker quiz' : 'Finish quiz')
+    ? (isTieBreaker ? 'Finish tie-breaker' : 'Finish Who am I')
     : 'Next question';
 
     // Skeleton Loader Component
@@ -208,13 +235,13 @@ function InterestAssessmentQuiz() {
 
   const handleSubmitQuiz = async () => {
     if (Object.keys(answers).length < quizQuestions.length) {
-      showToast('Pakisagot muna ang lahat ng katanungan.', 'warning');
+      showToast('Please answer all questions before continuing.', 'warning');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      if (!auth.currentUser) throw new Error('Mangyaring mag-login muna.');
+      if (!auth.currentUser) throw new Error('Please log in before continuing.');
 
       const quizRes = calculateResults(quizQuestions, answers);
 
@@ -225,6 +252,7 @@ function InterestAssessmentQuiz() {
         setTieQuestions(tiedQs);
         setTieAnswers({});
         setTieCurrent(0);
+        setTieRound(0);
         setStage('tiebreaker');
         showToast('Tie detected. Answer the tie-breaker questions for the tied fields.', 'warning');
         return;
@@ -234,12 +262,17 @@ function InterestAssessmentQuiz() {
 
       await saveQuizResults(auth.currentUser.uid, answers, quizRes.recommendedCategory, recommendedPrograms);
 
-      setResults({ ...quizRes, recommendedPrograms, tieBreakerUsed: false });
+      setResults({
+        ...quizRes,
+        scores: makeUniqueScores(quizRes.scores),
+        recommendedPrograms,
+        tieBreakerUsed: false,
+      });
       setQuizCompleted(true);
       setBaseResults(null);
       showToast('Quiz results saved successfully.', 'success');
     } catch (error) {
-      showToast(error.message || 'Hindi ma-save ang iyong resulta.', 'error');
+      showToast(error.message || 'Your result could not be saved.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -247,20 +280,38 @@ function InterestAssessmentQuiz() {
 
   const handleSubmitTieBreaker = async () => {
     if (Object.keys(tieAnswers).length < tieQuestions.length) {
-      showToast('Sagutin muna ang lahat ng tie-breaker questions.', 'warning');
+      showToast('Please answer all tie-breaker questions before continuing.', 'warning');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      if (!auth.currentUser) throw new Error('Mangyaring mag-login muna.');
+      if (!auth.currentUser) throw new Error('Please log in before continuing.');
 
       const tieRes = calculateResults(tieQuestions, tieAnswers, tieCategories);
       const winningCategories = tieRes.topCategories;
-      const finalCategory = winningCategories[0];
+
+      let finalCategory;
+
+      if (winningCategories.length > 1 && tieRound < 2) {
+        const nextRound = tieRound + 1;
+        const nextQuestions = getTieBreakerQuestions(winningCategories, nextRound);
+
+        setTieCategories(winningCategories);
+        setTieQuestions(nextQuestions);
+        setTieAnswers({});
+        setTieCurrent(0);
+        setTieRound(nextRound);
+        setIsSubmitting(false);
+        showToast(`The tie remains. Continue with tie-breaker round ${nextRound + 1}.`, 'warning');
+        return;
+      }
 
       if (winningCategories.length > 1) {
-        showToast('Pantay pa rin ang scores. Pinili ang unang field bilang default.', 'warning');
+        finalCategory = [...winningCategories].sort((left, right) => left.localeCompare(right))[0];
+        showToast('The tie-breaker answers were identical. One field was selected consistently.', 'warning');
+      } else {
+        finalCategory = winningCategories[0];
       }
 
       const finalScores = { ...(baseResults?.scores || {}) };
@@ -278,7 +329,7 @@ function InterestAssessmentQuiz() {
       );
 
       setResults({
-        scores: finalScores,
+        scores: makeUniqueScores(finalScores),
         recommendedCategory: finalCategory,
         recommendedPrograms,
         tieBreakerUsed: true,
@@ -289,7 +340,7 @@ function InterestAssessmentQuiz() {
       setBaseResults(null);
       showToast('Tie-breaker completed. Results saved.', 'success');
     } catch (error) {
-      showToast(error.message || 'Hindi ma-save ang iyong tie-breaker resulta.', 'error');
+      showToast(error.message || 'Your tie-breaker result could not be saved.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -302,7 +353,7 @@ function InterestAssessmentQuiz() {
       <div className="quiz-page">
         <div className="quiz-container">
           <div className="quiz-results">
-            <h2 style={{ textAlign: 'center', color: 'var(--primary)' }}>🎉 Quiz Completed!</h2>
+            <h2 style={{ textAlign: 'center', color: 'var(--primary)' }}>🎉 Who am I Completed!</h2>
             <div className="recommended-field">
               <h3 style={{ margin: 0, color: 'var(--text-main)' }}>Recommended Field:</h3>
               <p className="field-name">{results.recommendedCategory}</p>
@@ -319,6 +370,7 @@ function InterestAssessmentQuiz() {
                   {results.recommendedPrograms.map((programName) => (
                     <div key={`program-${programName}`} className="program-card">
                       <div className="program-title">{programName}</div>
+                      <CareerInfo programName={programName} />
                       {getUniversitiesForProgram(programName).length ? (
                         <ul className="program-schools">
                           {getUniversitiesForProgram(programName).map((school) => (
@@ -344,7 +396,7 @@ function InterestAssessmentQuiz() {
               {Object.entries(results.scores).sort(([,a],[,b]) => b-a).map(([cat, score]) => (
                 <div key={cat} className="score-item">
                   <span>{cat}</span>
-                  <strong>{score}/15</strong>
+                  <strong>{formatScore(score)}/15</strong>
                 </div>
               ))}
             </div>
@@ -359,6 +411,7 @@ function InterestAssessmentQuiz() {
                   setTieCategories([]);
                   setTieQuestions([]);
                   setTieCurrent(0);
+                  setTieRound(0);
                   setStage('main');
                   setBaseResults(null);
               }} className="nav-btn next-btn">Retake</button>

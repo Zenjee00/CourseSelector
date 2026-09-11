@@ -14,13 +14,13 @@ import {
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
 import { universities } from '../data/universities';
-import { CareerInfo } from './CareerLibrary';
 import {
   geocodeViaProxy,
   getRoadDistanceViaProxy,
   getUserLocation,
   sortUniversitiesByDistance,
 } from '../utils/location';
+import { CareerInfo } from './CareerLibrary';
 
 const GEO_CACHE_KEY = 'course_selector_geocode_cache_v1';
 const ROUTE_CACHE_KEY = 'course_selector_route_cache_v1';
@@ -52,6 +52,25 @@ const getOriginKey = (coords) => {
 };
 
 const getRouteKey = (originKey, school) => `${originKey}=>${getSchoolKey(school)}`;
+
+const forEachWithConcurrency = async (items, concurrency, worker, onProgress) => {
+    let nextIndex = 0;
+    let completed = 0;
+
+    const runWorker = async () => {
+        while (nextIndex < items.length) {
+            const currentIndex = nextIndex;
+            nextIndex += 1;
+            await worker(items[currentIndex], currentIndex);
+            completed += 1;
+            onProgress(completed);
+        }
+    };
+
+    await Promise.all(
+        Array.from({ length: Math.min(concurrency, items.length) }, runWorker),
+    );
+};
 
 function Results() {
     const navigate = useNavigate();
@@ -189,10 +208,9 @@ function Results() {
             setGeocodingMessage('Calculating nearest schools...');
 
             const updates = {};
-            for (let i = 0; i < missingCoordsSchools.length; i += 1) {
+            await forEachWithConcurrency(missingCoordsSchools, 3, async (school) => {
                 if (cancelled) return;
 
-                const school = missingCoordsSchools[i];
                 const cacheKey = getSchoolKey(school);
                 const query = `${school.name}, ${school.location}, Philippines`;
                 const geocoded = await geocodeViaProxy(query);
@@ -201,8 +219,12 @@ function Results() {
                     updates[cacheKey] = { lat: geocoded.lat, lon: geocoded.lon, updatedAt: Date.now() };
                 }
 
-                setGeocodingProgress({ running: true, done: i + 1, total: missingCoordsSchools.length });
-            }
+                setGeocodingProgress((previous) => ({
+                    ...previous,
+                    running: true,
+                    done: previous.done + 1,
+                }));
+            }, () => {});
 
             if (!cancelled && Object.keys(updates).length) {
                 setGeocodeCache((prev) => ({ ...prev, ...updates }));
@@ -257,10 +279,9 @@ function Results() {
             setRouteProgress({ running: true, done: 0, total: missingRoutes.length });
 
             const updates = {};
-            for (let i = 0; i < missingRoutes.length; i += 1) {
+            await forEachWithConcurrency(missingRoutes, 3, async (school) => {
                 if (cancelled) return;
 
-                const school = missingRoutes[i];
                 const routeKey = getRouteKey(originKey, school);
 
                 const route = await getRoadDistanceViaProxy({
@@ -278,8 +299,12 @@ function Results() {
                     };
                 }
 
-                setRouteProgress({ running: true, done: i + 1, total: missingRoutes.length });
-            }
+                setRouteProgress((previous) => ({
+                    ...previous,
+                    running: true,
+                    done: previous.done + 1,
+                }));
+            }, () => {});
 
             if (!cancelled && Object.keys(updates).length) {
                 setRouteCache((prev) => ({ ...prev, ...updates }));

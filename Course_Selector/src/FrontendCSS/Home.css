@@ -190,6 +190,10 @@ html, body, #root {
 .library-btn { color: var(--primary); }
 .library-btn-label { font-weight: 700; }
 
+.mode-cards-row { align-items: stretch; }
+.mode-card { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.mode-card p { flex: 1; }
+
 .nav-icon-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 .saved-count {

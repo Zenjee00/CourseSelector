@@ -2,6 +2,8 @@ export const universities = [
     {
         name: 'University of the Philippines Los Banos (UPLB)',
         location: 'Laguna',
+        lat: 14.1668,
+        lon: 121.2411,
         programs: [
             'BS Agriculture',
             'BS Agribusiness',
@@ -18,6 +20,8 @@ export const universities = [
     {
         name: 'Cavite State University (CvSU) - Main Campus',
         location: 'Indang, Cavite',
+        lat: 14.1957,
+        lon: 120.8769,
         programs: [
             'BS Agriculture',
             'BS Agribusiness',
@@ -36,6 +40,8 @@ export const universities = [
     {
         name: 'Batangas State University (BatStateU)',
         location: 'Batangas',
+        lat: 13.7565,
+        lon: 121.0583,
         programs: [
             'BS Information Technology',
             'BS Computer Science',
@@ -51,6 +57,8 @@ export const universities = [
     {
         name: 'Southern Luzon State University (SLSU)',
         location: 'Quezon',
+        lat: 14.1132,
+        lon: 121.5564,
         programs: [
             'BS Nursing',
             'BS Radiologic Technology',
@@ -61,6 +69,8 @@ export const universities = [
     {
         name: 'De La Salle Medical and Health Sciences Institute (DLSMHSI)',
         location: 'Dasmarinas, Cavite',
+        lat: 14.2988,
+        lon: 120.9583,
         programs: [
             'BS Nursing',
             'BS Medical Technology',
@@ -73,6 +83,8 @@ export const universities = [
     {
         name: 'University of Perpetual Help System DALTA (UPHSD) - Binan Campus',
         location: 'Binan, Laguna',
+        lat: 14.3342,
+        lon: 121.0808,
         programs: [
             'BS Nursing',
             'BS Medical Technology',
@@ -86,6 +98,8 @@ export const universities = [
     {
         name: 'University of Perpetual Help System DALTA (UPHSD) - Calamba Campus',
         location: 'Calamba, Laguna',
+        lat: 14.2115,
+        lon: 121.1651,
         programs: [
             'BS Nursing',
             'BS Medical Technology',
@@ -99,6 +113,8 @@ export const universities = [
     {
         name: 'Emilio Aguinaldo College (EAC)',
         location: 'Dasmarinas, Cavite',
+        lat: 14.2991,
+        lon: 120.9588,
         programs: [
             'BS Nursing',
             'BS Medical Technology',
@@ -110,6 +126,8 @@ export const universities = [
     {
         name: 'Mapua Malayan Colleges Laguna (MMCL)',
         location: 'Cabuyao, Laguna',
+        lat: 14.2462,
+        lon: 121.1412,
         programs: [
             'BS Computer Science',
             'BS Information Technology',
@@ -122,6 +140,8 @@ export const universities = [
     {
         name: 'Lyceum of the Philippines University (LPU) - Cavite Campus',
         location: 'General Trias, Cavite',
+        lat: 14.3102,
+        lon: 120.8807,
         programs: [
             'BS Hospitality Management',
             'BS Hotel and Restaurant Management',
@@ -135,6 +155,8 @@ export const universities = [
     {
         name: 'Lyceum of the Philippines University (LPU) - Laguna Campus',
         location: 'Calamba, Laguna',
+        lat: 14.2115,
+        lon: 121.1651,
         programs: [
             'BS Hospitality Management',
             'BS Hotel and Restaurant Management',
@@ -148,6 +170,8 @@ export const universities = [
     {
         name: 'Lyceum of the Philippines University (LPU) - Batangas Campus',
         location: 'Batangas City, Batangas',
+        lat: 13.7565,
+        lon: 121.0583,
         programs: [
             'BS Hospitality Management',
             'BS Hotel and Restaurant Management',
@@ -161,6 +185,8 @@ export const universities = [
     {
         name: 'De La Salle University - Dasmarinas (DLSU-D)',
         location: 'Dasmarinas, Cavite',
+        lat: 14.2995,
+        lon: 120.9587,
         programs: [
             'BS Architecture',
             'BS Multimedia Arts',
@@ -175,6 +201,8 @@ export const universities = [
     {
         name: 'FEU Alabang',
         location: 'Alabang, Muntinlupa',
+        lat: 14.4254,
+        lon: 121.0348,
         programs: [
             'BS Information Technology',
             'BS Computer Science',
@@ -185,6 +213,8 @@ export const universities = [
     {
         name: 'FEU Cavite',
         location: 'Silang, Cavite',
+        lat: 14.2385,
+        lon: 120.9952,
         programs: [
             'BS Information Technology',
             'BS Computer Science',
