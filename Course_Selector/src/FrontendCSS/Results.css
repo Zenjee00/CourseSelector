@@ -255,6 +255,37 @@
     color: var(--primary);
 }
 
+.career-info {
+    display: grid;
+    gap: .8rem;
+    margin-top: 1rem;
+    padding: .9rem 0;
+    border-top: 1px dashed var(--border-color);
+}
+
+.career-info-label {
+    display: block;
+    margin-bottom: .3rem;
+    color: var(--text-muted);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+.career-info p {
+    color: var(--text-main);
+    font-size: .84rem;
+    line-height: 1.5;
+}
+
+.career-salary {
+    padding-top: .7rem;
+    border-top: 1px dashed var(--border-color);
+}
+
+.career-salary strong { color: #059669; font-size: .95rem; }
+
 .suggestions .tags {
     margin-top: 6px;
 }

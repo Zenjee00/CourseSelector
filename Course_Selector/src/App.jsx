@@ -15,6 +15,7 @@ import {
 
 import { auth } from './BackendFbase/Firebase';
 import { ToastProvider } from './context/ToastContext';
+import CareerLibrary from './FrontendJSX/CareerLibrary';
 import Home from './FrontendJSX/Home';
 import InterestAssessmentQuiz from './FrontendJSX/InterestAssessmentQuiz';
 import LoginRegister from './FrontendJSX/LoginRegister';
@@ -64,6 +65,7 @@ function App() {
             <Route path="/" element={<Navigate to={user ? '/home' : '/login'} replace />} />
             <Route path="/login" element={user ? <Navigate to="/home" replace /> : <LoginRegister />} />
             <Route path="/home" element={user ? <Home /> : <Navigate to="/login" replace />} />
+            <Route path="/library" element={user ? <CareerLibrary /> : <Navigate to="/login" replace />} />
             <Route path="/results" element={user ? <Results /> : <Navigate to="/login" replace />} />
             <Route path="/quiz" element={user ? <InterestAssessmentQuiz /> : <Navigate to="/login" replace />} />
             <Route path="*" element={<Navigate to={user ? '/home' : '/login'} replace />} />

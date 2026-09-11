@@ -14,6 +14,7 @@ import {
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
 import { universities } from '../data/universities';
+import { CareerInfo } from './CareerLibrary';
 import {
   geocodeViaProxy,
   getRoadDistanceViaProxy,
@@ -381,6 +382,7 @@ function Results() {
                                                 <div className="primary-rec">
                                                     <p className="label">Recommended Program</p>
                                                     <span className="tag primary-tag">{primary}</span>
+                                                    <CareerInfo programName={primary} />
                                                     <div className="program-universities">
                                                         <p className="program-label">Recommended Schools</p>
                                                         {primarySchools.length > 0 ? (
@@ -416,6 +418,7 @@ function Results() {
                                                         {suggestions.map((programName) => (
                                                             <div key={`schools-${programName}`} className="suggestion-schools">
                                                                 <span className="suggestion-name">{programName}</span>
+                                                                <CareerInfo programName={programName} />
                                                                 {getUniversitiesForProgram(programName).length > 0 ? (
                                                                     <ul className="university-list">
                                                                         {getUniversitiesForProgram(programName).map((school) => (

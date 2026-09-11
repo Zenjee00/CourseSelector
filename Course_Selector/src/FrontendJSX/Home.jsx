@@ -91,6 +91,11 @@ function Home() {
         }
     };
 
+    const handleViewLibrary = () => {
+        setMobileMenuOpen(false);
+        navigate('/library');
+    };
+
     const toggleTheme = () => {
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
@@ -255,6 +260,10 @@ function Home() {
                         ) : (
                             <span className="saved-count">{savedPrograms.length}</span>
                         )}
+                    </button>
+                    <button className="nav-icon-btn library-btn" onClick={handleViewLibrary} aria-label="Open career library">
+                        <span aria-hidden="true">📚</span>
+                        <span className="library-btn-label">Library</span>
                     </button>
                     <button className="profile-chip" onClick={handleOpenProfile} aria-label="View profile">
                         <span className="avatar-circle" aria-hidden="true">

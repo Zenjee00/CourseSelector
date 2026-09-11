@@ -187,6 +187,9 @@ html, body, #root {
 
 .nav-icon-btn:hover { transform: translateY(-1px); background: var(--white); }
 
+.library-btn { color: var(--primary); }
+.library-btn-label { font-weight: 700; }
+
 .nav-icon-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 .saved-count {
