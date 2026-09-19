@@ -309,13 +309,30 @@ function Home() {
 
             <div className="home-content">
                 <header className="hero-section">
+                    <p className="hero-eyebrow">ACADEMIC PATHFINDER</p>
                     <h1>Start Your <span>Dream Course</span></h1>
                     <p>Discover the right path for your future career.</p>
                 </header>
 
+                <section className="home-status-rail" aria-label="CourseSelector overview">
+                    <div className="status-pill">
+                        <span className="status-dot" aria-hidden="true"></span>
+                        <span><strong>{savedPrograms.length}</strong> saved {savedPrograms.length === 1 ? 'result' : 'results'}</span>
+                    </div>
+                    <div className="status-pill">
+                        <span className="status-icon" aria-hidden="true">◎</span>
+                        <span>Personalized course discovery</span>
+                    </div>
+                    <div className="status-pill status-pill-accent">
+                        <span className="status-icon" aria-hidden="true">✦</span>
+                        <span>Explore with confidence</span>
+                    </div>
+                </section>
+
                 {/* ACTION CARDS - ROW LAYOUT */}
                 <div className="action-cards-row mode-cards-row">
                     <div className="card quiz-card mode-card">
+                        <span className="card-badge">RECOMMENDED START</span>
                         <div className="card-icon">📝</div>
                         <h3>Who am I</h3>
                         <p>Discover your strongest interests and receive personalized course recommendations.</p>
@@ -324,6 +341,7 @@ function Home() {
                         </button>
                     </div>
                     <div className="card mode-card">
+                        <span className="card-badge">DISCOVER</span>
                         <div className="card-icon">💫</div>
                         <h3>Swipe Match</h3>
                         <p>Swipe through work values, environments, and everyday activities.</p>
@@ -332,6 +350,7 @@ function Home() {
                         </button>
                     </div>
                     <div className="card mode-card">
+                        <span className="card-badge">PRACTICE</span>
                         <div className="card-icon">🎬</div>
                         <h3>Day in the Life</h3>
                         <p>Respond to real-world career scenarios and workplace challenges.</p>

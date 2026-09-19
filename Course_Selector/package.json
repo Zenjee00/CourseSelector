@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "proxy": "node server/index.js"
+    "proxy": "node server/index.js",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.3",
@@ -33,5 +35,6 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "vite": "^7.2.4"
+   
   }
 }

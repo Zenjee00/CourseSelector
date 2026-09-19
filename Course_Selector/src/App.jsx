@@ -5,7 +5,7 @@ import {
   useState,
 } from 'react';
 
-import { onAuthStateChanged } from 'firebase/auth';
+import { onIdTokenChanged } from 'firebase/auth';
 import {
   BrowserRouter as Router,
   Navigate,
@@ -14,13 +14,15 @@ import {
 } from 'react-router-dom';
 
 import { auth } from './BackendFbase/Firebase';
+import OrbitLoader from './components/OrbitLoader';
 import { ToastProvider } from './context/ToastContext';
 import CareerLibrary from './FrontendJSX/CareerLibrary';
-import GameModePlaceholder from './FrontendJSX/GameModePlaceholder';
 import Home from './FrontendJSX/Home';
 import InterestAssessmentQuiz from './FrontendJSX/InterestAssessmentQuiz';
 import LoginRegister from './FrontendJSX/LoginRegister';
 import Results from './FrontendJSX/Results';
+import Simulator from './FrontendJSX/Simulator';
+import SwipeGame from './FrontendJSX/SwipeGame';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -34,8 +36,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onIdTokenChanged(auth, (currentUser) => {
+      // Registration creates a signed-in user before email verification.
+      // Keep that user on the login page until verification is confirmed.
+      setUser(currentUser?.emailVerified === true ? currentUser : null);
       setAuthReady(true);
     });
 
@@ -44,16 +48,8 @@ function App() {
 
   if (!authReady) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'grid',
-          placeItems: 'center',
-          fontWeight: 700,
-          color: '#4f46e5',
-        }}
-      >
-        Restoring your session...
+      <div className="app-session-loader">
+        <OrbitLoader label="Restoring your session" />
       </div>
     );
   }
@@ -70,20 +66,8 @@ function App() {
             <Route path="/results" element={user ? <Results /> : <Navigate to="/login" replace />} />
             <Route path="/who-am-i" element={user ? <InterestAssessmentQuiz /> : <Navigate to="/login" replace />} />
             <Route path="/quiz" element={<Navigate to="/who-am-i" replace />} />
-            <Route path="/swipe-match" element={user ? (
-              <GameModePlaceholder
-                title="Swipe Match"
-                description="Quickly explore work values, environments, and daily activities by choosing Interested or Not for Me."
-                icon="💫"
-              />
-            ) : <Navigate to="/login" replace />} />
-            <Route path="/day-in-the-life" element={user ? (
-              <GameModePlaceholder
-                title="Day in the Life"
-                description="Step into real-world career scenarios and decide how you would respond to each challenge."
-                icon="🎬"
-              />
-            ) : <Navigate to="/login" replace />} />
+            <Route path="/swipe-match" element={user ? <SwipeGame /> : <Navigate to="/login" replace />} />
+            <Route path="/day-in-the-life" element={user ? <Simulator /> : <Navigate to="/login" replace />} />
             <Route path="*" element={<Navigate to={user ? '/home' : '/login'} replace />} />
           </Routes>
         </div>

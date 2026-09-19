@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 import {
   createUserWithEmailAndPassword,
+  getIdTokenResult,
+  reload,
   sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -11,6 +13,7 @@ import {
 } from 'firebase/auth';
 import {
   doc,
+  getDoc,
   setDoc,
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +34,50 @@ function LoginRegister() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [infoMessage, setInfoMessage] = useState('');
+
+    // Always disconnect an unverified account, even when email delivery fails.
+    const sendVerificationAndSignOut = async (user) => {
+        try {
+            await sendEmailVerification(user);
+            setInfoMessage('Verification email sent. Check your inbox and spam folder, then log in again after verifying.');
+        } catch (verificationError) {
+            setError(verificationError.code === 'auth/too-many-requests'
+                ? 'Too many verification requests. Use the existing email link or try again later.'
+                : 'Could not send the verification email. Please log in again to retry.');
+        } finally {
+            await signOut(auth);
+        }
+    };
+
+    const requireVerifiedUser = async (user) => {
+        try {
+            await reload(user);
+            if (!user.emailVerified) {
+                await sendVerificationAndSignOut(user);
+                return false;
+            }
+            const token = await getIdTokenResult(user, true);
+            if (token.claims.email_verified !== true) {
+                throw new Error('Email verification could not be confirmed. Please log in again.');
+            }
+            return true;
+        } catch (verificationError) {
+            await signOut(auth);
+            throw verificationError;
+        }
+    };
+
+    const saveVerifiedProfile = async (user) => {
+        const ref = doc(db, 'Users', user.uid);
+        const existing = await getDoc(ref);
+        await setDoc(ref, {
+            Email: user.email,
+            Name: user.displayName || '',
+            PhotoURL: user.photoURL || '',
+            ...(!existing.exists() ? { createdAt: new Date().toISOString() } : {}),
+            lastLogin: new Date().toISOString(),
+        }, { merge: true });
+    };
 
     // Skeleton Loader Component
     const SkeletonLoader = () => (
@@ -69,15 +116,11 @@ function LoginRegister() {
         try {
             if (isLogin) {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                if (!userCredential.user.emailVerified) {
-                    await sendEmailVerification(userCredential.user);
-                    setError('Please verify your email. We sent a new verification link.');
-                    await signOut(auth);
-                    return;
-                }
+                if (!await requireVerifiedUser(userCredential.user)) return;
+                await saveVerifiedProfile(userCredential.user);
 
                 console.log('Login successful!');
-                navigate('/home');
+                navigate('/home', { replace: true });
             } else {
                 // Register logic
                 if (password !== confirmPassword) {
@@ -92,31 +135,14 @@ function LoginRegister() {
                 }
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 
-                // Save user data to Firestore Users collection
-                try {
-                    await setDoc(doc(db, 'Users', userCredential.user.uid), {
-                        Email: email,
-                        createdAt: new Date().toISOString()
-                    });
-                } catch (dbError) {
-                    console.error("Database save failed:", dbError);
-                    // Continue anyway since auth succeeded
-                }
-
-                try {
-                    await sendEmailVerification(userCredential.user);
-                    setInfoMessage('Registration successful! Verification email sent. Please verify then log in.');
-                } catch (verifyError) {
-                    setError('Account created, but sending the verification email failed. Please try logging in to resend.');
-                }
-
-                await signOut(auth);
+                // Profile creation is deferred until the first verified login.
+                await sendVerificationAndSignOut(userCredential.user);
                 setIsLogin(true);
                 setEmail('');
                 setPassword('');
                 setConfirmPassword('');
                 setShowPassword(false);
-                console.log('Registration successful! Verification email sent.');
+
             }
         } catch (error) {
             console.error('Authentication error:', error);
@@ -151,27 +177,17 @@ function LoginRegister() {
     const handleGoogleSignIn = async () => {
         setLoading(true);
         setError('');
+        setInfoMessage('');
         
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
             
-            // Try to save user data, but catch errors so login doesn't fail
-            // if permission is denied for updates
-            try {
-                await setDoc(doc(db, 'Users', user.uid), {
-                    Email: user.email,
-                    Name: user.displayName,
-                    PhotoURL: user.photoURL,
-                    lastLogin: new Date().toISOString() // Updated field name for tracking
-                }, { merge: true }); 
-            } catch (firestoreError) {
-                console.warn("Could not update user data in Firestore (Permission issue?):", firestoreError);
-                // We ignore this error and proceed to login because the user IS authenticated
-            }
-            
+            if (!await requireVerifiedUser(user)) return;
+            await saveVerifiedProfile(user);
+
             console.log('Google sign-in successful!');
-            navigate('/home');
+            navigate('/home', { replace: true });
         } catch (error) {
             console.error('Google sign-in error:', error);
             if (error.code === 'auth/popup-closed-by-user') {

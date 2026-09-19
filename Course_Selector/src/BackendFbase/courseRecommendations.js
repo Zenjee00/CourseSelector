@@ -10,6 +10,7 @@ import {
   where,
 } from 'firebase/firestore';
 
+import { normalizeProgram } from '../utils/programMatching';
 import { db } from './Firebase.js';
 
 export const CATEGORY = {
@@ -29,81 +30,128 @@ const recommendations = {
   [CATEGORY.IT]: [
     'BS Computer Science',
     'BS Information Technology',
-    'BS Information Systems',
     'BS Computer Engineering',
-    'BS Software Engineering',
-    'BS Data Science',
-    'BS Cybersecurity',
-    'BS Multimedia Computing',
-    'BS Game Development',
+    'Bachelor of Library and Information Science',
+    'BS Technical Communication',
+    'Bachelor of Science in Computer Science',
+    'Bachelor of Science in Information Technology',
+    'Bachelor of Science in Information Technology – Mobile and Web Applications',
   ],
   [CATEGORY.BIZ]: [
     'BS Accountancy',
-    'BS Management Accounting',
-    'BS Business Administration (Marketing / Finance / Operations / HR)',
-    'BS Entrepreneurship',
-    'BS Economics',
-    'BS Office Administration',
-    'BS Customs Administration',
+    'BSBA Management – Business Analytics',
+    'BS Human Capital Development',
+    'BSBA Marketing',
+    'BSBA Finance',
+    'BSBA Business Process Outsourcing',
+    'BSBA Entrepreneurship',
+    'BS Accounting Technology',
+    'BS Management',
+    'BS Marketing',
+    'Bachelor of Science in Business Administration – Marketing Management',
+    'Bachelor of Science in Office Administration',
+    'Bachelor of Science in Management Accounting',
+    'Bachelor of Science in Business Administration – Financial Management',
+    'Human Resource Management',
   ],
   [CATEGORY.HEALTH]: [
     'BS Nursing',
     'BS Medical Technology',
-    'BS Radiologic Technology',
-    'BS Pharmacy',
     'BS Physical Therapy',
-    'BS Occupational Therapy',
-    'BS Nutrition and Dietetics',
-    'BS Midwifery',
-    'BS Public Health',
   ],
   [CATEGORY.EDU]: [
-    'BS Elementary Education',
-    'BS Secondary Education (English / Math / Science / Filipino / Social Studies)',
-    'BS Special Needs Education',
-    'BS Physical Education',
+    'Bachelor of Early Childhood Education',
+    'Bachelor of Technology and Livelihood Education – Home Economics',
   ],
   [CATEGORY.SOCSCI]: [
-    'BS Criminology',
-    'BS Psychology',
-    'BS Political Science',
-    'BS Social Work',
-    'BS Sociology',
-    'BS Public Administration',
-    'BS International Studies',
+    'BA Psychology',
+    'Bachelor of Science in Psychology',
+    'Bachelor of Science in Criminology',
+    'Bachelor of Arts in Communication',
   ],
   [CATEGORY.ARTS]: [
-    'BS Architecture',
-    'BS Interior Design',
     'BS Industrial Design',
-    'BS Fine Arts',
-    'BS Multimedia Arts',
-    'BS Animation',
-    'BS Film',
-    'BS Fashion Design',
+    'BS Multimedia Arts and Sciences',
+    'BFA Theater Arts',
+    'BS Digital Illustration and Animation',
+    'BA Communication',
+    'BA Literature',
+    'Bachelor of Fine Arts',
   ],
   [CATEGORY.AGRI]: [
-    'BS Agriculture',
-    'BS Agribusiness',
-    'BS Agricultural Engineering',
-    'BS Fisheries',
-    'BS Forestry',
-    'BS Environmental Science',
+    'BS Environmental Planning and Management',
+    'BS Geological Science and Engineering',
+    'BS Geology',
+    'BS Environmental and Sanitary Engineering',
   ],
   [CATEGORY.HOSP]: [
-    'BS Hospitality Management',
     'BS Hotel and Restaurant Management',
+    'BS Hotel Management',
     'BS Tourism Management',
-    'BS Culinary Arts',
+    'BS Leisure and Tourism Management',
+    'Bachelor in International Hotel Management',
+    'Bachelor of Science in Hospitality Management',
+    'Bachelor of Science in Tourism Management',
   ],
   [CATEGORY.SCI]: [
-    'BS Biology',
     'BS Chemistry',
-    'BS Physics',
-    'BS Mathematics',
-    'BS Applied Mathematics',
-    'BS Statistics',
+    'BS Biological Engineering',
+    'BS Materials Science and Engineering',
+    'BS Manufacturing Engineering',
+    'BS Management Science and Engineering',
+    'BS Service Engineering and Management',
+    'BS Civil Engineering',
+    'BS Electronics Engineering',
+    'BS Electrical Engineering',
+    'BS Industrial Engineering',
+    'BS Mechanical Engineering',
+    'BS Chemical Engineering',
+    'Bachelor of Industrial Technology – Automotive Technology',
+    'Bachelor of Industrial Technology – Drafting Technology',
+    'Bachelor of Industrial Technology – Electrical Technology',
+    'Bachelor of Industrial Technology – Electronics Technology',
+    'Bachelor of Industrial Technology – Food Trades',
+    'Bachelor of Science in Computer Engineering',
+    'Bachelor of Science in Civil Engineering',
+    'Bachelor of Science in Architecture',
+    'Bachelor of Physical Education',
   ],
+};
+
+const canonicalProgramNames = new Map([
+  ['BS Computer Science', 'BS Computer Science'],
+  ['Bachelor of Science in Computer Science', 'BS Computer Science'],
+  ['BS Information Technology', 'BS Information Technology'],
+  ['Bachelor of Science in Information Technology', 'BS Information Technology'],
+  ['BS Computer Engineering', 'BS Computer Engineering'],
+  ['Bachelor of Science in Computer Engineering', 'BS Computer Engineering'],
+  ['BS Accountancy', 'BS Accountancy'],
+  ['Bachelor of Science in Accountancy', 'BS Accountancy'],
+  ['BS Psychology', 'BS Psychology'],
+  ['Bachelor of Science in Psychology', 'BS Psychology'],
+  ['BS Hospitality Management', 'BS Hospitality Management'],
+  ['Bachelor of Science in Hospitality Management', 'BS Hospitality Management'],
+  ['BS Tourism Management', 'BS Tourism Management'],
+  ['Bachelor of Science in Tourism Management', 'BS Tourism Management'],
+  ['BS Civil Engineering', 'BS Civil Engineering'],
+  ['Bachelor of Science in Civil Engineering', 'BS Civil Engineering'],
+]);
+
+const canonicalizeProgram = (programName) => {
+  if (typeof programName !== 'string') return null;
+  const trimmedName = programName.trim();
+  return canonicalProgramNames.get(trimmedName) || trimmedName;
+};
+
+const dedupePrograms = (programs = []) => {
+  const uniquePrograms = new Map();
+  programs.forEach((programName) => {
+    const canonicalName = canonicalizeProgram(programName);
+    if (!canonicalName) return;
+    const key = normalizeProgram(canonicalName);
+    if (!uniquePrograms.has(key)) uniquePrograms.set(key, canonicalName);
+  });
+  return [...uniquePrograms.values()];
 };
 
 // Get recommendations from Programs collection (with fallback to static data)
@@ -129,15 +177,15 @@ export async function getRecommendedPrograms(category) {
           programs.push(data.name);
         }
       });
-      return programs;
+      return dedupePrograms(programs);
     } else {
       // Fallback to static data if no data in Firebase
-      return recommendations[category] || [];
+      return dedupePrograms(recommendations[category] || []);
     }
   } catch (error) {
     console.error('Error fetching from Programs collection:', error);
     // Fallback to static data on error
-    return recommendations[category] || [];
+    return dedupePrograms(recommendations[category] || []);
   }
 }
 
@@ -147,7 +195,7 @@ export async function initializeRecommendationsInFirebase() {
     for (const [category, programs] of Object.entries(recommendations)) {
       await setDoc(doc(db, 'Programs', category), {
         category: category,
-        programs: programs,
+        programs: dedupePrograms(programs),
         lastUpdated: new Date()
       });
     }
@@ -188,7 +236,7 @@ export async function saveQuizResults(userId, answers, recommendedCategory, reco
 
     await addDoc(collection(db, 'Programs'), {
       userId: userId,
-      recommendedPrograms: recommendedPrograms,
+      recommendedPrograms: dedupePrograms(recommendedPrograms),
       Score: totalScore,
       Recommended_Field: recommendedField, // Now stores the simplified field name
       timestamp: new Date()

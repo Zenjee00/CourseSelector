@@ -348,10 +348,12 @@ function InterestAssessmentQuiz() {
 
   if (quizCompleted && results) {
     const topScoreValue = Math.max(...Object.values(results.scores || {}));
+    const rankedScores = Object.entries(results.scores || {})
+      .sort(([, leftScore], [, rightScore]) => rightScore - leftScore);
 
     return (
       <div className="quiz-page">
-        <div className="quiz-container">
+        <div className="quiz-container quiz-results-container">
           <div className="quiz-results">
             <h2 style={{ textAlign: 'center', color: 'var(--primary)' }}>🎉 Who am I Completed!</h2>
             <div className="recommended-field">
@@ -362,6 +364,24 @@ function InterestAssessmentQuiz() {
               <p className="tie-note">Tie-breaker applied for {results.tieBreakerCategories.join(' • ')}.</p>
             )}
             <p className="top-score">Highest score: {topScoreValue}/15</p>
+
+            <div className="category-scores">
+              <h3>Interest Breakdown:</h3>
+              <div className="score-grid">
+                {rankedScores.map(([cat, score], index) => (
+                  <div
+                    key={cat}
+                    className={`score-item score-rank-${index + 1}${index > 2 ? ' score-rank-other' : ''}`}
+                  >
+                    <small className="score-rank-label">
+                      {index === 0 ? 'Highest score' : index === 1 ? '2nd highest' : index === 2 ? '3rd highest' : `Rank ${index + 1}`}
+                    </small>
+                    <span>{cat}</span>
+                    <strong>{formatScore(score)}/15</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <div className="recommended-programs">
               <h3>Recommended Programs and Schools</h3>
@@ -389,16 +409,6 @@ function InterestAssessmentQuiz() {
               ) : (
                 <p className="quiz-no-schools">No recommended programs found.</p>
               )}
-            </div>
-            
-            <div className="category-scores">
-              <h3>Interest Breakdown:</h3>
-              {Object.entries(results.scores).sort(([,a],[,b]) => b-a).map(([cat, score]) => (
-                <div key={cat} className="score-item">
-                  <span>{cat}</span>
-                  <strong>{formatScore(score)}/15</strong>
-                </div>
-              ))}
             </div>
 
             <div className="quiz-nav">

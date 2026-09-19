@@ -1,6 +1,6 @@
 import '../FrontendCSS/Results.css';
 
-import React, {
+import {
   useEffect,
   useRef,
   useState,
@@ -13,6 +13,7 @@ import {
   getUserSavedPrograms,
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
+import OrbitLoader from '../components/OrbitLoader';
 import { universities } from '../data/universities';
 import {
   geocodeViaProxy,
@@ -20,6 +21,10 @@ import {
   getUserLocation,
   sortUniversitiesByDistance,
 } from '../utils/location';
+import {
+  getSchoolsForProgram as getCatalogSchoolsForProgram,
+} from '../utils/programCatalog';
+import { programsMatch } from '../utils/programMatching';
 import { CareerInfo } from './CareerLibrary';
 
 const GEO_CACHE_KEY = 'course_selector_geocode_cache_v1';
@@ -88,38 +93,6 @@ function Results() {
 
     const originKey = getOriginKey(userLocation);
 
-    // Skeleton Loader Component
-    const SkeletonLoader = () => (
-        <div className="results-grid-full">
-            {[...Array(2)].map((_, i) => (
-                <div key={i} className="detailed-card skeleton-card">
-                    <div className="card-top">
-                        <div className="skeleton-text" style={{ width: '100px', height: '24px', borderRadius: '100px' }}></div>
-                        <div className="skeleton-text" style={{ width: '80px', height: '24px', borderRadius: '12px' }}></div>
-                        <div className="skeleton-text" style={{ width: '60px', height: '32px', borderRadius: '10px' }}></div>
-                    </div>
-                    
-                    <div className="skeleton-text" style={{ width: '70%', height: '32px', margin: '0 0 1.5rem 0' }}></div>
-
-                    <div className="card-mid">
-                        <div className="skeleton-text" style={{ width: '120px', height: '12px', margin: '0 0 10px 0' }}></div>
-                        <div className="skeleton-text" style={{ width: '200px', height: '36px', borderRadius: '10px', margin: '0 0 1rem 0' }}></div>
-                        <div className="program-universities">
-                             <div className="skeleton-text" style={{ width: '150px', height: '12px', margin: '0 0 12px 0' }}></div>
-                             {[...Array(2)].map((_, j) => (
-                                 <div key={j} className="skeleton-text" style={{ width: '100%', height: '40px', borderRadius: '12px', margin: '0 0 8px 0' }}></div>
-                             ))}
-                        </div>
-                    </div>
-                    
-                    <div className="card-bottom">
-                        <div className="skeleton-text" style={{ width: '150px', height: '14px' }}></div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-
     useEffect(() => {
         localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(geocodeCache));
     }, [geocodeCache]);
@@ -130,15 +103,20 @@ function Results() {
 
     const getUniversitiesForProgram = (programName) => {
         if (!programName) return [];
-        const schools = universities
-            .filter((university) => university.programs.includes(programName))
+        const schools = getCatalogSchoolsForProgram(programName)
             .map((school) => {
+                const { matchedProgram } = school;
                 const cacheKey = getSchoolKey(school);
                 const cachedCoords = geocodeCache[cacheKey];
                 const routeKey = getRouteKey(originKey, school);
                 const cachedRoute = routeCache[routeKey];
                 return {
                     ...school,
+                    matchedProgram,
+                    campus: school.campus,
+                    region: school.region,
+                    duration: school.programDetails?.[matchedProgram]?.duration ?? 'Not publicly specified',
+                    programStatus: school.programDetails?.[matchedProgram]?.status ?? 'Not publicly specified',
                     lat: school.lat ?? cachedCoords?.lat ?? null,
                     lon: school.lon ?? cachedCoords?.lon ?? null,
                     routeDistanceKm: cachedRoute?.distanceKm ?? null,
@@ -190,7 +168,7 @@ function Results() {
         });
 
         const schoolsToCheck = universities.filter((school) =>
-            school.programs?.some((programName) => allProgramNames.has(programName))
+            school.programs?.some((listedProgram) => [...allProgramNames].some((programName) => programsMatch(programName, listedProgram)))
         );
 
         const missingCoordsSchools = schoolsToCheck.filter((school) => {
@@ -254,7 +232,7 @@ function Results() {
         });
 
         const schoolsToCheck = universities
-            .filter((school) => school.programs?.some((programName) => allProgramNames.has(programName)))
+            .filter((school) => school.programs?.some((listedProgram) => [...allProgramNames].some((programName) => programsMatch(programName, listedProgram))))
             .map((school) => {
                 const cacheKey = getSchoolKey(school);
                 const cachedCoords = geocodeCache[cacheKey];
@@ -376,7 +354,9 @@ function Results() {
                 </header>
 
                 {loading ? (
-                    <SkeletonLoader />
+                    <div className="results-loading-state">
+                        <OrbitLoader label="Loading your results" />
+                    </div>
                 ) : (
                     <div className="results-grid-full">
                         {savedPrograms.length > 0 ? (
@@ -415,7 +395,9 @@ function Results() {
                                                                 {primarySchools.map((school) => (
                                                                     <li key={`${primary}-${school.name}`}>
                                                                         <span className="school-name">{school.name}</span>
-                                                                        <span className="school-location">{school.location}</span>
+                                                                        <span className="school-location">{school.campus} · {school.region}</span>
+                                                                        <span className="school-duration">{school.duration}</span>
+                                                                        <span className="school-status">{school.programStatus}</span>
                                                                         {school.routeDistanceKm != null ? (
                                                                             <span className="school-distance"> {Math.round(school.routeDistanceKm)} km away</span>
                                                                         ) : school.distance != null ? (
@@ -449,7 +431,9 @@ function Results() {
                                                                         {getUniversitiesForProgram(programName).map((school) => (
                                                                             <li key={`${programName}-${school.name}`}>
                                                                                 <span className="school-name">{school.name}</span>
-                                                                                <span className="school-location">{school.location}</span>
+                                                                                <span className="school-location">{school.campus} · {school.region}</span>
+                                                                                <span className="school-duration">{school.duration}</span>
+                                                                                <span className="school-status">{school.programStatus}</span>
                                                                                 {school.routeDistanceKm != null ? (
                                                                                     <span className="school-distance"> {Math.round(school.routeDistanceKm)} km away</span>
                                                                                 ) : school.distance != null ? (

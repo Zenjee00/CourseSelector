@@ -1,4 +1,4 @@
-export const universities = [
+const legacyUniversities = [
     {
         name: 'University of the Philippines Los Banos (UPLB)',
         location: 'Laguna',
@@ -223,3 +223,292 @@ export const universities = [
         ],
     },
 ];
+const program = (name, duration, status = 'Verified') => ({ name, duration, status });
+
+const pdfUniversities = [
+    {
+        name: 'Miriam College',
+        location: 'Quezon City, Metro Manila',
+        lat: 14.6408,
+        lon: 121.0747,
+        programs: [
+            program('BS Leisure and Tourism Management', '4 years'),
+            program('Bachelor of Early Childhood Education', '4 years'),
+            program('BS Environmental Planning and Management', '4 years', 'Strongly supported'),
+            program('Bachelor of Applied Arts major in Visual Design', '4 years', 'Strongly supported'),
+        ],
+    },
+    {
+        name: 'University of Asia and the Pacific',
+        location: 'Pasig City, Metro Manila',
+        lat: 14.5764,
+        lon: 121.0618,
+        programs: [
+            program('BSBA Management – Business Analytics', '4 years'),
+            program('BS Human Capital Development', '4 years'),
+        ],
+    },
+    {
+        name: 'Silliman University',
+        location: 'Dumaguete City, Negros Oriental',
+        lat: 9.3103,
+        lon: 123.3074,
+        programs: [
+            program('BS Information Technology', '4 years'),
+            program('BS Accountancy', '4 years'),
+            program('BS Nursing', '4 years'),
+            program('BS Medical Technology', '4 years'),
+            program('BS Physical Therapy', '4 years'),
+        ],
+    },
+    {
+        name: 'La Salle University - Ozamiz',
+        location: 'Ozamiz City, Misamis Occidental',
+        lat: 8.1481,
+        lon: 123.8416,
+        programs: [
+            program('Bachelor of Library and Information Science', '4 years', 'Strongly supported'),
+            program('BS Nursing', '4 years'),
+        ],
+    },
+    {
+        name: 'National College of Science and Technology',
+        location: 'Dasmarinas, Cavite',
+        lat: 14.2995,
+        lon: 120.9587,
+        programs: [
+            program('BS Industrial Engineering', '4 years', 'Strongly supported'),
+            program('BS Accountancy', '4 years', 'Strongly supported'),
+            program('BS Computer Science', '4 years', 'Strongly supported'),
+        ],
+    },
+    {
+        name: 'Mapúa University',
+        location: 'Intramuros, Manila',
+        lat: 14.5906,
+        lon: 120.9754,
+        programs: [
+            program('BS Industrial Design', '3.5 years'),
+            program('BS Biological Engineering', '3 years and 1 term'),
+            program('BS Manufacturing Engineering', '3 years and 1 term'),
+            program('BS Geological Science and Engineering', 'Not publicly specified', 'Not publicly specified'),
+            program('BS Management Science and Engineering', 'Not publicly specified', 'Not publicly specified'),
+            program('BS Service Engineering and Management', 'Not publicly specified', 'Not publicly specified'),
+            program('BS Multimedia Arts and Sciences', '3 years and 1 term', 'Strongly supported'),
+            program('BS Civil Engineering', '3 years and 2 terms', 'Strongly supported'),
+            program('BS Computer Engineering', '3 years and 1 term', 'Strongly supported'),
+            program('BS Electronics Engineering', '3 years'),
+            program('BS Computer Science', '3 years'),
+            program('BS Geology', '3 years and 1 term'),
+            program('BS Materials Science and Engineering', '3 years and 1 term'),
+            program('BS Electrical Engineering', '3 years and 1 term'),
+            program('BS Industrial Engineering', '3.5 years'),
+            program('BS Mechanical Engineering', '3 years and 1 term'),
+            program('BS Information Technology', '3 years'),
+            program('BS Technical Communication', 'Not publicly specified', 'Not publicly specified'),
+            program('BS Hotel and Restaurant Management', 'Not publicly specified', 'Not publicly specified'),
+            program('BS Environmental and Sanitary Engineering', '3 years and 1 term'),
+            program('BS Chemical Engineering', '3 years and 1 term'),
+            program('BS Chemistry', '3 years and 1 term'),
+            program('BA Psychology', '3 years', 'Strongly supported'),
+        ],
+    },
+    {
+        name: 'Ateneo de Manila University',
+        location: 'Quezon City, Metro Manila',
+        lat: 14.6406,
+        lon: 121.0777,
+        programs: [
+            program('BFA Theater Arts', '4 years', 'Strongly supported'),
+            program('BS Computer Science', '4 years'),
+        ],
+    },
+    {
+        name: 'National University',
+        location: 'Manila, Metro Manila',
+        lat: 14.6089,
+        lon: 120.9895,
+        programs: [
+            program('BS Electrical Engineering', '4 years', 'Strongly supported'),
+            program('BS Accountancy', '4 years', 'Strongly supported'),
+        ],
+    },
+    {
+        name: 'Ateneo de Naga University',
+        location: 'Naga City, Camarines Sur',
+        lat: 13.6254,
+        lon: 123.1851,
+        programs: [
+            program('BS Accountancy', '4 years', 'Strongly supported'),
+            program('BS Digital Illustration and Animation', '4 years', 'Strongly supported'),
+            program('BS Computer Engineering', '5 years (historical); current duration not specified', 'Legacy/Historical'),
+        ],
+    },
+    {
+        name: 'Pasig Catholic College',
+        location: 'Pasig City, Metro Manila',
+        lat: 14.5609,
+        lon: 121.0765,
+        programs: [
+            program('BS Accountancy', '4 years', 'Strongly supported'),
+            program('BS Information Technology', '4 years', 'Strongly supported'),
+        ],
+    },
+    {
+        name: 'UERM Memorial Medical Center',
+        location: 'Quezon City, Metro Manila',
+        lat: 14.6265,
+        lon: 121.0618,
+        programs: [program('BS Nursing', '4 years')],
+    },
+    {
+        name: 'Vatel Manila',
+        location: 'Makati City, Metro Manila',
+        lat: 14.5547,
+        lon: 121.0244,
+        programs: [program('Bachelor in International Hotel Management', '3 years')],
+    },
+    {
+        name: 'University of Santo Tomas',
+        location: 'Manila, Metro Manila',
+        lat: 14.6091,
+        lon: 120.9897,
+        programs: [
+            program('BS Computer Science', '4 years'),
+            program('BS Chemical Engineering', '4 years'),
+            program('BS Accountancy', '4 years'),
+        ],
+    },
+    {
+        name: 'World Citi Colleges',
+        location: 'Quezon City, Metro Manila',
+        lat: 14.6308,
+        lon: 121.0694,
+        programs: [
+            program('BS Accountancy', '4 years', 'Strongly supported'),
+            program('BA Communication', '4 years', 'Strongly supported'),
+        ],
+    },
+    {
+        name: 'De La Salle Araneta University',
+        location: 'Malabon City, Metro Manila',
+        lat: 14.6598,
+        lon: 120.9683,
+        programs: [program('BS Computer Science', '4 years', 'Strongly supported')],
+    },
+    {
+        name: 'Kalayaan College',
+        location: 'Quezon City, Metro Manila',
+        lat: 14.6442,
+        lon: 121.0611,
+        programs: [
+            program('BS Hotel and Restaurant Management', '4 years (historical)', 'No longer current'),
+            program('BA Literature', '4 years (historical)', 'No longer current'),
+            program('Bachelor of Fine Arts', 'Not publicly specified', 'No longer current'),
+        ],
+    },
+    {
+        name: 'Central Colleges of the Philippines',
+        location: 'Quezon City, Metro Manila',
+        lat: 14.6317,
+        lon: 121.0595,
+        programs: [
+            program('BS Electrical Engineering', '4 years', 'Strongly supported'),
+            program('BS Industrial Engineering', '5 years (historical)', 'Legacy/Historical'),
+            program('BS Marketing', '4 years', 'Strongly supported'),
+            program('BS Civil Engineering', '4 years', 'Strongly supported'),
+            program('BS Management', '4 years (historical)', 'Legacy/Historical'),
+            program('BS Tourism Management', '4 years (historical)', 'Legacy/Historical'),
+            program('BS Mechanical Engineering', '4 years', 'Strongly supported'),
+            program('BS Hotel Management', '4 years (historical)', 'Legacy/Historical'),
+        ],
+    },
+    {
+        name: 'Aldersgate College',
+        location: 'Solano, Nueva Vizcaya',
+        lat: 16.5182,
+        lon: 121.1815,
+        programs: [
+            program('BSBA Marketing', '4 years'),
+            program('BSBA Finance', '4 years'),
+            program('BSBA Business Process Outsourcing', '4 years', 'Strongly supported'),
+            program('BS Accountancy', '4 years'),
+            program('BS Electrical Engineering', '4 years'),
+            program('BSBA Entrepreneurship', '4 years (historical)', 'Legacy/Historical'),
+            program('BS Accounting Technology', '4 years (historical)', 'Legacy/Historical'),
+            program('BS Civil Engineering', '4 years'),
+        ],
+    },
+    {
+        name: 'EARIST - Cavite Branch (GMA)',
+        location: 'General Mariano Alvarez, Cavite',
+        lat: 14.3007,
+        lon: 121.0012,
+        programs: [
+            program('Bachelor of Industrial Technology – Automotive Technology', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Industrial Technology – Drafting Technology', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Industrial Technology – Electrical Technology', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Industrial Technology – Electronics Technology', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Industrial Technology – Food Trades', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Science in Business Administration – Marketing Management', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Science in Computer Science', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Science in Criminology', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Science in Hospitality Management', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Science in Information Technology', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Science in Office Administration', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Science in Psychology', '4 years (normal full-time)', 'Not explicitly published'),
+            program('Bachelor of Technology and Livelihood Education – Home Economics', '4 years (normal full-time)', 'Not explicitly published'),
+        ],
+    },
+    {
+        name: 'National University - Dasmariñas',
+        location: 'Dasmariñas, Cavite',
+        lat: 14.2995,
+        lon: 120.9587,
+        programs: [
+            program('Bachelor of Science in Accountancy', '4 years'),
+            program('Bachelor of Science in Management Accounting', '4 years'),
+            program('Bachelor of Science in Business Administration – Financial Management', '4 years'),
+            program('Bachelor of Science in Business Administration – Marketing Management', '4 years'),
+            program('Human Resource Management', '4 years'),
+            program('Bachelor of Science in Hospitality Management', '4 years'),
+            program('Bachelor of Science in Tourism Management', '4 years'),
+            program('Bachelor of Science in Information Technology – Mobile and Web Applications', '4 years'),
+            program('Bachelor of Science in Computer Science', '4 years'),
+            program('Bachelor of Science in Computer Engineering', '4 years'),
+            program('Bachelor of Science in Civil Engineering', '4 years'),
+            program('Bachelor of Science in Architecture', '5 years'),
+            program('Bachelor of Science in Psychology', '4 years'),
+            program('Bachelor of Arts in Communication', '3 years + 1 term'),
+            program('Bachelor of Physical Education', '4 years'),
+        ],
+    },
+];
+
+// Keep both catalogs while exposing duration metadata to views.
+export const universities = [...pdfUniversities, ...legacyUniversities];
+
+const getRegionFromLocation = (location) => {
+    if (/Metro Manila|Manila|Muntinlupa|Makati|Malabon|Pasig|Quezon City/i.test(location)) return 'National Capital Region';
+    if (/Cavite|Laguna|Batangas|Quezon/i.test(location)) return 'Calabarzon';
+    if (/Nueva Vizcaya/i.test(location)) return 'Cagayan Valley';
+    if (/Camarines Sur/i.test(location)) return 'Bicol Region';
+    if (/Negros Oriental/i.test(location)) return 'Central Visayas';
+    if (/Misamis Occidental/i.test(location)) return 'Northern Mindanao';
+    return 'Philippines';
+};
+
+universities.forEach((university) => {
+    const normalizedPrograms = university.programs.map((entry) => (
+        typeof entry === 'string'
+            ? { name: entry, duration: 'Not publicly specified', status: 'Not publicly specified' }
+            : entry
+    ));
+
+    university.programDetails = Object.fromEntries(
+        normalizedPrograms.map(({ name, duration, status }) => [name, { duration, status }]),
+    );
+    university.programs = normalizedPrograms.map(({ name }) => name);
+    university.campus = university.campus || university.location;
+    university.region = university.region || getRegionFromLocation(university.location);
+});

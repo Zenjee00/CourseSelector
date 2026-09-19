@@ -1,3 +1,8 @@
+import {
+  getCanonicalPrograms,
+  getProgramDetails,
+} from '../utils/programCatalog';
+
 const careerLibrary = {
   'BS Computer Science': { jobs: ['Junior Programmer', 'Software Developer', 'Systems Analyst', 'IT Staff'], salary: 'PHP 18,000 - PHP 50,000' },
   'BS Information Technology': { jobs: ['IT Support/Staff', 'Systems Analyst', 'Junior Software Developer', 'IT Administrator'], salary: 'PHP 16,000 - PHP 25,000' },
@@ -61,10 +66,73 @@ const careerLibrary = {
   'BS Statistics': { jobs: ['Statistical Assistant', 'Data Analyst', 'Statistician'], salary: 'PHP 15,000 - PHP 30,000' },
 };
 
-export const getCareerInfo = (programName) => careerLibrary[programName] || {
-  jobs: ['Entry-level roles related to this program'],
-  salary: 'Salary estimate unavailable',
+const careerFamilyProfiles = [
+  {
+    keywords: ['computer', 'information technology', 'information systems', 'software', 'data science', 'cybersecurity', 'technical communication'],
+    jobs: ['Junior Software Developer', 'IT Support Specialist', 'Systems Analyst'],
+    salary: 'PHP 18,000 - PHP 35,000',
+  },
+  {
+    keywords: ['accountancy', 'accounting', 'business', 'management', 'marketing', 'finance', 'entrepreneurship', 'economics', 'human capital', 'customs', 'office administration'],
+    jobs: ['Business Operations Assistant', 'Management Trainee', 'Administrative Associate'],
+    salary: 'PHP 15,000 - PHP 28,000',
+  },
+  {
+    keywords: ['nursing', 'medical technology', 'radiologic', 'pharmacy', 'physical therapy', 'occupational therapy', 'nutrition', 'midwifery', 'public health'],
+    jobs: ['Healthcare Assistant', 'Clinic Staff', 'Medical Services Associate'],
+    salary: 'PHP 16,000 - PHP 28,000',
+  },
+  {
+    keywords: ['education', 'early childhood', 'special needs', 'physical education'],
+    jobs: ['Teaching Assistant', 'Education Program Assistant', 'Learning Support Staff'],
+    salary: 'PHP 15,000 - PHP 32,000',
+  },
+  {
+    keywords: ['criminology', 'psychology', 'political', 'social work', 'sociology', 'public administration', 'international studies', 'communication', 'literature'],
+    jobs: ['Research Assistant', 'Community Development Associate', 'Administrative Staff'],
+    salary: 'PHP 15,000 - PHP 28,000',
+  },
+  {
+    keywords: ['architecture', 'interior design', 'industrial design', 'fine arts', 'multimedia', 'animation', 'film', 'fashion', 'theater', 'visual design'],
+    jobs: ['Design Assistant', 'Junior Creative Associate', 'Production Assistant'],
+    salary: 'PHP 15,000 - PHP 28,000',
+  },
+  {
+    keywords: ['agriculture', 'agribusiness', 'fisheries', 'forestry', 'environmental', 'geology'],
+    jobs: ['Field Technician', 'Environmental Assistant', 'Agricultural Associate'],
+    salary: 'PHP 15,000 - PHP 28,000',
+  },
+  {
+    keywords: ['hospitality', 'hotel', 'tourism', 'culinary', 'leisure'],
+    jobs: ['Guest Services Associate', 'Hotel or Restaurant Staff', 'Tourism Assistant'],
+    salary: 'PHP 12,000 - PHP 28,000',
+  },
+  {
+    keywords: ['engineering', 'biology', 'chemistry', 'physics', 'mathematics', 'statistics', 'science'],
+    jobs: ['Junior Technical Associate', 'Laboratory Assistant', 'Research Assistant'],
+    salary: 'PHP 16,000 - PHP 30,000',
+  },
+];
+
+const normalizeProgramName = (programName) => programName
+  .toLowerCase()
+  .replace(/[^a-z0-9 ]/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+export const getCareerInfo = (programName) => {
+  if (careerLibrary[programName]) return careerLibrary[programName];
+
+  const normalizedName = normalizeProgramName(programName || '');
+  const matchingProfile = careerFamilyProfiles.find((profile) => profile.keywords
+    .some((keyword) => normalizedName.includes(keyword)));
+
+  return matchingProfile || {
+    jobs: ['Entry-level roles related to this program', 'Industry trainee', 'Program assistant'],
+    salary: 'Salary estimate unavailable',
+  };
 };
 
-export const careerPrograms = Object.keys(careerLibrary);
+export { getProgramDetails };
+export const careerPrograms = getCanonicalPrograms();
 export default careerLibrary;

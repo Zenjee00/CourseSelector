@@ -1,0 +1,76 @@
+.orbit-loader {
+  display: grid;
+  justify-items: center;
+  gap: .7rem;
+  color: var(--text-main, #1e293b);
+}
+
+.orbit-loader-svg {
+  width: 9rem;
+  height: 9rem;
+  display: block;
+}
+
+.orbit-ring {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-dasharray: 190 190;
+  transform-origin: 80px 80px;
+}
+
+.orbit-ring-primary {
+  stroke: hsl(223 90% 55%);
+  animation: orbit-ring-spin 1.8s linear infinite, orbit-ring-pulse 1.8s ease-in-out infinite;
+}
+
+.orbit-ring-secondary {
+  stroke: hsl(193 90% 55%);
+  stroke-dashoffset: 190;
+  animation: orbit-ring-spin-reverse 1.8s linear infinite, orbit-ring-pulse 1.8s ease-in-out infinite reverse;
+}
+
+.orbit-core {
+  fill: hsl(333 90% 55%);
+  animation: orbit-core-pulse 1.2s ease-in-out infinite;
+}
+
+.orbit-ticks {
+  fill: none;
+  stroke: var(--text-muted, #64748b);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: .75;
+}
+
+.orbit-loader-label {
+  color: var(--text-muted, #64748b);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+@keyframes orbit-ring-spin {
+  from { transform: rotate(-45deg); }
+  to { transform: rotate(315deg); }
+}
+
+@keyframes orbit-ring-spin-reverse {
+  from { transform: rotate(135deg); }
+  to { transform: rotate(-225deg); }
+}
+
+@keyframes orbit-ring-pulse {
+  0%, 100% { stroke-dashoffset: 190; }
+  50% { stroke-dashoffset: 70; }
+}
+
+@keyframes orbit-core-pulse {
+  0%, 100% { transform: scale(1); transform-origin: 80px 80px; }
+  50% { transform: scale(1.35); transform-origin: 80px 80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-ring,
+  .orbit-core { animation: none; }
+}
