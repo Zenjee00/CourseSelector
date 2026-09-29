@@ -19,6 +19,7 @@ import {
   sortUniversitiesByDistance,
 } from '../utils/location';
 import {
+  formatTuition,
   getProgramKey,
   getSchoolsForProgram,
 } from '../utils/programCatalog';
@@ -47,6 +48,14 @@ function getCategory(programName) {
   if (/Agriculture|Agribusiness|Fisheries|Forestry|Environmental/.test(programName)) return 'Agriculture';
   if (/Hospitality|Hotel|Tourism|Culinary/.test(programName)) return 'Hospitality';
   return 'Science';
+}
+
+function getSchoolTuition(school) {
+  const tuitionText = school.details?.tuitionFee ?? school.tuitionFee;
+  if (typeof tuitionText === 'string' && tuitionText.trim()) return tuitionText;
+
+  const tuitionData = school.details?.tuition ?? school.tuition;
+  return formatTuition(tuitionData);
 }
 
 function CareerInfo({ programName, showDuration = true }) {
@@ -266,6 +275,7 @@ function CareerLibrary() {
                         )}
                       </div>
                       <div className="library-school-meta">
+                        <span>Tuition: {getSchoolTuition(school)}</span>
                         <span>{school.details?.duration || 'Not publicly specified'}</span>
                         <small>{school.details?.status || 'Not publicly specified'}</small>
                         {school.distance != null && <small>{Math.round(school.distance)} km away</small>}
@@ -316,7 +326,13 @@ function CareerLibrary() {
                         <div className="comparison-fact"><span>Related careers</span><p>{career.jobs.join(' • ')}</p></div>
                         <div className="comparison-fact"><span>Licensure</span><p>Not yet specified</p></div>
                         <div className="comparison-fact comparison-schools"><span>Schools offering this course</span>
-                          {schools.length ? schools.map((school) => <p key={`${program}-${school.name}`}>{school.name}<small>{school.campus} · {school.region}</small></p>) : <p>No school match in the current catalog.</p>}
+                          {schools.length ? schools.map((school) => (
+                            <p key={`${program}-${school.name}`}>
+                              {school.name}
+                              <small>{school.campus} · {school.region}</small>
+                              <small>Tuition: {getSchoolTuition(school)}</small>
+                            </p>
+                          )) : <p>No school match in the current catalog.</p>}
                         </div>
                       </article>
                     );

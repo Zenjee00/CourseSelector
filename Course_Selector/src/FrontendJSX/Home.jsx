@@ -352,7 +352,7 @@ function Home() {
                     <div className="card mode-card">
                         <span className="card-badge">PRACTICE</span>
                         <div className="card-icon">🎬</div>
-                        <h3>Day in the Life</h3>
+                        <h3>Day in a Life</h3>
                         <p>Respond to real-world career scenarios and workplace challenges.</p>
                         <button onClick={() => handleStartMode('/day-in-the-life')} className="card-btn primary" aria-label="Open Day in the Life">
                             Explore Mode

@@ -11,7 +11,7 @@ function Simulator() {
 				</button>
 				<div style={styles.icon} aria-hidden="true">🎬</div>
 				<p style={styles.eyebrow}>NEW GAME MODE</p>
-				<h1 id="day-in-life-title" style={styles.title}>Day in the Life</h1>
+				<h1 id="day-in-life-title" style={styles.title}>Day in a Life</h1>
 				<p style={styles.description}>
 					Step into real-world career scenarios and decide how you would respond to each challenge.
 				</p>

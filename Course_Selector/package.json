@@ -4,13 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+  "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "proxy": "node server/index.js",
+
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+
+    "test:e2e": "firebase emulators:exec --project demo-courseselector --only auth,firestore \"playwright test\"",
+    "test:e2e:headed": "firebase emulators:exec --project demo-courseselector --only auth,firestore \"playwright test --headed\"",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.3",
@@ -27,14 +31,22 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@playwright/test": "^1.63.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
+    "firebase-tools": "^15.30.2",
     "globals": "^16.5.0",
-    "vite": "^7.2.4"
-   
+    "jsdom": "^29.1.1",
+    "vite": "^7.2.4",
+    "vitest": "^5.0.1"
+    
   }
 }

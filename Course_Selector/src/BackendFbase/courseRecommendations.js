@@ -10,7 +10,6 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { normalizeProgram } from '../utils/programMatching';
 import { db } from './Firebase.js';
 
 export const CATEGORY = {
@@ -28,40 +27,38 @@ export const CATEGORY = {
 // Static fallback data (keep this as backup)
 const recommendations = {
   [CATEGORY.IT]: [
-    'BS Computer Science',
-    'BS Information Technology',
-    'BS Computer Engineering',
-    'Bachelor of Library and Information Science',
-    'BS Technical Communication',
     'Bachelor of Science in Computer Science',
     'Bachelor of Science in Information Technology',
-    'Bachelor of Science in Information Technology – Mobile and Web Applications',
+    'Bachelor of Science in Computer Engineering',
+    'Bachelor of Library and Information Science',
+    'Bachelor of Science in Technical Communication',
+    'Bachelor of Science in Information Technology Ã¢– Mobile and Web Applications',
   ],
   [CATEGORY.BIZ]: [
-    'BS Accountancy',
-    'BSBA Management – Business Analytics',
-    'BS Human Capital Development',
+    'Bachelor of Science in Accountancy',
+    'BSBA Management Ã¢– Business Analytics',
+    'Bachelor of Science in Human Capital Development',
     'BSBA Marketing',
     'BSBA Finance',
     'BSBA Business Process Outsourcing',
     'BSBA Entrepreneurship',
-    'BS Accounting Technology',
-    'BS Management',
-    'BS Marketing',
-    'Bachelor of Science in Business Administration – Marketing Management',
+    'Bachelor of Science in Accounting Technology',
+    'Bachelor of Science in Management',
+    'Bachelor of Science in Marketing',
+    'Bachelor of Science in Business Administration Ã¢– Marketing Management',
     'Bachelor of Science in Office Administration',
     'Bachelor of Science in Management Accounting',
-    'Bachelor of Science in Business Administration – Financial Management',
+    'Bachelor of Science in Business Administration Ã¢– Financial Management',
     'Human Resource Management',
   ],
   [CATEGORY.HEALTH]: [
-    'BS Nursing',
-    'BS Medical Technology',
-    'BS Physical Therapy',
+    'Bachelor of Science in Nursing',
+    'Bachelor of Science in Medical Technology',
+    'Bachelor of Science in Physical Therapy',
   ],
   [CATEGORY.EDU]: [
     'Bachelor of Early Childhood Education',
-    'Bachelor of Technology and Livelihood Education – Home Economics',
+    'Bachelor of Technology and Livelihood Education Ã¢– Home Economics',
   ],
   [CATEGORY.SOCSCI]: [
     'BA Psychology',
@@ -70,47 +67,47 @@ const recommendations = {
     'Bachelor of Arts in Communication',
   ],
   [CATEGORY.ARTS]: [
-    'BS Industrial Design',
-    'BS Multimedia Arts and Sciences',
+    'Bachelor of Science in Industrial Design',
+    'Bachelor of Science in Multimedia Arts and Sciences',
     'BFA Theater Arts',
-    'BS Digital Illustration and Animation',
+    'Bachelor of Science in Digital Illustration and Animation',
     'BA Communication',
     'BA Literature',
     'Bachelor of Fine Arts',
   ],
   [CATEGORY.AGRI]: [
-    'BS Environmental Planning and Management',
-    'BS Geological Science and Engineering',
-    'BS Geology',
-    'BS Environmental and Sanitary Engineering',
+    'Bachelor of Science in Environmental Planning and Management',
+    'Bachelor of Science in Geological Science and Engineering',
+    'Bachelor of Science in Geology',
+    'Bachelor of Science in Environmental and Sanitary Engineering',
   ],
   [CATEGORY.HOSP]: [
-    'BS Hotel and Restaurant Management',
-    'BS Hotel Management',
-    'BS Tourism Management',
-    'BS Leisure and Tourism Management',
+    'Bachelor of Science in Hotel and Restaurant Management',
+    'Bachelor of Science in Hotel Management',
+    'Bachelor of Science in Tourism Management',
+    'Bachelor of Science in Leisure and Tourism Management',
     'Bachelor in International Hotel Management',
     'Bachelor of Science in Hospitality Management',
     'Bachelor of Science in Tourism Management',
   ],
   [CATEGORY.SCI]: [
-    'BS Chemistry',
-    'BS Biological Engineering',
-    'BS Materials Science and Engineering',
-    'BS Manufacturing Engineering',
-    'BS Management Science and Engineering',
-    'BS Service Engineering and Management',
-    'BS Civil Engineering',
-    'BS Electronics Engineering',
-    'BS Electrical Engineering',
-    'BS Industrial Engineering',
-    'BS Mechanical Engineering',
-    'BS Chemical Engineering',
-    'Bachelor of Industrial Technology – Automotive Technology',
-    'Bachelor of Industrial Technology – Drafting Technology',
-    'Bachelor of Industrial Technology – Electrical Technology',
-    'Bachelor of Industrial Technology – Electronics Technology',
-    'Bachelor of Industrial Technology – Food Trades',
+    'Bachelor of Science in Chemistry',
+    'Bachelor of Science in Biological Engineering',
+    'Bachelor of Science in Materials Science and Engineering',
+    'Bachelor of Science in Manufacturing Engineering',
+    'Bachelor of Science in Management Science and Engineering',
+    'Bachelor of Science in Service Engineering and Management',
+    'Bachelor of Science in Civil Engineering',
+    'Bachelor of Science in Electronics Engineering',
+    'Bachelor of Science in Electrical Engineering',
+    'Bachelor of Science in Industrial Engineering',
+    'Bachelor of Science in Mechanical Engineering',
+    'Bachelor of Science in Chemical Engineering',
+    'Bachelor of Industrial Technology Ã¢– Automotive Technology',
+    'Bachelor of Industrial Technology Ã¢– Drafting Technology',
+    'Bachelor of Industrial Technology Ã¢– Electrical Technology',
+    'Bachelor of Industrial Technology Ã¢– Electronics Technology',
+    'Bachelor of Industrial Technology Ã¢– Food Trades',
     'Bachelor of Science in Computer Engineering',
     'Bachelor of Science in Civil Engineering',
     'Bachelor of Science in Architecture',
@@ -118,37 +115,28 @@ const recommendations = {
   ],
 };
 
-const canonicalProgramNames = new Map([
-  ['BS Computer Science', 'BS Computer Science'],
-  ['Bachelor of Science in Computer Science', 'BS Computer Science'],
-  ['BS Information Technology', 'BS Information Technology'],
-  ['Bachelor of Science in Information Technology', 'BS Information Technology'],
-  ['BS Computer Engineering', 'BS Computer Engineering'],
-  ['Bachelor of Science in Computer Engineering', 'BS Computer Engineering'],
-  ['BS Accountancy', 'BS Accountancy'],
-  ['Bachelor of Science in Accountancy', 'BS Accountancy'],
-  ['BS Psychology', 'BS Psychology'],
-  ['Bachelor of Science in Psychology', 'BS Psychology'],
-  ['BS Hospitality Management', 'BS Hospitality Management'],
-  ['Bachelor of Science in Hospitality Management', 'BS Hospitality Management'],
-  ['BS Tourism Management', 'BS Tourism Management'],
-  ['Bachelor of Science in Tourism Management', 'BS Tourism Management'],
-  ['BS Civil Engineering', 'BS Civil Engineering'],
-  ['Bachelor of Science in Civil Engineering', 'BS Civil Engineering'],
-]);
-
 const canonicalizeProgram = (programName) => {
   if (typeof programName !== 'string') return null;
   const trimmedName = programName.trim();
-  return canonicalProgramNames.get(trimmedName) || trimmedName;
+  return trimmedName;
 };
+
+const getProgramKey = (programName) => programName
+  .toLowerCase()
+  .replace(/^\s*bachelor\s+of\s+science\s+in\s+/i, 'Bachelor of Science in ')
+  .replace(/^\s*bs\s+/i, 'Bachelor of Science in ')
+  .replace(/^\s*bachelor\s+of\s+arts\s+in\s+/i, 'ba ')
+  .replace(/^\s*bachelor\s+of\s+fine\s+arts\s+in\s+/i, 'bfa ')
+  .replace(/[^a-z0-9]/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
 
 const dedupePrograms = (programs = []) => {
   const uniquePrograms = new Map();
   programs.forEach((programName) => {
     const canonicalName = canonicalizeProgram(programName);
     if (!canonicalName) return;
-    const key = normalizeProgram(canonicalName);
+    const key = getProgramKey(canonicalName);
     if (!uniquePrograms.has(key)) uniquePrograms.set(key, canonicalName);
   });
   return [...uniquePrograms.values()];

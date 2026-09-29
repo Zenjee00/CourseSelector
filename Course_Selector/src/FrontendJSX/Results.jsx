@@ -22,6 +22,7 @@ import {
   sortUniversitiesByDistance,
 } from '../utils/location';
 import {
+  formatTuition,
   getSchoolsForProgram as getCatalogSchoolsForProgram,
 } from '../utils/programCatalog';
 import { programsMatch } from '../utils/programMatching';
@@ -57,6 +58,14 @@ const getOriginKey = (coords) => {
 };
 
 const getRouteKey = (originKey, school) => `${originKey}=>${getSchoolKey(school)}`;
+
+const getSchoolTuition = (school) => {
+    const tuitionText = school.details?.tuitionFee ?? school.tuitionFee;
+    if (typeof tuitionText === 'string' && tuitionText.trim()) return tuitionText;
+
+    const tuitionData = school.details?.tuition ?? school.tuition;
+    return formatTuition(tuitionData);
+};
 
 const forEachWithConcurrency = async (items, concurrency, worker, onProgress) => {
     let nextIndex = 0;
@@ -117,6 +126,7 @@ function Results() {
                     region: school.region,
                     duration: school.programDetails?.[matchedProgram]?.duration ?? 'Not publicly specified',
                     programStatus: school.programDetails?.[matchedProgram]?.status ?? 'Not publicly specified',
+                    tuitionText: getSchoolTuition(school),
                     lat: school.lat ?? cachedCoords?.lat ?? null,
                     lon: school.lon ?? cachedCoords?.lon ?? null,
                     routeDistanceKm: cachedRoute?.distanceKm ?? null,
@@ -396,6 +406,7 @@ function Results() {
                                                                     <li key={`${primary}-${school.name}`}>
                                                                         <span className="school-name">{school.name}</span>
                                                                         <span className="school-location">{school.campus} · {school.region}</span>
+                                                                        <span className="school-status">Tuition: {school.tuitionText}</span>
                                                                         <span className="school-duration">{school.duration}</span>
                                                                         <span className="school-status">{school.programStatus}</span>
                                                                         {school.routeDistanceKm != null ? (
@@ -432,6 +443,7 @@ function Results() {
                                                                             <li key={`${programName}-${school.name}`}>
                                                                                 <span className="school-name">{school.name}</span>
                                                                                 <span className="school-location">{school.campus} · {school.region}</span>
+                                                                                <span className="school-status">Tuition: {school.tuitionText}</span>
                                                                                 <span className="school-duration">{school.duration}</span>
                                                                                 <span className="school-status">{school.programStatus}</span>
                                                                                 {school.routeDistanceKm != null ? (

@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isVerified() {
+      return request.auth != null
+        && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isVerified()
+        && request.auth.uid == userId;
+    }
+
+    match /Users/{userId} {
+      allow create, read, update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    match /Courses/{docId} {
+      allow read, write: if false;
+    }
+
+    match /quiz_results/{docId} {
+      allow read, write: if false;
+    }
+
+    match /Programs/{docId} {
+      // Recommendation catalog
+      allow read: if isVerified()
+        && !resource.data.keys().hasAny(['userId'])
+        && resource.data.keys().hasAll(['category', 'programs']);
+
+      // User result
+      allow create: if isOwner(request.resource.data.userId)
+        && !request.resource.data.keys().hasAny([
+          'category',
+          'programs'
+        ]);
+
+      allow read: if isOwner(resource.data.userId);
+
+      allow update: if isOwner(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId
+        && !request.resource.data.keys().hasAny([
+          'category',
+          'programs'
+        ]);
+
+      allow delete: if isOwner(resource.data.userId);
+    }
+  }
+}

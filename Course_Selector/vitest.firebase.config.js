@@ -1,25 +1,21 @@
 import { defineConfig } from 'vitest/config';
 
-import react from '@vitejs/plugin-react';
-
 export default defineConfig({
-  plugins: [react()],
-
   test: {
-    environment: 'jsdom',
+    environment: 'node',
     globals: true,
-    setupFiles: './src/Test/setup.js',
-    css: true,
 
     include: [
-      'src/Test/**/*.{test,spec}.{js,jsx}',
+      'MainTest/FirebaseTest/**/*.{test,spec}.{js,jsx}',
     ],
 
     exclude: [
       'node_modules/**',
       'dist/**',
-      'MainTest/**',
+      'MainTest/EndtoEndTest/**',
     ],
+
+    fileParallelism: false,
 
     testTimeout: 20000,
     hookTimeout: 20000,
