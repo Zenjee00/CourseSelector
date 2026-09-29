@@ -10,7 +10,7 @@ import {
 
 import PropTypes from 'prop-types';
 
-import Toast from '../components/Toast';
+import Toast from '../FrontendJSX/Toast';
 
 const ToastContext = createContext(null);
 

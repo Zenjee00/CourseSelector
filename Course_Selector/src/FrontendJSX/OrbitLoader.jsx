@@ -1,4 +1,4 @@
-import './OrbitLoader.css';
+import '../FrontendCSS/OrbitLoader.css';
 
 function OrbitLoader({ label = 'Loading' }) {
   return (

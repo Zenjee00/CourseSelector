@@ -32,7 +32,7 @@ vi.mock('../context/ToastContext', () => ({
   ToastProvider: ({ children }) => children,
 }));
 
-vi.mock('../components/OrbitLoader', () => ({
+vi.mock('../FrontendJSX/OrbitLoader', () => ({
   default: ({ label }) => <div>{label}</div>,
 }));
 

@@ -8,7 +8,6 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 
-import OrbitLoader from '../components/OrbitLoader';
 import {
   careerPrograms,
   getCareerInfo,
@@ -23,6 +22,7 @@ import {
   getProgramKey,
   getSchoolsForProgram,
 } from '../utils/programCatalog';
+import OrbitLoader from './OrbitLoader';
 
 const categories = [
   { label: 'All programs', value: '' },

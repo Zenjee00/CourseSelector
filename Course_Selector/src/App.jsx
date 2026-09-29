@@ -14,13 +14,13 @@ import {
 } from 'react-router-dom';
 
 import { auth } from './BackendFbase/Firebase';
-import OfflineBanner from './components/OfflineBanner';
-import OrbitLoader from './components/OrbitLoader';
 import { ToastProvider } from './context/ToastContext';
 import CareerLibrary from './FrontendJSX/CareerLibrary';
 import Home from './FrontendJSX/Home';
 import InterestAssessmentQuiz from './FrontendJSX/InterestAssessmentQuiz';
 import LoginRegister from './FrontendJSX/LoginRegister';
+import OfflineBanner from './FrontendJSX/OfflineBanner';
+import OrbitLoader from './FrontendJSX/OrbitLoader';
 import Results from './FrontendJSX/Results';
 import Simulator from './FrontendJSX/Simulator';
 import SwipeGame from './FrontendJSX/SwipeGame';

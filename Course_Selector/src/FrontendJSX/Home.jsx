@@ -14,10 +14,10 @@ import {
 } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
+import folderIcon from '../assets/Photos/Folder.png';
 import { getUserSavedPrograms } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
 import { useToast } from '../context/ToastContext';
-import folderIcon from '../Photos/Folder.png';
 
 function Home() {
     const navigate = useNavigate();

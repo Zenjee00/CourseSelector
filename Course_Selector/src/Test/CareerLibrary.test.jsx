@@ -43,7 +43,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
   }
 })
 
-vi.mock('../components/OrbitLoader', () => ({
+vi.mock('../FrontendJSX/OrbitLoader', () => ({
   default: ({ label }) => (
     <div role="status">{label}</div>
   ),
@@ -64,12 +64,15 @@ vi.mock('../utils/location', () => ({
     testData.sortUniversitiesByDistance,
 }))
 
-vi.mock('../utils/programCatalog', () => ({
-  getProgramKey: testData.getProgramKey,
+vi.mock('../utils/programCatalog', async (importOriginal) => {
+  const original = await importOriginal()
 
-  getSchoolsForProgram:
-    testData.getSchoolsForProgram,
-}))
+  return {
+    ...original,
+    getProgramKey: testData.getProgramKey,
+    getSchoolsForProgram: testData.getSchoolsForProgram,
+  }
+})
 
 const getProgramWrapper = (programName) => {
   const heading = screen.getByRole('heading', {

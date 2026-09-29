@@ -53,7 +53,7 @@ vi.mock('../BackendFbase/courseRecommendations', () => ({
   deleteUserProgram: mocks.deleteUserProgram,
 }))
 
-vi.mock('../components/OrbitLoader', () => ({
+vi.mock('../FrontendJSX/OrbitLoader', () => ({
   default: ({ label }) => (
     <div role="status">{label}</div>
   ),
@@ -66,9 +66,14 @@ vi.mock('../utils/location', () => ({
   sortUniversitiesByDistance: mocks.sortUniversitiesByDistance,
 }))
 
-vi.mock('../utils/programCatalog', () => ({
-  getSchoolsForProgram: mocks.getSchoolsForProgram,
-}))
+vi.mock('../utils/programCatalog', async (importOriginal) => {
+  const original = await importOriginal()
+
+  return {
+    ...original,
+    getSchoolsForProgram: mocks.getSchoolsForProgram,
+  }
+})
 
 vi.mock('../utils/programMatching', () => ({
   programsMatch: mocks.programsMatch,

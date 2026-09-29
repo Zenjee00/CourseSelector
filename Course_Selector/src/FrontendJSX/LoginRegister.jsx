@@ -23,7 +23,7 @@ import {
   db,
   googleProvider,
 } from '../BackendFbase/Firebase';
-import OrbitLoader from '../components/OrbitLoader';
+import OrbitLoader from './OrbitLoader';
 
 function LoginRegister() {
     const navigate = useNavigate();

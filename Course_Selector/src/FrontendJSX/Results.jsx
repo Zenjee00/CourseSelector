@@ -13,7 +13,6 @@ import {
   getUserSavedPrograms,
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
-import OrbitLoader from '../components/OrbitLoader';
 import { universities } from '../data/universities';
 import {
   geocodeViaProxy,
@@ -27,6 +26,7 @@ import {
 } from '../utils/programCatalog';
 import { programsMatch } from '../utils/programMatching';
 import { CareerInfo } from './CareerLibrary';
+import OrbitLoader from './OrbitLoader';
 
 const GEO_CACHE_KEY = 'course_selector_geocode_cache_v1';
 const ROUTE_CACHE_KEY = 'course_selector_route_cache_v1';

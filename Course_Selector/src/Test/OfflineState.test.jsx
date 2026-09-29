@@ -12,7 +12,7 @@ import {
   screen,
 } from '@testing-library/react';
 
-import OfflineBanner from '../components/OfflineBanner';
+import OfflineBanner from '../FrontendJSX/OfflineBanner';
 
 const setOnlineStatus = (status) => {
   Object.defineProperty(
