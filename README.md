@@ -1,8 +1,8 @@
-Key Features of Academira (CourseSelector)
+Key Features of Academira (CourseSelector) | Full-Stack Developer & QA Engineer
 
-- Secure Authentication & Onboarding:   Engineered a secure web platform featuring multi-provider authentication (Google OAuth via Firebase & Email/Password), protected routes, mandatory email verification, theme persistence, and responsive UI components (toasts, skeletons, modals).
-- Automated Career Assessment Engine:   Developed an automated 30-question career assessment scoring across 9 domains with custom tie-breaker logic to eliminate duplicate course recommendations, ensuring accurate program matches and history logs.
-- Proximity & University Location Engine:   Integrated LocationIQ APIs and browser location detection to geocode educational institutions, sort nearby schools, and calculate real-time driving distances alongside estimated travel times.
+- Secure Authentication & Onboarding:   Engineered an end-to-end web platform featuring secure multi-provider authentication (Firebase Google OAuth & Email), protected routes, mandatory email verification, and theme persistence.
+- Automated Career Assessment Engine:   Developed an automated 30-question/9-domain career assessment engine using custom tie-breaker scoring logic to eliminate duplicate course recommendations and track user history logs.
+- Proximity & University Location Engine:   Integrated LocationIQ APIs and browser location detection to geocode educational institutions, sort nearby schools, and calculate real-time driving distances with estimated travel times.
 
 
 
@@ -10,5 +10,5 @@ Automated Testing & Quality Assurance
 
 Implemented a robust, dual-layered testing pipeline using   Vitest   and   Playwright   to maintain high code quality and prevent regressions in production:
 
-- Unit & Integration Testing (Vitest):   Achieved 100% test suite reliability across 34 test cases covering critical modules such as assessment scoring logic, offline state resilience, React navigation flows, and UI component state transitions.
-- End-to-End (E2E) Automation (Playwright):   Automated E2E test scenarios validating real-world user flows—including Firebase Google OAuth authentication, mobile layout viewport responsiveness, registration route protection, and network reconnection handling.
+- Unit & Integration Testing (Vitest):   Achieved 100% test suite reliability by authoring 34 unit and integration test cases using Vitest to validate assessment scoring logic, offline state resilience, and UI component state transitions.
+- End-to-End (E2E) Automation (Playwright):   Automated critical E2E scenarios using Playwright to validate real-world user journeys, including Firebase Google OAuth authentication, mobile layout responsiveness, and network reconnection handling.
