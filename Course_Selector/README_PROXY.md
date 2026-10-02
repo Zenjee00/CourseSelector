@@ -8,6 +8,8 @@ How to use (local development):
 1. Copy `.env.example` to `.env` in the project root and add your key:
 
    LOCATIONIQ_KEY=pk.your_real_token_here
+   VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
+   RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key
 
 2. Install runtime deps for the proxy (run in project root):
 
@@ -24,3 +26,5 @@ How to use (local development):
 Security notes:
 - Never commit `.env` containing `LOCATIONIQ_KEY` to the repo. Keep it local or use a secrets store in production.
 - For production, host the proxy on a secure server and protect it with proper rate limits and auth where needed.
+- The login/register form uses a visible classic reCAPTCHA v2 checkbox. `VITE_RECAPTCHA_SITE_KEY` is public; keep `RECAPTCHA_SECRET_KEY` server-only.
+- Start the Express proxy before using authentication so `/api/verify-recaptcha` can validate each challenge token.

@@ -1,6 +1,10 @@
 import '../FrontendCSS/LoginRegister.css';
 
-import { useState } from 'react';
+import {
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
 
 import {
   createUserWithEmailAndPassword,
@@ -16,6 +20,7 @@ import {
   getDoc,
   setDoc,
 } from 'firebase/firestore';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -23,10 +28,13 @@ import {
   db,
   googleProvider,
 } from '../BackendFbase/Firebase';
+import academiraLogo from '../assets/Photos/Academira .png';
 import OrbitLoader from './OrbitLoader';
 
 function LoginRegister() {
     const navigate = useNavigate();
+    const recaptchaRef = useRef(null);
+    const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -36,6 +44,35 @@ function LoginRegister() {
     const [loadingLabel, setLoadingLabel] = useState('Signing you in...');
     const [error, setError] = useState('');
     const [infoMessage, setInfoMessage] = useState('');
+    const [recaptchaToken, setRecaptchaToken] = useState('');
+
+    const verifyRecaptcha = async () => {
+        if (import.meta.env.MODE === 'test') return;
+        if (!recaptchaSiteKey) {
+            if (import.meta.env.PROD) {
+                throw new Error('reCAPTCHA is not configured. Please contact the administrator.');
+            }
+            return;
+        }
+
+        if (!recaptchaToken) throw new Error('Please complete the reCAPTCHA challenge and try again.');
+
+        const baseUrl = import.meta.env.VITE_GEO_PROXY_URL || 'http://localhost:5174';
+        const response = await fetch(`${baseUrl}/api/verify-recaptcha`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: recaptchaToken }),
+        });
+        if (!response.ok) {
+            recaptchaRef.current?.reset();
+            setRecaptchaToken('');
+            const result = await response.json().catch(() => ({}));
+            throw new Error(result.error || 'reCAPTCHA verification failed.');
+        }
+
+        recaptchaRef.current?.reset();
+        setRecaptchaToken('');
+    };
 
     // Always disconnect an unverified account, even when email delivery fails.
     const sendVerificationAndSignOut = async (user) => {
@@ -72,13 +109,17 @@ function LoginRegister() {
     const saveVerifiedProfile = async (user) => {
         const ref = doc(db, 'Users', user.uid);
         const existing = await getDoc(ref);
+        const needsOnboarding = !existing.exists()
+            || existing.data().onboardingCompleted !== true;
         await setDoc(ref, {
             Email: user.email,
             Name: user.displayName || '',
             PhotoURL: user.photoURL || '',
             ...(!existing.exists() ? { createdAt: new Date().toISOString() } : {}),
+            ...(existing.exists() ? {} : { onboardingCompleted: false }),
             lastLogin: new Date().toISOString(),
         }, { merge: true });
+        return needsOnboarding;
     };
 
     const SkeletonLoader = () => (
@@ -97,13 +138,14 @@ function LoginRegister() {
         setLoading(true);
         
         try {
+            if (isLogin) await verifyRecaptcha();
             if (isLogin) {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 if (!await requireVerifiedUser(userCredential.user)) return;
-                await saveVerifiedProfile(userCredential.user);
+                const needsOnboarding = await saveVerifiedProfile(userCredential.user);
 
                 console.log('Login successful!');
-                navigate('/home', { replace: true });
+                navigate(needsOnboarding ? '/onboarding' : '/home', { replace: true });
             } else {
                 // Register logic
                 if (password !== confirmPassword) {
@@ -168,10 +210,10 @@ function LoginRegister() {
             const user = result.user;
             
             if (!await requireVerifiedUser(user)) return;
-            await saveVerifiedProfile(user);
+            const needsOnboarding = await saveVerifiedProfile(user);
 
             console.log('Google sign-in successful!');
-            navigate('/home', { replace: true });
+            navigate(needsOnboarding ? '/onboarding' : '/home', { replace: true });
         } catch (error) {
             console.error('Google sign-in error:', error);
             if (error.code === 'auth/popup-closed-by-user') {
@@ -207,8 +249,10 @@ function LoginRegister() {
                     <div className="auth-orb auth-orb-one" />
                     <div className="auth-orb auth-orb-two" />
                     <div className="auth-visual-content">
-                        <div className="auth-brand-mark">CS</div>
-                        <p className="auth-kicker">COURSESELECTOR</p>
+                        <div className="auth-brand-mark">
+                            <img src={academiraLogo} alt="Academira logo" />
+                        </div>
+                        <p className="auth-kicker">ACADEMIRA</p>
                         <h1>{isLogin ? 'Welcome back.' : 'Start your journey.'}</h1>
                         <p>
                             {isLogin
@@ -217,7 +261,7 @@ function LoginRegister() {
                         </p>
                         <div className="auth-feature-list">
                             <span>Personalized recommendations</span>
-                            <span>School and tuition information</span>
+                            <span>School informations</span>
                             <span>Saved assessment history</span>
                         </div>
                     </div>
@@ -225,7 +269,7 @@ function LoginRegister() {
 
                 <div className="form-wrapper">
                     <div className="auth-form-inner" key={isLogin ? 'login' : 'register'}>
-                        <p className="form-eyebrow">{isLogin ? 'WELCOME BACK' : 'JOIN COURSESELECTOR'}</p>
+                        <p className="form-eyebrow">{isLogin ? 'WELCOME BACK' : 'JOIN ACADEMIRA'}</p>
                         <h2>{isLogin ? 'Login' : 'Register'}</h2>
                         <p className="form-subtitle">
                             {isLogin ? 'Sign in to continue your career journey.' : 'Create your account to get started.'}
@@ -342,6 +386,19 @@ function LoginRegister() {
                     </div>
                 </div>
             </div>
+
+            {isLogin && recaptchaSiteKey && createPortal(
+                <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={recaptchaSiteKey}
+                    size="invisible"
+                    badge="bottomright"
+                    onChange={setRecaptchaToken}
+                    onExpired={() => setRecaptchaToken('')}
+                    onErrored={() => setError('Could not load reCAPTCHA. Please refresh and try again.')}
+                />,
+                document.body,
+            )}
         </div>
     );
 }

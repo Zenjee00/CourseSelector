@@ -44,6 +44,10 @@ function Home() {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
+                const accountTheme = localStorage.getItem(`theme:${currentUser.uid}`);
+                if (accountTheme === 'dark' || accountTheme === 'light') {
+                    setTheme(accountTheme);
+                }
                 setProfileForm({
                     displayName: currentUser.displayName || '',
                     photoURL: currentUser.photoURL || '',
@@ -60,9 +64,10 @@ function Home() {
 
     useEffect(() => {
         localStorage.setItem('theme', theme);
+        if (user?.uid) localStorage.setItem(`theme:${user.uid}`, theme);
         document.documentElement.setAttribute('data-theme', theme);
         document.body.setAttribute('data-theme', theme);
-    }, [theme]);
+    }, [theme, user?.uid]);
 
     const fetchSavedPrograms = async (userId) => {
         setLoadingPrograms(true);
@@ -237,8 +242,8 @@ function Home() {
     return (
         <div className="home-container">
             <nav className="home-navbar" role="navigation" aria-label="Primary">
-                <div className="nav-brand" aria-label="CourseSelector home">
-                    <h2 className="logo" onClick={handleLogoConfetti}>Course<span>Selector</span></h2>
+                <div className="nav-brand" aria-label="Academira home">
+                    <h2 className="logo" onClick={handleLogoConfetti}>Acade<span>mira</span></h2>
                 </div>
 
                 <button
@@ -314,7 +319,7 @@ function Home() {
                     <p>Discover the right path for your future career.</p>
                 </header>
 
-                <section className="home-status-rail" aria-label="CourseSelector overview">
+                <section className="home-status-rail" aria-label="Academira overview">
                     <div className="status-pill">
                         <span className="status-dot" aria-hidden="true"></span>
                         <span><strong>{savedPrograms.length}</strong> saved {savedPrograms.length === 1 ? 'result' : 'results'}</span>
@@ -447,7 +452,7 @@ function Home() {
                 >
                     <div className="modal-card">
                         <h3 id="logout-modal-title">Log out?</h3>
-                        <p className="modal-text">You will be signed out of CourseSelector.</p>
+                        <p className="modal-text">You will be signed out of Academira.</p>
                         <div className="modal-actions">
                             <button className="modal-btn ghost" onClick={handleCloseLogout} aria-label="Cancel logout">Cancel</button>
                             <button className="modal-btn danger" onClick={handleLogoutConfirm} aria-label="Confirm logout">Logout</button>

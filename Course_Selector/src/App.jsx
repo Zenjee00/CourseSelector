@@ -7,19 +7,27 @@ import {
 
 import { onIdTokenChanged } from 'firebase/auth';
 import {
+  doc,
+  getDoc,
+} from 'firebase/firestore';
+import {
   BrowserRouter as Router,
   Navigate,
   Route,
   Routes,
 } from 'react-router-dom';
 
-import { auth } from './BackendFbase/Firebase';
+import {
+  auth,
+  db,
+} from './BackendFbase/Firebase';
 import { ToastProvider } from './context/ToastContext';
 import CareerLibrary from './FrontendJSX/CareerLibrary';
 import Home from './FrontendJSX/Home';
 import InterestAssessmentQuiz from './FrontendJSX/InterestAssessmentQuiz';
 import LoginRegister from './FrontendJSX/LoginRegister';
 import OfflineBanner from './FrontendJSX/OfflineBanner';
+import Onboarding from './FrontendJSX/Onboarding';
 import OrbitLoader from './FrontendJSX/OrbitLoader';
 import Results from './FrontendJSX/Results';
 import Simulator from './FrontendJSX/Simulator';
@@ -27,12 +35,14 @@ import SwipeGame from './FrontendJSX/SwipeGame';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme');
-    const theme = storedTheme === 'dark'
-      ? 'dark'
+    if (!authReady) return;
+
+    const theme = user
+      ? (localStorage.getItem('theme') === 'dark' ? 'dark' : 'light')
       : 'light';
 
     document.documentElement.setAttribute(
@@ -44,12 +54,15 @@ function App() {
       'data-theme',
       theme,
     );
-  }, []);
+  }, [authReady, user]);
 
   useEffect(() => {
-    const unsubscribe = onIdTokenChanged(
-      auth,
-      (currentUser) => {
+    let isActive = true;
+
+    const unsubscribe = onIdTokenChanged(auth, async (currentUser) => {
+        if (!isActive) return;
+
+        setAuthReady(false);
         /*
          * Registration creates a signed-in user before
          * email verification. Keep unverified users on
@@ -60,12 +73,28 @@ function App() {
             ? currentUser
             : null;
 
-        setUser(verifiedUser);
-        setAuthReady(true);
-      },
-    );
+        let onboardingRequired = false;
+        if (verifiedUser) {
+          try {
+            const profile = await getDoc(doc(db, 'Users', verifiedUser.uid));
+            onboardingRequired = !profile.exists()
+              || profile.data()?.onboardingCompleted !== true;
+          } catch (error) {
+            console.error('Could not read onboarding status:', error);
+            onboardingRequired = true;
+          }
+        }
 
-    return unsubscribe;
+        if (!isActive) return;
+        setUser(verifiedUser);
+        setNeedsOnboarding(onboardingRequired);
+        setAuthReady(true);
+      });
+
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
   }, []);
 
   if (!authReady) {
@@ -90,7 +119,7 @@ function App() {
               path="/"
               element={(
                 <Navigate
-                  to={user ? '/home' : '/login'}
+                  to={user ? (needsOnboarding ? '/onboarding' : '/home') : '/login'}
                   replace
                 />
               )}
@@ -100,7 +129,7 @@ function App() {
               path="/login"
               element={
                 user
-                  ? <Navigate to="/home" replace />
+                  ? <Navigate to={needsOnboarding ? '/onboarding' : '/home'} replace />
                   : <LoginRegister />
               }
             />
@@ -109,7 +138,18 @@ function App() {
               path="/home"
               element={
                 user
-                  ? <Home />
+                  ? needsOnboarding
+                    ? <Navigate to="/onboarding" replace />
+                    : <Home />
+                  : <Navigate to="/login" replace />
+              }
+            />
+
+            <Route
+              path="/onboarding"
+              element={
+                user
+                  ? <Onboarding onComplete={() => setNeedsOnboarding(false)} />
                   : <Navigate to="/login" replace />
               }
             />

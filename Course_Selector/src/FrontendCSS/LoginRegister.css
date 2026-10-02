@@ -20,6 +20,14 @@
         var(--bg-main, #f5f7fb);
     color: var(--auth-ink);
     font-family: 'Plus Jakarta Sans', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.login-register-container input,
+.login-register-container textarea {
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 .auth-shell,
@@ -102,8 +110,8 @@
 }
 
 .auth-brand-mark {
-    width: 54px;
-    height: 54px;
+    width: 86px;
+    height: 86px;
     display: grid;
     place-items: center;
     margin-bottom: 1.35rem;
@@ -115,6 +123,13 @@
     font-weight: 800;
     letter-spacing: -.03em;
     backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+.auth-brand-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .auth-kicker {

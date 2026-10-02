@@ -20,12 +20,20 @@ const authState = vi.hoisted(() => ({
   onIdTokenChanged: vi.fn(),
 }));
 
+const firestoreState = vi.hoisted(() => ({
+  doc: vi.fn(),
+  getDoc: vi.fn(),
+}));
+
 vi.mock('firebase/auth', () => ({
   onIdTokenChanged: authState.onIdTokenChanged,
 }));
 
+vi.mock('firebase/firestore', () => firestoreState);
+
 vi.mock('../BackendFbase/Firebase', () => ({
   auth: { name: 'test-auth' },
+  db: { name: 'test-db' },
 }));
 
 vi.mock('../context/ToastContext', () => ({
@@ -63,6 +71,11 @@ vi.mock('../FrontendJSX/GameModePlaceholder', () => ({
 describe('App route protection', () => {
   beforeEach(() => {
     authState.callback = null;
+    firestoreState.doc.mockReturnValue({ name: 'user-reference' });
+    firestoreState.getDoc.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ onboardingCompleted: true }),
+    });
     authState.onIdTokenChanged.mockImplementation((_auth, callback) => {
       authState.callback = callback;
       return authState.unsubscribe;

@@ -10,6 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 const LOCATIONIQ_KEY = process.env.LOCATIONIQ_KEY;
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const MAX_CACHE_ENTRIES = 5000;
 const geocodeCache = new Map();
@@ -18,6 +19,10 @@ const inFlightRequests = new Map();
 
 if (!LOCATIONIQ_KEY) {
   console.warn('Warning: LOCATIONIQ_KEY is not set. Create a .env file with LOCATIONIQ_KEY=your_key');
+}
+
+if (!RECAPTCHA_SECRET_KEY) {
+  console.warn('Warning: RECAPTCHA_SECRET_KEY is not set. Create a .env file with RECAPTCHA_SECRET_KEY=your_key');
 }
 
 const getCached = (cache, key) => {
@@ -44,6 +49,30 @@ const shareRequest = (key, request) => {
   inFlightRequests.set(key, pending);
   return pending;
 };
+
+app.post('/api/verify-recaptcha', async (req, res) => {
+  const { token } = req.body || {};
+  if (!token) return res.status(400).json({ error: 'Missing reCAPTCHA token' });
+  if (!RECAPTCHA_SECRET_KEY) return res.status(503).json({ error: 'reCAPTCHA is not configured on the server' });
+
+  try {
+    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret: RECAPTCHA_SECRET_KEY, response: token }),
+    });
+    const result = await response.json();
+
+    if (!response.ok || result.success !== true) {
+      return res.status(403).json({ error: 'reCAPTCHA verification failed' });
+    }
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('reCAPTCHA verification error', err);
+    return res.status(502).json({ error: 'reCAPTCHA service unavailable' });
+  }
+});
 
 // Simple proxy to LocationIQ forward geocoding
 app.get('/api/geocode', async (req, res) => {
