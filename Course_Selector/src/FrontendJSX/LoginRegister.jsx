@@ -331,7 +331,7 @@ function LoginRegister() {
 
                             {!isLogin && (
                                 <div className="formField confirm-password-group">
-                                    <label className="sr-only" htmlFor="confirmPassword">Confirm Passwords</label>
+                                    <label className="sr-only" htmlFor="confirmPassword">Confirm Password</label>
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         id="confirmPassword"
