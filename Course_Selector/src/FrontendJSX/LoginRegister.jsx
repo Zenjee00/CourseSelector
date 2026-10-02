@@ -23,12 +23,12 @@ import {
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from 'react-router-dom';
 
+import academiraLogo from '../assets/Photos/Academira .png';
 import {
   auth,
   db,
   googleProvider,
 } from '../BackendFbase/Firebase';
-import academiraLogo from '../assets/Photos/Academira .png';
 import OrbitLoader from './OrbitLoader';
 
 function LoginRegister() {
@@ -331,7 +331,7 @@ function LoginRegister() {
 
                             {!isLogin && (
                                 <div className="formField confirm-password-group">
-                                    <label className="sr-only" htmlFor="confirmPassword">Confirm Password</label>
+                                    <label className="sr-only" htmlFor="confirmPassword">Confirm Passwords</label>
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         id="confirmPassword"
