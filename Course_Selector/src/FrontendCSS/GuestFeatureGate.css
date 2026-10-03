@@ -1,0 +1,50 @@
+.guest-gate-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    background: var(--bg-main, #f5f7fb);
+    color: var(--text-main, #172033);
+}
+
+.guest-gate-panel {
+    width: min(520px, 100%);
+    padding: clamp(2rem, 6vw, 4rem);
+    border: 1px solid var(--border-color, #dfe3ec);
+    border-radius: 18px;
+    background: var(--card-bg, #fff);
+    box-shadow: 0 24px 70px rgba(28, 35, 70, .12);
+    text-align: center;
+}
+
+.guest-gate-kicker {
+    margin: 0 0 .8rem;
+    color: #5146e5;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .16em;
+}
+
+.guest-gate-panel h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.1;
+}
+
+.guest-gate-panel p:not(.guest-gate-kicker) {
+    margin: 1rem 0 1.5rem;
+    color: var(--text-muted, #667085);
+    line-height: 1.7;
+}
+
+.guest-gate-panel button {
+    min-height: 46px;
+    padding: .75rem 1rem;
+    border: 0;
+    border-radius: 10px;
+    background: #5146e5;
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}

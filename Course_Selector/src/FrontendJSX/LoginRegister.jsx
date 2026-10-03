@@ -21,7 +21,10 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { useNavigate } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 
 import academiraLogo from '../assets/Photos/Academira .png';
 import {
@@ -33,9 +36,10 @@ import OrbitLoader from './OrbitLoader';
 
 function LoginRegister() {
     const navigate = useNavigate();
+    const location = useLocation();
     const recaptchaRef = useRef(null);
     const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
-    const [isLogin, setIsLogin] = useState(true);
+    const [isLogin, setIsLogin] = useState(() => location.state?.mode !== 'register');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');

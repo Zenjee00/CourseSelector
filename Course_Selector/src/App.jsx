@@ -23,6 +23,7 @@ import {
 } from './BackendFbase/Firebase';
 import { ToastProvider } from './context/ToastContext';
 import CareerLibrary from './FrontendJSX/CareerLibrary';
+import GuestFeatureGate from './FrontendJSX/GuestFeatureGate';
 import Home from './FrontendJSX/Home';
 import InterestAssessmentQuiz from './FrontendJSX/InterestAssessmentQuiz';
 import LoginRegister from './FrontendJSX/LoginRegister';
@@ -35,6 +36,7 @@ import SwipeGame from './FrontendJSX/SwipeGame';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [authSession, setAuthSession] = useState(null);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [authReady, setAuthReady] = useState(false);
 
@@ -86,6 +88,7 @@ function App() {
         }
 
         if (!isActive) return;
+        setAuthSession(currentUser);
         setUser(verifiedUser);
         setNeedsOnboarding(onboardingRequired);
         setAuthReady(true);
@@ -107,6 +110,8 @@ function App() {
     );
   }
 
+  const isUnverifiedUser = Boolean(authSession && !user);
+
   return (
     <ToastProvider>
       {/* Available globally on every route */}
@@ -119,7 +124,7 @@ function App() {
               path="/"
               element={(
                 <Navigate
-                  to={user ? (needsOnboarding ? '/onboarding' : '/home') : '/login'}
+                  to={isUnverifiedUser ? '/login' : user ? (needsOnboarding ? '/onboarding' : '/home') : '/home'}
                   replace
                 />
               )}
@@ -137,11 +142,11 @@ function App() {
             <Route
               path="/home"
               element={
-                user
-                  ? needsOnboarding
-                    ? <Navigate to="/onboarding" replace />
-                    : <Home />
-                  : <Navigate to="/login" replace />
+                isUnverifiedUser
+                  ? <Navigate to="/login" replace />
+                  : user && needsOnboarding
+                  ? <Navigate to="/onboarding" replace />
+                  : <Home />
               }
             />
 
@@ -157,9 +162,11 @@ function App() {
             <Route
               path="/library"
               element={
-                user
-                  ? <CareerLibrary />
-                  : <Navigate to="/login" replace />
+                isUnverifiedUser
+                  ? <Navigate to="/login" replace />
+                  : user && needsOnboarding
+                  ? <Navigate to="/onboarding" replace />
+                  : <CareerLibrary />
               }
             />
 
@@ -168,16 +175,20 @@ function App() {
               element={
                 user
                   ? <Results />
-                  : <Navigate to="/login" replace />
+                  : isUnverifiedUser
+                    ? <Navigate to="/login" replace />
+                  : <GuestFeatureGate feature="saved history" />
               }
             />
 
             <Route
               path="/who-am-i"
               element={
-                user
-                  ? <InterestAssessmentQuiz />
-                  : <Navigate to="/login" replace />
+                isUnverifiedUser
+                  ? <Navigate to="/login" replace />
+                  : user && needsOnboarding
+                  ? <Navigate to="/onboarding" replace />
+                  : <InterestAssessmentQuiz />
               }
             />
 
@@ -194,18 +205,22 @@ function App() {
             <Route
               path="/swipe-match"
               element={
-                user
-                  ? <SwipeGame />
-                  : <Navigate to="/login" replace />
+                isUnverifiedUser
+                  ? <Navigate to="/login" replace />
+                  : user && needsOnboarding
+                  ? <Navigate to="/onboarding" replace />
+                  : <SwipeGame />
               }
             />
 
             <Route
               path="/day-in-the-life"
               element={
-                user
-                  ? <Simulator />
-                  : <Navigate to="/login" replace />
+                isUnverifiedUser
+                  ? <Navigate to="/login" replace />
+                  : user && needsOnboarding
+                  ? <Navigate to="/onboarding" replace />
+                  : <Simulator />
               }
             />
 

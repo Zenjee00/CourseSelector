@@ -8,6 +8,7 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 
+import { auth } from '../BackendFbase/Firebase';
 import {
   careerPrograms,
   getCareerInfo,
@@ -85,11 +86,13 @@ function CareerInfo({ programName, showDuration = true }) {
 
 function CareerLibrary() {
   const navigate = useNavigate();
+  const isGuest = !auth.currentUser;
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [favorites, setFavorites] = useState(() => {
+    if (!auth.currentUser) return [];
     try {
       return JSON.parse(localStorage.getItem('course_selector_favorites') || '[]');
     } catch {
@@ -107,6 +110,7 @@ function CareerLibrary() {
   const [comparisonPair, setComparisonPair] = useState([]);
   const [comparisonLoading, setComparisonLoading] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
+  const [showFavoriteGate, setShowFavoriteGate] = useState(false);
 
   useEffect(() => {
     if (!selectedProgram && !comparisonOpen && !comparisonLoading) return undefined;
@@ -129,14 +133,24 @@ function CareerLibrary() {
   }, [selectedProgram, comparisonLoading, comparisonOpen]);
 
   useEffect(() => {
+    let cancelled = false;
+
     getUserLocation()
-      .then((coords) => setUserLocation(coords))
-      .catch(() => setUserLocation(null));
+      .then((coords) => {
+        if (!cancelled) setUserLocation(coords);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('course_selector_favorites', JSON.stringify(favorites));
-  }, [favorites]);
+    if (!isGuest) {
+      localStorage.setItem('course_selector_favorites', JSON.stringify(favorites));
+    }
+  }, [favorites, isGuest]);
 
   useEffect(() => {
     localStorage.setItem('course_selector_compare', JSON.stringify(comparePrograms));
@@ -148,6 +162,10 @@ function CareerLibrary() {
   };
 
   const toggleFavorite = (programName) => {
+    if (isGuest) {
+      setShowFavoriteGate(true);
+      return;
+    }
     const key = getProgramKey(programName);
     setFavorites((previous) => previous.includes(key)
       ? previous.filter((item) => item !== key)
@@ -203,12 +221,17 @@ function CareerLibrary() {
           <label className="library-filter">
             <span>Category</span>
             <select value={category} onChange={(event) => setCategory(event.target.value)}>
-              {categories.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+              {categories.map((item) => (
+                <option key={item.value} value={item.value} disabled={isGuest && item.value === 'Favorites'}>
+                  {isGuest && item.value === 'Favorites' ? 'My Favorites (Sign in required)' : item.label}
+                </option>
+              ))}
             </select>
           </label>
         </div>
 
         <p className="library-count">Showing {filteredPrograms.length} of {careerPrograms.length} programs</p>
+        {isGuest && <p className="library-guest-note">Sign in to save favorite courses and access them later.</p>}
         <div className="library-grid">
           {filteredPrograms.map((program) => (
             <div className="library-card-wrapper" key={program}>
@@ -225,7 +248,10 @@ function CareerLibrary() {
                 <CareerInfo programName={program} showDuration={false} />
               </button>
               <div className="library-card-actions">
-                <button type="button" onClick={() => toggleFavorite(program)}>
+                <button
+                  type="button"
+                  onClick={() => toggleFavorite(program)}
+                >
                   {favorites.includes(getProgramKey(program)) ? 'Remove favorite' : 'Favorite'}
                 </button>
                 <button type="button" onClick={() => toggleCompare(program)}>
@@ -285,6 +311,41 @@ function CareerLibrary() {
                 ) : (
                   <p className="library-empty">No school match in the current catalog.</p>
                 )}
+              </div>
+            </section>
+          </div>
+        )}
+        {showFavoriteGate && (
+          <div
+            className="library-modal-backdrop"
+            role="presentation"
+            onClick={() => setShowFavoriteGate(false)}
+          >
+            <section
+              className="guest-feature-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="favorite-gate-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="library-close-btn guest-feature-modal-close"
+                onClick={() => setShowFavoriteGate(false)}
+                aria-label="Close sign-in prompt"
+              >
+                ×
+              </button>
+              <p className="library-eyebrow">SAVE YOUR PICKS</p>
+              <h2 id="favorite-gate-title">Create an account to favorite courses</h2>
+              <p>Sign in or sign up to save courses and access your favorites on your next visit.</p>
+              <div className="guest-feature-modal-actions">
+                <button type="button" onClick={() => navigate('/login')}>
+                  Sign in
+                </button>
+                <button type="button" onClick={() => navigate('/login', { state: { mode: 'register' } })}>
+                  Sign up
+                </button>
               </div>
             </section>
           </div>

@@ -741,3 +741,50 @@ textarea:focus-visible {
     width: 100%;
     border-radius: 18px;
 }
+
+.delete-account-link {
+    display: block;
+    margin: 1rem auto 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #b42318;
+    font: inherit;
+    font-size: .78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.delete-confirm-modal {
+    width: min(440px, 100%);
+}
+
+.delete-confirm-label {
+    display: block;
+    margin: 1rem 0 .4rem;
+    color: var(--text-main);
+    font-size: .78rem;
+    font-weight: 800;
+}
+
+.delete-confirm-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: .75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-main);
+    font: inherit;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.delete-confirm-error {
+    margin: .6rem 0 0;
+    color: #b42318;
+    font-size: .78rem;
+    font-weight: 700;
+}

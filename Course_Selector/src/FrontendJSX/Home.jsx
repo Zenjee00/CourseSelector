@@ -7,16 +7,28 @@ import {
 
 import confetti from 'canvas-confetti';
 import {
+  deleteUser,
   onAuthStateChanged,
   signOut,
   updatePassword,
   updateProfile,
 } from 'firebase/auth';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 import folderIcon from '../assets/Photos/Folder.png';
 import { getUserSavedPrograms } from '../BackendFbase/courseRecommendations';
-import { auth } from '../BackendFbase/Firebase';
+import {
+  auth,
+  db,
+} from '../BackendFbase/Firebase';
 import { useToast } from '../context/ToastContext';
 
 function Home() {
@@ -29,6 +41,12 @@ function Home() {
         return localStorage.getItem('theme') || 'light';
     });
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+    const [showGuestLoginPrompt, setShowGuestLoginPrompt] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showDeletePhrasePrompt, setShowDeletePhrasePrompt] = useState(false);
+    const [deletePhrase, setDeletePhrase] = useState('');
+    const [deleteError, setDeleteError] = useState('');
+    const [isDeletingAccount, setIsDeletingAccount] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -55,7 +73,8 @@ function Home() {
                 });
                 fetchSavedPrograms(currentUser.uid);
             } else {
-                navigate('/login');
+                setUser(null);
+                setSavedPrograms([]);
             }
             setIsInitialLoading(false);
         });
@@ -93,6 +112,10 @@ function Home() {
     
     // Function to navigate to the Results page
     const handleViewResults = () => {
+        if (!user) {
+            showToast('Sign in to save and view your history.', 'warning');
+            return;
+        }
         if (savedPrograms.length > 0) {
             setMobileMenuOpen(false);
             navigate('/results');
@@ -145,6 +168,15 @@ function Home() {
         setMobileMenuOpen(false);
     };
 
+    const handleProfileChipClick = () => {
+        if (!user) {
+            setShowGuestLoginPrompt(true);
+            setMobileMenuOpen(false);
+            return;
+        }
+        handleOpenProfile();
+    };
+
     const handleCloseProfile = () => {
         setShowProfileModal(false);
         setProfileForm((prev) => ({ ...prev, newPassword: '' }));
@@ -184,6 +216,54 @@ function Home() {
             showToast(error.message || 'Unable to update profile.', 'error');
         } finally {
             setIsSavingProfile(false);
+        }
+    };
+
+    const handleDeleteAccountRequest = () => {
+        setShowProfileModal(false);
+        setShowDeleteConfirm(true);
+    };
+
+    const handleDeleteConfirm = () => {
+        setShowDeleteConfirm(false);
+        setDeletePhrase('');
+        setDeleteError('');
+        setShowDeletePhrasePrompt(true);
+    };
+
+    const handleDeleteAccount = async (event) => {
+        event.preventDefault();
+        if (deletePhrase !== 'CONFIRM') {
+            setDeleteError('Type CONFIRM exactly to permanently delete your account.');
+            return;
+        }
+
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            navigate('/login', { replace: true });
+            return;
+        }
+
+        setIsDeletingAccount(true);
+        setDeleteError('');
+        try {
+            const resultsSnapshot = await getDocs(query(
+                collection(db, 'Programs'),
+                where('userId', '==', currentUser.uid),
+            ));
+            await Promise.all(resultsSnapshot.docs.map((result) => deleteDoc(result.ref)));
+            await deleteDoc(doc(db, 'Users', currentUser.uid));
+            await deleteUser(currentUser);
+            setShowDeletePhrasePrompt(false);
+            showToast('Your account has been permanently deleted.', 'success');
+            navigate('/login', { replace: true });
+        } catch (error) {
+            console.error('Account deletion error:', error);
+            setDeleteError(error.code === 'auth/requires-recent-login'
+                ? 'For security, sign in again before deleting your account.'
+                : error.message || 'Unable to delete your account. Please try again.');
+        } finally {
+            setIsDeletingAccount(false);
         }
     };
 
@@ -262,7 +342,7 @@ function Home() {
                         className="nav-icon-btn saved-btn"
                         onClick={handleViewResults}
                         aria-label={`Saved history (${savedPrograms.length})`}
-                        disabled={loadingPrograms || savedPrograms.length === 0}
+                        disabled={!user || loadingPrograms || savedPrograms.length === 0}
                     >
                         <img src={folderIcon} alt="Saved history" />
                         {loadingPrograms ? (
@@ -275,11 +355,15 @@ function Home() {
                         <span aria-hidden="true">📚</span>
                         <span className="library-btn-label">Library</span>
                     </button>
-                    <button className="profile-chip" onClick={handleOpenProfile} aria-label="View profile">
+                    <button
+                        className="profile-chip"
+                        onClick={handleProfileChipClick}
+                        aria-label={user ? 'View profile' : 'Sign in'}
+                    >
                         <span className="avatar-circle" aria-hidden="true">
                             {avatarSrc ? <img src={avatarSrc} alt="" /> : avatarLetter}
                         </span>
-                        <span className="user-email">{displayName}</span>
+                        <span className="user-email">{user ? displayName : 'Guest'}</span>
                     </button>
                     <div className="settings-wrapper">
                         <button
@@ -302,9 +386,9 @@ function Home() {
                                     <span>{theme === 'light' ? '🌙' : '☀️'}</span>
                                     <span>{theme === 'light' ? 'Switch to Dark' : 'Switch to Light'}</span>
                                 </button>
-                                <button className="settings-item danger" onClick={() => { handleOpenLogout(); closeSettings(); }} role="menuitem">
+                                <button className="settings-item danger" onClick={() => { (user ? handleOpenLogout : () => navigate('/login'))(); closeSettings(); }} role="menuitem">
                                     <span>🚪</span>
-                                    <span>Logout</span>
+                                    <span>{user ? 'Logout' : 'Sign in'}</span>
                                 </button>
                             </div>
                         )}
@@ -434,6 +518,83 @@ function Home() {
                                 <button type="button" className="modal-btn ghost" onClick={handleCloseProfile} aria-label="Cancel profile edits">Cancel</button>
                                 <button type="submit" className="modal-btn primary" disabled={isSavingProfile} aria-label="Save profile">
                                     {isSavingProfile ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                            <button type="button" className="delete-account-link" onClick={handleDeleteAccountRequest}>
+                                Delete Account
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {showGuestLoginPrompt && (
+                <div
+                    className="modal-overlay"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="guest-login-title"
+                    onKeyDown={(e) => handleKeyClose(e, () => setShowGuestLoginPrompt(false))}
+                    tabIndex={-1}
+                >
+                    <div className="modal-card">
+                        <h3 id="guest-login-title">Log in to your account?</h3>
+                        <p className="modal-text">You are browsing as a guest. Log in to access your profile, saved history, and account features.</p>
+                        <div className="modal-actions">
+                            <button className="modal-btn ghost" onClick={() => setShowGuestLoginPrompt(false)}>Continue as guest</button>
+                            <button className="modal-btn primary" onClick={() => navigate('/login')}>Log in</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showDeleteConfirm && (
+                <div
+                    className="modal-overlay"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="delete-account-title"
+                    onKeyDown={(e) => handleKeyClose(e, () => setShowDeleteConfirm(false))}
+                    tabIndex={-1}
+                >
+                    <div className="modal-card">
+                        <h3 id="delete-account-title">Delete your account?</h3>
+                        <p className="modal-text">This permanently removes your profile and saved history. This action cannot be undone.</p>
+                        <div className="modal-actions">
+                            <button className="modal-btn ghost" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                            <button className="modal-btn danger" onClick={handleDeleteConfirm}>Continue</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showDeletePhrasePrompt && (
+                <div
+                    className="modal-overlay"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="delete-confirm-title"
+                    onKeyDown={(e) => handleKeyClose(e, () => setShowDeletePhrasePrompt(false))}
+                    tabIndex={-1}
+                >
+                    <div className="modal-card delete-confirm-modal">
+                        <h3 id="delete-confirm-title">Permanently delete account</h3>
+                        <p className="modal-text">Type <strong>CONFIRM</strong> to permanently delete your account and saved data.</p>
+                        <form onSubmit={handleDeleteAccount}>
+                            <label className="delete-confirm-label" htmlFor="delete-confirm-input">Confirmation</label>
+                            <input
+                                id="delete-confirm-input"
+                                className="delete-confirm-input"
+                                value={deletePhrase}
+                                onChange={(event) => setDeletePhrase(event.target.value)}
+                                autoComplete="off"
+                                autoFocus
+                            />
+                            {deleteError && <p className="delete-confirm-error" role="alert">{deleteError}</p>}
+                            <div className="modal-actions">
+                                <button type="button" className="modal-btn ghost" onClick={() => setShowDeletePhrasePrompt(false)} disabled={isDeletingAccount}>Cancel</button>
+                                <button type="submit" className="modal-btn danger" disabled={isDeletingAccount || deletePhrase !== 'CONFIRM'}>
+                                    {isDeletingAccount ? 'Deleting...' : 'Delete permanently'}
                                 </button>
                             </div>
                         </form>

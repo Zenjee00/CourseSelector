@@ -18,6 +18,15 @@ import {
 
 import CareerLibrary from '../FrontendJSX/CareerLibrary';
 
+vi.mock('../BackendFbase/Firebase', () => ({
+  auth: {
+    currentUser: {
+      uid: 'test-user-123',
+      emailVerified: true,
+    },
+  },
+}));
+
 const testData = vi.hoisted(() => ({
   programs: [
     'Bachelor of Science in Computer Science',

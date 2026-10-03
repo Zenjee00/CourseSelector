@@ -148,25 +148,37 @@ function Results() {
     };
 
     useEffect(() => {
+        let cancelled = false;
+
         const fetchResults = async () => {
             if (!auth.currentUser) {
-                navigate('/login');
+                if (!cancelled) navigate('/login');
                 return;
             }
             try {
                 const programs = await getUserSavedPrograms(auth.currentUser.uid);
-                setSavedPrograms(programs.sort((a, b) => b.timestamp - a.timestamp));
+                if (!cancelled) {
+                    setSavedPrograms(programs.sort((a, b) => b.timestamp - a.timestamp));
+                }
             } catch (err) {
                 console.error(err);
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         };
         fetchResults();
         // try to get user location (will prompt user for permission)
         getUserLocation()
-            .then((coords) => setUserLocation(coords))
-            .catch((err) => setLocationError(err.message || 'Could not get location'));
+            .then((coords) => {
+                if (!cancelled) setUserLocation(coords);
+            })
+            .catch((err) => {
+                if (!cancelled) setLocationError(err.message || 'Could not get location');
+            });
+
+        return () => {
+            cancelled = true;
+        };
     }, [navigate]);
 
     useEffect(() => {

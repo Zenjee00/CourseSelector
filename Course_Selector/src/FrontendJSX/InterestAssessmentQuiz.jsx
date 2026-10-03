@@ -241,8 +241,6 @@ function InterestAssessmentQuiz() {
 
     setIsSubmitting(true);
     try {
-      if (!auth.currentUser) throw new Error('Please log in before continuing.');
-
       const quizRes = calculateResults(quizQuestions, answers);
 
       if (quizRes.topCategories.length > 1) {
@@ -260,7 +258,9 @@ function InterestAssessmentQuiz() {
 
       const recommendedPrograms = await getRecommendedPrograms(quizRes.recommendedCategory);
 
-      await saveQuizResults(auth.currentUser.uid, answers, quizRes.recommendedCategory, recommendedPrograms);
+      if (auth.currentUser) {
+        await saveQuizResults(auth.currentUser.uid, answers, quizRes.recommendedCategory, recommendedPrograms);
+      }
 
       setResults({
         ...quizRes,
@@ -270,7 +270,12 @@ function InterestAssessmentQuiz() {
       });
       setQuizCompleted(true);
       setBaseResults(null);
-      showToast('Quiz results saved successfully.', 'success');
+      showToast(
+        auth.currentUser
+          ? 'Quiz results saved successfully.'
+          : 'Recommendations ready. Sign in to save your history.',
+        'success',
+      );
     } catch (error) {
       showToast(error.message || 'Your result could not be saved.', 'error');
     } finally {
@@ -286,8 +291,6 @@ function InterestAssessmentQuiz() {
 
     setIsSubmitting(true);
     try {
-      if (!auth.currentUser) throw new Error('Please log in before continuing.');
-
       const tieRes = calculateResults(tieQuestions, tieAnswers, tieCategories);
       const winningCategories = tieRes.topCategories;
 
@@ -321,12 +324,14 @@ function InterestAssessmentQuiz() {
 
       const recommendedPrograms = await getRecommendedPrograms(finalCategory);
 
-      await saveQuizResults(
-        auth.currentUser.uid,
-        { ...answers, ...tieAnswers },
-        finalCategory,
-        recommendedPrograms,
-      );
+      if (auth.currentUser) {
+        await saveQuizResults(
+          auth.currentUser.uid,
+          { ...answers, ...tieAnswers },
+          finalCategory,
+          recommendedPrograms,
+        );
+      }
 
       setResults({
         scores: makeUniqueScores(finalScores),
@@ -338,7 +343,12 @@ function InterestAssessmentQuiz() {
       setQuizCompleted(true);
       setStage('main');
       setBaseResults(null);
-      showToast('Tie-breaker completed. Results saved.', 'success');
+      showToast(
+        auth.currentUser
+          ? 'Tie-breaker completed. Results saved.'
+          : 'Recommendations ready. Sign in to save your history.',
+        'success',
+      );
     } catch (error) {
       showToast(error.message || 'Your tie-breaker result could not be saved.', 'error');
     } finally {
