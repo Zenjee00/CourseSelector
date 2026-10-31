@@ -26,7 +26,7 @@ import {
   useNavigate,
 } from 'react-router-dom';
 
-import courseNFoundLogo from '../assets/Photos/CourseNFound .png';
+import courseNFoundLogo from '../assets/Photos/CourseNFound.png';
 import {
   auth,
   db,
