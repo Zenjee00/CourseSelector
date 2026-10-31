@@ -26,7 +26,7 @@ import {
   useNavigate,
 } from 'react-router-dom';
 
-import academiraLogo from '../assets/Photos/Academira .png';
+import courseNFoundLogo from '../assets/Photos/CourseNFound .png';
 import {
   auth,
   db,
@@ -254,7 +254,7 @@ function LoginRegister() {
                     <div className="auth-orb auth-orb-two" />
                     <div className="auth-visual-content">
                         <div className="auth-brand-mark">
-                            <img src={academiraLogo} alt="Academira logo" />
+                            <img src={courseNFoundLogo} alt="CourseNFound logo" />
                         </div>
                         <p className="auth-kicker">CourseNFound</p>
                         <h1>{isLogin ? 'Welcome back.' : 'Start your journey.'}</h1>
@@ -273,7 +273,7 @@ function LoginRegister() {
 
                 <div className="form-wrapper">
                     <div className="auth-form-inner" key={isLogin ? 'login' : 'register'}>
-                        <p className="form-eyebrow">{isLogin ? 'WELCOME BACK' : 'JOIN ACADEMIRA'}</p>
+                        <p className="form-eyebrow">{isLogin ? 'WELCOME BACK' : 'JOIN COURSENFOUND'}</p>
                         <h2>{isLogin ? 'Login' : 'Register'}</h2>
                         <p className="form-subtitle">
                             {isLogin ? 'Sign in to continue your career journey.' : 'Create your account to get started.'}

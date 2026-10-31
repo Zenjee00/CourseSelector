@@ -322,8 +322,8 @@ function Home() {
     return (
         <div className="home-container">
             <nav className="home-navbar" role="navigation" aria-label="Primary">
-                <div className="nav-brand" aria-label="Academira home">
-                    <h2 className="logo" onClick={handleLogoConfetti}>Acade<span>mira</span></h2>
+                <div className="nav-brand" aria-label="CourseNFound home">
+                    <h2 className="logo" onClick={handleLogoConfetti}>Course<span>NFound</span></h2>
                 </div>
 
                 <button
@@ -403,7 +403,7 @@ function Home() {
                     <p>Discover the right path for your future career.</p>
                 </header>
 
-                <section className="home-status-rail" aria-label="Academira overview">
+                <section className="home-status-rail" aria-label="CourseNFound overview">
                     <div className="status-pill">
                         <span className="status-dot" aria-hidden="true"></span>
                         <span><strong>{savedPrograms.length}</strong> saved {savedPrograms.length === 1 ? 'result' : 'results'}</span>

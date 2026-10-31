@@ -18,7 +18,7 @@ const sections = [
 		number: '01',
 		label: 'RESPONSIBILITIES',
 		title: 'Your answers shape the recommendations.',
-		body: 'Academira learns about your interests, behavior, strengths, and preferences through your answers. Be honest and thoughtful so the results reflect what you really like.',
+		body: 'CourseNFound learns about your interests, behavior, strengths, and preferences through your answers. Be honest and thoughtful so the results reflect what you really like.',
 	},
 	{
 		number: '02',
@@ -82,7 +82,7 @@ function Onboarding({ onComplete }) {
 				<div className="onboarding-footer">
 					<p>Your answers are personal. Take your time and answer what feels true to you.</p>
 					<button type="button" onClick={handleContinue} disabled={isSaving}>
-						{isSaving ? 'Saving...' : 'Continue to Academira'}
+						{isSaving ? 'Saving...' : 'Continue to CourseNFound'}
 						<span aria-hidden="true">-&gt;</span>
 					</button>
 				</div>

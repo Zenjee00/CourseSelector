@@ -1,4 +1,4 @@
-Key Features of Academira (CourseSelector) | Full-Stack Developer & QA Engineer
+Key Features of CourseNFound (CourseSelector) | Full-Stack Developer & QA Engineer
 
 - Secure Authentication & Onboarding:   Engineered an end-to-end web platform featuring secure multi-provider authentication (Firebase Google OAuth & Email), protected routes, mandatory email verification, and theme persistence.
 - Automated Career Assessment Engine:   Developed an automated 30-question/9-domain career assessment engine using custom tie-breaker scoring logic to eliminate duplicate course recommendations and track user history logs.
