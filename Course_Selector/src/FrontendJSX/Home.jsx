@@ -613,7 +613,7 @@ function Home() {
                 >
                     <div className="modal-card">
                         <h3 id="logout-modal-title">Log out?</h3>
-                        <p className="modal-text">You will be signed out of Academira.</p>
+                        <p className="modal-text">You will be signed out of CourseNFound.</p>
                         <div className="modal-actions">
                             <button className="modal-btn ghost" onClick={handleCloseLogout} aria-label="Cancel logout">Cancel</button>
                             <button className="modal-btn danger" onClick={handleLogoutConfirm} aria-label="Confirm logout">Logout</button>

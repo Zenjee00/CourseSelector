@@ -256,7 +256,7 @@ function LoginRegister() {
                         <div className="auth-brand-mark">
                             <img src={academiraLogo} alt="Academira logo" />
                         </div>
-                        <p className="auth-kicker">ACADEMIRA</p>
+                        <p className="auth-kicker">CourseNFound</p>
                         <h1>{isLogin ? 'Welcome back.' : 'Start your journey.'}</h1>
                         <p>
                             {isLogin

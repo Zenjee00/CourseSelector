@@ -210,7 +210,7 @@ function CareerLibrary() {
           <button onClick={() => navigate('/home')} className="library-back-btn">← Back to Dashboard</button>
           <p className="library-eyebrow">CAREER LIBRARY</p>
           <h1>Courses, jobs, and starting salaries</h1>
-          <p>Explore common entry-level roles and estimated monthly pay for every course in Academira.</p>
+          <p>Explore common entry-level roles and estimated monthly pay for every course in CourseNFound.</p>
         </header>
 
         <div className="library-controls">

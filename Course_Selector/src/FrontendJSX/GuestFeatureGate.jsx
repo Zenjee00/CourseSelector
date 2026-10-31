@@ -11,7 +11,7 @@ function GuestFeatureGate({ feature }) {
                 <p className="guest-gate-kicker">ACCOUNT FEATURE</p>
                 <h1 id="guest-gate-title">Sign in to access {feature}</h1>
                 <p>
-                    You can keep exploring Academira as a guest. Sign in or create an account to save your history and favorites across sessions.
+                You can keep exploring CourseNFound as a guest. Sign in or create an account to save your history and favorites across sessions.
                 </p>
                 <button type="button" onClick={() => navigate('/login')}>
                     Sign in to continue <span aria-hidden="true">-&gt;</span>

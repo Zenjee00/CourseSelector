@@ -61,7 +61,7 @@ function Onboarding({ onComplete }) {
 		<main className="onboarding-page">
 			<section className="onboarding-shell" aria-labelledby="onboarding-title">
 				<div className="onboarding-heading">
-					<p className="onboarding-kicker">A QUICK START WITH ACADEMIRA</p>
+					<p className="onboarding-kicker">A QUICK START WITH CourseNFound</p>
 					<h1 id="onboarding-title">Before you choose, get to know your direction.</h1>
 					<p className="onboarding-intro">
 						A few things to keep in mind before exploring your course and school recommendations.
