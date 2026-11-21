@@ -269,7 +269,7 @@ function LoginRegister() {
                 </aside>
 
                 <div className="form-wrapper">
-                    <div className="auth-form-inner" key={isLogin ? 'login' : 'register'}>
+                    <div className="auth-form-inner">
                         <h2>{isLogin ? 'Login' : 'Register'}</h2>
                         <p className="form-subtitle">
                             {isLogin ? 'Sign in to continue your career journey.' : 'Create your account to get started.'}
@@ -296,7 +296,7 @@ function LoginRegister() {
                             </button>
                         </div>
 
-                        <form className="login-form" onSubmit={handleSubmit}>
+                        <form className="login-form" key={isLogin ? 'login' : 'register'} onSubmit={handleSubmit}>
                             {error && <div className="error-message" role="alert">{error}</div>}
                             {infoMessage && <div className="info-message" role="status">{infoMessage}</div>}
 

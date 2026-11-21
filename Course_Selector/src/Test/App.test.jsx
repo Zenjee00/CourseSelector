@@ -117,4 +117,27 @@ describe('App route protection', () => {
 
     expect(screen.getByText('Home screen')).toBeInTheDocument();
   });
+  it('applies the account theme after sign-in without inheriting the guest theme', async () => {
+    localStorage.setItem('theme:guest', 'dark');
+    window.history.replaceState({}, '', '/home');
+    render(<App />);
+    await act(async () => { authState.callback(null); });
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    await act(async () => { authState.callback({ uid: 'fresh-account', emailVerified: true }); });
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(localStorage.getItem('theme:fresh-account')).toBeNull();
+  });
+
+  it('shows login in light mode after signing out of a dark account', async () => {
+    localStorage.setItem('theme:alice', 'dark');
+    window.history.replaceState({}, '', '/home');
+    render(<App />);
+    await act(async () => { authState.callback({ uid: 'alice', emailVerified: true }); });
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    window.history.replaceState({}, '', '/login');
+    await act(async () => { authState.callback(null); });
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(localStorage.getItem('theme:alice')).toBe('dark');
+  });
+
 });

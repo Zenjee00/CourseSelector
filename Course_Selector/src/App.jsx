@@ -24,6 +24,7 @@ import {
   db,
 } from './BackendFbase/Firebase';
 import { ToastProvider } from './context/ToastContext';
+import ThemeProvider from './context/ThemeProvider';
 const CareerLibrary = lazy(() => import('./FrontendJSX/CareerLibrary'));
 import GuestFeatureGate from './FrontendJSX/GuestFeatureGate';
 const Home = lazy(() => import('./FrontendJSX/Home'));
@@ -41,24 +42,6 @@ function App() {
   const [authSession, setAuthSession] = useState(null);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [authReady, setAuthReady] = useState(false);
-
-  useEffect(() => {
-    if (!authReady) return;
-
-    const theme = user
-      ? (localStorage.getItem('theme') === 'dark' ? 'dark' : 'light')
-      : 'light';
-
-    document.documentElement.setAttribute(
-      'data-theme',
-      theme,
-    );
-
-    document.body.setAttribute(
-      'data-theme',
-      theme,
-    );
-  }, [authReady, user]);
 
   useEffect(() => {
     let isActive = true;
@@ -124,6 +107,7 @@ function App() {
       <OfflineBanner />
 
       <Router>
+        <ThemeProvider key={user?.uid || 'guest'} userId={user?.uid}>
         <div className="App">
           <Suspense fallback={<OrbitLoader label="Loading page" />}>
           <Routes>
@@ -243,6 +227,7 @@ function App() {
           </Routes>
           </Suspense>
         </div>
+        </ThemeProvider>
       </Router>
     </ToastProvider>
   );

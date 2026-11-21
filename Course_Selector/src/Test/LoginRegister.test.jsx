@@ -106,4 +106,20 @@ describe('LoginRegister', () => {
     expect(authMocks.getIdTokenResult).not.toHaveBeenCalled();
     expect(firestoreMocks.setDoc).not.toHaveBeenCalled();
   });
+
+  it('slides the auth mode indicator between sign in and sign up', () => {
+    renderLogin();
+
+    const signInTab = screen.getByRole('tab', { name: 'Sign In' });
+    const signUpTab = screen.getByRole('tab', { name: 'Sign Up' });
+
+    expect(signInTab).toHaveAttribute('aria-selected', 'true');
+    expect(signInTab.closest('.auth-mode-switch')).not.toHaveClass('show-register');
+
+    fireEvent.click(signUpTab);
+
+    const updatedSignUpTab = screen.getByRole('tab', { name: 'Sign Up' });
+    expect(updatedSignUpTab).toHaveAttribute('aria-selected', 'true');
+    expect(updatedSignUpTab.closest('.auth-mode-switch')).toHaveClass('show-register');
+  });
 });
