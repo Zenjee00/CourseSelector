@@ -34,6 +34,7 @@ import {
   db,
 } from '../BackendFbase/Firebase';
 import { useToast } from '../context/useToast';
+import { useTheme } from '../context/useTheme';
 
 function isSafePhotoUrl(value) {
     try { return new URL(value).protocol === 'https:'; } catch { return false; }
@@ -45,9 +46,7 @@ function Home() {
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [loadingPrograms, setLoadingPrograms] = useState(false);
-    const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('theme') || 'light';
-    });
+    const { theme, toggleTheme } = useTheme();
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showGuestLoginPrompt, setShowGuestLoginPrompt] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -91,10 +90,6 @@ function Home() {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
-                const accountTheme = localStorage.getItem(`theme:${currentUser.uid}`);
-                if (accountTheme === 'dark' || accountTheme === 'light') {
-                    setTheme(accountTheme);
-                }
                 setProfileForm({
                     displayName: currentUser.displayName || '',
                     photoURL: currentUser.photoURL || '',
@@ -109,13 +104,6 @@ function Home() {
         });
         return () => unsubscribe();
     }, [navigate, showToast]);
-
-    useEffect(() => {
-        localStorage.setItem('theme', theme);
-        if (user?.uid) localStorage.setItem(`theme:${user.uid}`, theme);
-        document.documentElement.setAttribute('data-theme', theme);
-        document.body.setAttribute('data-theme', theme);
-    }, [theme, user?.uid]);
 
     const handleViewResults = () => {
         if (!user) {
@@ -133,10 +121,6 @@ function Home() {
     const handleViewLibrary = () => {
         setMobileMenuOpen(false);
         navigate('/library');
-    };
-
-    const toggleTheme = () => {
-        setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
 
     const handleLogoutConfirm = async () => {

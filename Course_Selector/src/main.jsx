@@ -6,11 +6,10 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary';
+import { applyTheme, DEFAULT_THEME } from './utils/theme';
 
-const storedTheme = localStorage.getItem('theme')
-const initialTheme = storedTheme === 'dark' ? 'dark' : 'light'
-document.documentElement.setAttribute('data-theme', initialTheme)
-document.body.setAttribute('data-theme', initialTheme)
+// Start light until Firebase identifies whose preference should be restored.
+applyTheme(DEFAULT_THEME);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
