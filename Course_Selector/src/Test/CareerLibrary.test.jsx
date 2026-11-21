@@ -49,6 +49,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
   return {
     ...original,
     useNavigate: () => testData.navigate,
+    useSearchParams: () => [new URLSearchParams()],
   }
 })
 
@@ -270,7 +271,7 @@ describe('CareerLibrary', () => {
     await waitFor(() => {
       const storedFavorites = JSON.parse(
         localStorage.getItem(
-          'course_selector_favorites',
+          'course_selector_favorites:test-user-123',
         ),
       )
 
@@ -296,7 +297,7 @@ describe('CareerLibrary', () => {
 
   it('shows only favorite programs', () => {
     localStorage.setItem(
-      'course_selector_favorites',
+      'course_selector_favorites:test-user-123',
       JSON.stringify(['bachelor of science in computer science']),
     )
 

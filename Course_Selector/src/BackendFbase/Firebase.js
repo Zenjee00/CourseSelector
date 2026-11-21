@@ -17,12 +17,12 @@ const useFirebaseEmulator =
   import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true';
 
 const productionConfig = {
-  apiKey: 'AIzaSyCYHVpk-zn7N3y8qp9nvERGDfm39n65F3Q',
-  authDomain: 'courseselector-76d5f.firebaseapp.com',
-  projectId: 'courseselector-76d5f',
-  storageBucket: 'courseselector-76d5f.firebasestorage.app',
-  messagingSenderId: '1040290911840',
-  appId: '1:1040290911840:web:416b8d119c0a9a6bd4d505',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCYHVpk-zn7N3y8qp9nvERGDfm39n65F3Q',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'courseselector-76d5f.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'courseselector-76d5f',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'courseselector-76d5f.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '1040290911840',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:1040290911840:web:416b8d119c0a9a6bd4d505',
 };
 
 const emulatorConfig = {

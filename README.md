@@ -1,14 +1,23 @@
-Key Features of CourseNFound (CourseSelector) | Full-Stack Developer & QA Engineer
+# CourseNFound
 
-- Secure Authentication & Onboarding:   Engineered an end-to-end web platform featuring secure multi-provider authentication (Firebase Google OAuth & Email), protected routes, mandatory email verification, and theme persistence.
-- Automated Career Assessment Engine:   Developed an automated 30-question/9-domain career assessment engine using custom tie-breaker scoring logic to eliminate duplicate course recommendations and track user history logs.
-- Proximity & University Location Engine:   Integrated LocationIQ APIs and browser location detection to geocode educational institutions, sort nearby schools, and calculate real-time driving distances with estimated travel times.
+CourseNFound helps students explore their interests, compare degree programs, and find nearby universities. The React/Vite app and Node API live in `Course_Selector/`.
 
+The interest assessment has 30 questions across nine fields, with tie-breaker questions when needed. Students can browse the career library, compare programs, inspect school and tuition information, and save assessment history after verifying their account. Favorites are stored per account in the current browser. Salary and tuition figures are estimates.
 
+Swipe Match and Day in a Life are planned modes and are labeled coming soon.
 
-Automated Testing & Quality Assurance
+## Development
 
-Implemented a robust, dual-layered testing pipeline using   Vitest   and   Playwright   to maintain high code quality and prevent regressions in production:
+Use Node 22 or 24. From `Course_Selector/`:
 
-- Unit & Integration Testing (Vitest):   Achieved 100% test suite reliability by authoring 34 unit and integration test cases using Vitest to validate assessment scoring logic, offline state resilience, and UI component state transitions.
-- End-to-End (E2E) Automation (Playwright):   Automated critical E2E scenarios using Playwright to validate real-world user journeys, including Firebase Google OAuth authentication, mobile layout responsiveness, and network reconnection handling.
+```sh
+npm ci
+cp .env.example .env
+npm run dev
+```
+
+Supply server credentials in `.env`, then run `npm run start:server` in a second terminal. Vite forwards `/api` to the local API. To verify changes, run `npm run check`; for Firebase emulator tests, run `npm run test:firebase` with Java 21 installed.
+
+See [API setup](Course_Selector/README_PROXY.md) and [operations](Course_Selector/OPERATIONS.md) for staging, production configuration, health checks, logging, deployment boundaries, and rollback.
+
+GitHub Actions runs lint, UI tests, API tests, production builds, production dependency audits, and Firebase rules checks. Production hosting, uptime alerts, and deployment promotion must be configured separately.

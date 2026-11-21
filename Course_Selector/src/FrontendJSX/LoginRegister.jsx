@@ -61,11 +61,12 @@ function LoginRegister() {
 
         if (!recaptchaToken) throw new Error('Please complete the reCAPTCHA challenge and try again.');
 
-        const baseUrl = import.meta.env.VITE_GEO_PROXY_URL || 'http://localhost:5174';
+        const baseUrl = import.meta.env.VITE_GEO_PROXY_URL || '';
         const response = await fetch(`${baseUrl}/api/verify-recaptcha`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: recaptchaToken }),
+            signal: AbortSignal.timeout(10000),
         });
         if (!response.ok) {
             recaptchaRef.current?.reset();
@@ -140,7 +141,7 @@ function LoginRegister() {
         setInfoMessage('');
         setLoadingLabel(isLogin ? 'Signing you in...' : 'Creating your account...');
         setLoading(true);
-        
+
         try {
             if (isLogin) await verifyRecaptcha();
             if (isLogin) {
@@ -163,7 +164,7 @@ function LoginRegister() {
                     return;
                 }
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                
+
                 // Profile creation is deferred until the first verified login.
                 await sendVerificationAndSignOut(userCredential.user);
                 setIsLogin(true);
@@ -174,7 +175,7 @@ function LoginRegister() {
 
             }
         } catch (error) {
-            console.error('Authentication error:', error);
+            console.error('Authentication failed:', error.code);
             // Handle specific Firebase errors
             switch (error.code) {
                 case 'auth/email-already-in-use':
@@ -187,16 +188,15 @@ function LoginRegister() {
                     setError('Password is too weak');
                     break;
                 case 'auth/user-not-found':
-                    setError('No account found with this email');
-                    break;
+                case 'auth/invalid-credential':
                 case 'auth/wrong-password':
-                    setError('Incorrect password');
+                    setError('The email or password is incorrect. Please try again.');
                     break;
                 case 'auth/operation-not-allowed':
-                    setError('Email/Password sign-in is disabled in Firebase. Enable Email/Password provider in Firebase Console > Authentication > Sign-in method.');
+                    setError('Email sign-in is currently unavailable. Try Google sign-in or contact support.');
                     break;
                 default:
-                    setError(error.message || 'An error occurred. Please try again.');
+                    setError('Sign-in could not be completed. Check your connection and try again.');
             }
         } finally {
             setLoading(false);
@@ -208,18 +208,18 @@ function LoginRegister() {
         setLoading(true);
         setError('');
         setInfoMessage('');
-        
+
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
-            
+
             if (!await requireVerifiedUser(user)) return;
             const needsOnboarding = await saveVerifiedProfile(user);
 
             console.log('Google sign-in successful!');
             navigate(needsOnboarding ? '/onboarding' : '/home', { replace: true });
         } catch (error) {
-            console.error('Google sign-in error:', error);
+            console.error('Google sign-in failed:', error.code);
             if (error.code === 'auth/popup-closed-by-user') {
                 setError('Sign-in cancelled.');
             } else {
@@ -249,14 +249,11 @@ function LoginRegister() {
     return (
         <div className="login-register-container">
             <div className={`auth-shell${isLogin ? ' is-login' : ' is-register'}`}>
-                <aside className="auth-visual" aria-hidden="true">
-                    <div className="auth-orb auth-orb-one" />
-                    <div className="auth-orb auth-orb-two" />
+                <aside className="auth-visual" >
                     <div className="auth-visual-content">
                         <div className="auth-brand-mark">
                             <img src={courseNFoundLogo} alt="CourseNFound logo" />
                         </div>
-                        <p className="auth-kicker">CourseNFound</p>
                         <h1>{isLogin ? 'Welcome back.' : 'Start your journey.'}</h1>
                         <p>
                             {isLogin
@@ -265,7 +262,7 @@ function LoginRegister() {
                         </p>
                         <div className="auth-feature-list">
                             <span>Personalized recommendations</span>
-                            <span>School informations</span>
+                            <span>School information</span>
                             <span>Saved assessment history</span>
                         </div>
                     </div>
@@ -273,14 +270,12 @@ function LoginRegister() {
 
                 <div className="form-wrapper">
                     <div className="auth-form-inner" key={isLogin ? 'login' : 'register'}>
-                        <p className="form-eyebrow">{isLogin ? 'WELCOME BACK' : 'JOIN COURSENFOUND'}</p>
                         <h2>{isLogin ? 'Login' : 'Register'}</h2>
                         <p className="form-subtitle">
                             {isLogin ? 'Sign in to continue your career journey.' : 'Create your account to get started.'}
                         </p>
 
                         <div className={`auth-mode-switch${isLogin ? '' : ' show-register'}`} role="tablist" aria-label="Authentication mode">
-                            <span className="auth-mode-indicator" aria-hidden="true" />
                             <button
                                 type="button"
                                 role="tab"
@@ -361,7 +356,6 @@ function LoginRegister() {
 
                             <button type="submit" className="submit-btn" disabled={loading}>
                                 <span>{loading ? 'Please wait...' : (isLogin ? 'Login' : 'Register')}</span>
-                                <span className="submit-arrow" aria-hidden="true">→</span>
                             </button>
                         </form>
 

@@ -38,7 +38,7 @@ vi.mock('../BackendFbase/Firebase', () => ({
   },
 }));
 
-vi.mock('../context/ToastContext', () => ({
+vi.mock('../context/useToast', () => ({
   useToast: () => vi.fn(),
 }));
 
@@ -46,8 +46,8 @@ vi.mock('../data/universities', () => ({
   universities: [],
 }));
 
-vi.mock('../FrontendJSX/CareerLibrary', () => ({
-  CareerInfo: ({ programName }) => <div>{programName}</div>,
+vi.mock('../components/CareerInfo', () => ({
+  default: ({ programName }) => <div>{programName}</div>,
 }));
 
 const renderQuiz = () => render(

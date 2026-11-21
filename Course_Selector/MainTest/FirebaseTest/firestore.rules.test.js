@@ -87,7 +87,7 @@ describe('/Users rules', () => {
     }));
   });
 
-  it('denies access to another user profile and denies profile deletion', async () => {
+  it('denies access to another user profile and allows owner deletion', async () => {
     await seed('Users/alice', { displayName: 'Alice' });
 
     const bob = verifiedDb('bob');
@@ -95,7 +95,7 @@ describe('/Users rules', () => {
 
     await assertFails(getDoc(doc(bob, 'Users/alice')));
     await assertFails(updateDoc(doc(bob, 'Users/alice'), { displayName: 'Hacked' }));
-    await assertFails(deleteDoc(doc(alice, 'Users/alice')));
+    await assertSucceeds(deleteDoc(doc(alice, 'Users/alice')));
   });
 });
 

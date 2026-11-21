@@ -1,6 +1,8 @@
 import './App.css';
 
 import {
+  lazy,
+  Suspense,
   useEffect,
   useState,
 } from 'react';
@@ -22,17 +24,17 @@ import {
   db,
 } from './BackendFbase/Firebase';
 import { ToastProvider } from './context/ToastContext';
-import CareerLibrary from './FrontendJSX/CareerLibrary';
+const CareerLibrary = lazy(() => import('./FrontendJSX/CareerLibrary'));
 import GuestFeatureGate from './FrontendJSX/GuestFeatureGate';
-import Home from './FrontendJSX/Home';
-import InterestAssessmentQuiz from './FrontendJSX/InterestAssessmentQuiz';
-import LoginRegister from './FrontendJSX/LoginRegister';
+const Home = lazy(() => import('./FrontendJSX/Home'));
+const InterestAssessmentQuiz = lazy(() => import('./FrontendJSX/InterestAssessmentQuiz'));
+const LoginRegister = lazy(() => import('./FrontendJSX/LoginRegister'));
 import OfflineBanner from './FrontendJSX/OfflineBanner';
-import Onboarding from './FrontendJSX/Onboarding';
+const Onboarding = lazy(() => import('./FrontendJSX/Onboarding'));
 import OrbitLoader from './FrontendJSX/OrbitLoader';
-import Results from './FrontendJSX/Results';
-import Simulator from './FrontendJSX/Simulator';
-import SwipeGame from './FrontendJSX/SwipeGame';
+const Results = lazy(() => import('./FrontendJSX/Results'));
+const Simulator = lazy(() => import('./FrontendJSX/Simulator'));
+const SwipeGame = lazy(() => import('./FrontendJSX/SwipeGame'));
 
 function App() {
   const [user, setUser] = useState(null);
@@ -60,10 +62,12 @@ function App() {
 
   useEffect(() => {
     let isActive = true;
+    let sessionVersion = 0;
 
     const unsubscribe = onIdTokenChanged(auth, async (currentUser) => {
         if (!isActive) return;
 
+        const version = ++sessionVersion;
         setAuthReady(false);
         /*
          * Registration creates a signed-in user before
@@ -87,7 +91,7 @@ function App() {
           }
         }
 
-        if (!isActive) return;
+        if (!isActive || version !== sessionVersion) return;
         setAuthSession(currentUser);
         setUser(verifiedUser);
         setNeedsOnboarding(onboardingRequired);
@@ -111,6 +115,8 @@ function App() {
   }
 
   const isUnverifiedUser = Boolean(authSession && !user);
+  const onboardingRedirect = user && needsOnboarding;
+
 
   return (
     <ToastProvider>
@@ -119,6 +125,7 @@ function App() {
 
       <Router>
         <div className="App">
+          <Suspense fallback={<OrbitLoader label="Loading page" />}>
           <Routes>
             <Route
               path="/"
@@ -174,7 +181,7 @@ function App() {
               path="/results"
               element={
                 user
-                  ? <Results />
+                  ? onboardingRedirect ? <Navigate to="/onboarding" replace /> : <Results />
                   : isUnverifiedUser
                     ? <Navigate to="/login" replace />
                   : <GuestFeatureGate feature="saved history" />
@@ -234,6 +241,7 @@ function App() {
               )}
             />
           </Routes>
+          </Suspense>
         </div>
       </Router>
     </ToastProvider>

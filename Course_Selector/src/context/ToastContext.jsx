@@ -1,9 +1,7 @@
 import '../FrontendCSS/Toast.css';
 
 import {
-  createContext,
   useCallback,
-  useContext,
   useMemo,
   useState,
 } from 'react';
@@ -12,7 +10,7 @@ import PropTypes from 'prop-types';
 
 import Toast from '../FrontendJSX/Toast';
 
-const ToastContext = createContext(null);
+import { ToastContext } from './toast-context';
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -45,11 +43,3 @@ export function ToastProvider({ children }) {
 ToastProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
-
-export function useToast() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return ctx.showToast;
-}

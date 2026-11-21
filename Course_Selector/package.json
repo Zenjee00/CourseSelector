@@ -12,16 +12,19 @@
     "test:run": "vitest run",
     "test:e2e": "firebase emulators:exec --project demo-courseselector --only auth,firestore \"playwright test\"",
     "test:e2e:headed": "firebase emulators:exec --project demo-courseselector --only auth,firestore \"playwright test --headed\"",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "start:server": "node server/index.js",
+    "test:server": "node --test server/app.test.js",
+    "test:firebase": "firebase emulators:exec --project demo-courseselector --only auth,firestore \"vitest run --config vitest.firebase.config.js\"",
+    "check": "npm run lint && npm run test:run && npm run test:server && npm run build"
   },
   "dependencies": {
-    "canvas-confetti": "^1.9.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.7.5",
     "firebase": "^12.7.0",
-    "framer-motion": "^12.26.2",
-    "node-fetch": "^3.3.2",
+    "helmet": "^8.3.0",
     "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -46,5 +49,11 @@
     "jsdom": "^29.1.1",
     "vite": "^7.2.4",
     "vitest": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.7"
   }
 }

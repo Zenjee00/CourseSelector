@@ -25,11 +25,10 @@ import {
   getSchoolsForProgram as getCatalogSchoolsForProgram,
 } from '../utils/programCatalog';
 import { programsMatch } from '../utils/programMatching';
-import { CareerInfo } from './CareerLibrary';
+import CareerInfo from '../components/CareerInfo';
 import OrbitLoader from './OrbitLoader';
 
 const GEO_CACHE_KEY = 'course_selector_geocode_cache_v1';
-const ROUTE_CACHE_KEY = 'course_selector_route_cache_v1';
 
 const readGeocodeCache = () => {
         try {
@@ -41,15 +40,6 @@ const readGeocodeCache = () => {
 };
 
 const getSchoolKey = (school) => `${school.name}||${school.location}`.toLowerCase();
-const readRouteCache = () => {
-    try {
-        const raw = localStorage.getItem(ROUTE_CACHE_KEY);
-        return raw ? JSON.parse(raw) : {};
-    } catch {
-        return {};
-    }
-};
-
 const getOriginKey = (coords) => {
     if (!coords) return 'no-origin';
     const lat = Number(coords.latitude ?? coords.lat ?? 0).toFixed(4);
@@ -90,11 +80,12 @@ function Results() {
     const navigate = useNavigate();
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
     const [deletingId, setDeletingId] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
     const [locationError, setLocationError] = useState(null);
     const [geocodeCache, setGeocodeCache] = useState(() => readGeocodeCache());
-    const [routeCache, setRouteCache] = useState(() => readRouteCache());
+    const [routeCache, setRouteCache] = useState({});
     const [geocodingProgress, setGeocodingProgress] = useState({ running: false, done: 0, total: 0 });
     const [routeProgress, setRouteProgress] = useState({ running: false, done: 0, total: 0 });
     const [geocodingMessage, setGeocodingMessage] = useState('');
@@ -107,8 +98,8 @@ function Results() {
     }, [geocodeCache]);
 
     useEffect(() => {
-        localStorage.setItem(ROUTE_CACHE_KEY, JSON.stringify(routeCache));
-    }, [routeCache]);
+        localStorage.removeItem('course_selector_route_cache_v1');
+    }, []);
 
     const getUniversitiesForProgram = (programName) => {
         if (!programName) return [];
@@ -161,7 +152,8 @@ function Results() {
                     setSavedPrograms(programs.sort((a, b) => b.timestamp - a.timestamp));
                 }
             } catch (err) {
-                console.error(err);
+                console.error('Could not load history:', err.code);
+                if (!cancelled) setLoadError('Could not load your saved history. Check your connection, then refresh this page.');
             } finally {
                 if (!cancelled) setLoading(false);
             }
@@ -375,6 +367,7 @@ function Results() {
                     )}
                 </header>
 
+                {loadError && <p role="alert">{loadError} <button onClick={() => window.location.reload()}>Refresh history</button></p>}
                 {loading ? (
                     <div className="results-loading-state">
                         <OrbitLoader label="Loading your results" />
@@ -401,7 +394,7 @@ function Results() {
                                                 {deletingId === program.id ? 'Deleting…' : 'Delete'}
                                             </button>
                                         </div>
-                                        
+
                                         <h3>{program.Recommended_Field || 'Recommended Program'}</h3>
 
                                         <div className="card-mid">
@@ -475,7 +468,7 @@ function Results() {
                                                 </div>
                                             )}
                                         </div>
-                                        
+
                                         <div className="card-bottom">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>

@@ -1,0 +1,5 @@
+.career-info { display: grid; grid-template-columns: 1fr; gap: .8rem; }
+.career-info-label { display: block; font-size: .75rem; color: var(--text-muted); font-weight: 600; margin-bottom: .3rem; }
+.career-info p { margin: 0; font-size: .875rem; }
+.career-salary strong { font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.career-duration small { color: var(--text-muted); }

@@ -13,9 +13,9 @@ import {
   saveQuizResults,
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import { universities } from '../data/universities';
-import { CareerInfo } from './CareerLibrary';
+import CareerInfo from '../components/CareerInfo';
 
 const quizQuestions = [
   { id: 'q1', text: '1. I enjoy setting up, configuring, and maintaining computer networks or systems.', category: 'COMPUTER / IT / TECHNOLOGY' },
@@ -89,7 +89,7 @@ function InterestAssessmentQuiz() {
   const [tieRound, setTieRound] = useState(0);
   const [baseResults, setBaseResults] = useState(null);
   const [animationClass, setAnimationClass] = useState('');
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [theme] = useState(() => localStorage.getItem('theme') || 'light');
   const navigate = useNavigate();
   const showToast = useToast();
 
@@ -130,7 +130,7 @@ function InterestAssessmentQuiz() {
                 <div className="quiz-card" style={{ minHeight: '280px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div className="skeleton-text" style={{ width: '90%', height: '32px', marginBottom: '12px' }}></div>
                     <div className="skeleton-text" style={{ width: '70%', height: '32px', marginBottom: '36px' }}></div>
-                    
+
                     <div className="quiz-scale">
                         <div className="skeleton-text" style={{ width: '120px', height: '12px' }}></div>
                         <div className="skeleton-text" style={{ width: '150px', height: '12px' }}></div>
@@ -467,14 +467,14 @@ function InterestAssessmentQuiz() {
             <span aria-live="polite">{Math.round(progress)}%</span>
           </div>
           <div className="progress-bar-bg">
-            <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+            <div className="progress-bar-fill" style={{ transform: `scaleX(${progress / 100})` }}></div>
           </div>
         </div>
 
         {/* Animated Question Card */}
         <div className={`quiz-card ${animationClass}`}>
           <p className="question-text">{currentQuestion?.text}</p>
-          
+
           <div className="quiz-scale">
             <span>Agree</span>
             <span>Disagree</span>
@@ -497,17 +497,17 @@ function InterestAssessmentQuiz() {
 
         {/* Navigation Footer */}
         <div className="quiz-nav">
-          <button 
-            className="nav-btn prev-btn" 
-            onClick={handlePrev} 
+          <button
+            className="nav-btn prev-btn"
+            onClick={handlePrev}
             disabled={currentIndex === 0 || isSubmitting}
             aria-label="Previous question"
           >
             Previous
           </button>
 
-          <button 
-            className="nav-btn next-btn" 
+          <button
+            className="nav-btn next-btn"
             onClick={handleNext}
             disabled={!currentQuestion || !activeAnswers[currentQuestion.id] || isSubmitting}
             aria-label={nextAriaLabel}

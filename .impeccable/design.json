@@ -1,0 +1,584 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-21T17:54:24.736600+00:00",
+  "title": "Design System: CourseNFound",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary",
+        "tonalRamp": [
+          "oklch(15% 0.06401 166.25)",
+          "oklch(26% 0.06401 166.25)",
+          "oklch(38% 0.06401 166.25)",
+          "oklch(49% 0.06401 166.25)",
+          "oklch(61% 0.06401 166.25)",
+          "oklch(72% 0.06401 166.25)",
+          "oklch(84% 0.06401 166.25)",
+          "oklch(95% 0.06401 166.25)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Primary Hover",
+        "tonalRamp": [
+          "oklch(15% 0.05185 167.33)",
+          "oklch(26% 0.05185 167.33)",
+          "oklch(38% 0.05185 167.33)",
+          "oklch(49% 0.05185 167.33)",
+          "oklch(61% 0.05185 167.33)",
+          "oklch(72% 0.05185 167.33)",
+          "oklch(84% 0.05185 167.33)",
+          "oklch(95% 0.05185 167.33)"
+        ]
+      },
+      "primary-light": {
+        "role": "primary",
+        "displayName": "Primary Light",
+        "tonalRamp": [
+          "oklch(15% 0.06997 162.19)",
+          "oklch(26% 0.06997 162.19)",
+          "oklch(38% 0.06997 162.19)",
+          "oklch(49% 0.06997 162.19)",
+          "oklch(61% 0.06997 162.19)",
+          "oklch(72% 0.06997 162.19)",
+          "oklch(84% 0.06997 162.19)",
+          "oklch(95% 0.06997 162.19)"
+        ]
+      },
+      "primary-soft": {
+        "role": "primary",
+        "displayName": "Primary Soft",
+        "tonalRamp": [
+          "oklch(15% 0.01409 138.71)",
+          "oklch(26% 0.01409 138.71)",
+          "oklch(38% 0.01409 138.71)",
+          "oklch(49% 0.01409 138.71)",
+          "oklch(61% 0.01409 138.71)",
+          "oklch(72% 0.01409 138.71)",
+          "oklch(84% 0.01409 138.71)",
+          "oklch(95% 0.01409 138.71)"
+        ]
+      },
+      "bg-main": {
+        "role": "neutral",
+        "displayName": "Bg Main",
+        "tonalRamp": [
+          "oklch(15% 0.01236 91.52)",
+          "oklch(26% 0.01236 91.52)",
+          "oklch(38% 0.01236 91.52)",
+          "oklch(49% 0.01236 91.52)",
+          "oklch(61% 0.01236 91.52)",
+          "oklch(72% 0.01236 91.52)",
+          "oklch(84% 0.01236 91.52)",
+          "oklch(95% 0.01236 91.52)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "tonalRamp": [
+          "oklch(15% 0.00818 91.48)",
+          "oklch(26% 0.00818 91.48)",
+          "oklch(38% 0.00818 91.48)",
+          "oklch(49% 0.00818 91.48)",
+          "oklch(61% 0.00818 91.48)",
+          "oklch(72% 0.00818 91.48)",
+          "oklch(84% 0.00818 91.48)",
+          "oklch(95% 0.00818 91.48)"
+        ]
+      },
+      "text-main": {
+        "role": "neutral",
+        "displayName": "Text Main",
+        "tonalRamp": [
+          "oklch(15% 0.02853 162.47)",
+          "oklch(26% 0.02853 162.47)",
+          "oklch(38% 0.02853 162.47)",
+          "oklch(49% 0.02853 162.47)",
+          "oklch(61% 0.02853 162.47)",
+          "oklch(72% 0.02853 162.47)",
+          "oklch(84% 0.02853 162.47)",
+          "oklch(95% 0.02853 162.47)"
+        ]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Text Muted",
+        "tonalRamp": [
+          "oklch(15% 0.02178 137.84)",
+          "oklch(26% 0.02178 137.84)",
+          "oklch(38% 0.02178 137.84)",
+          "oklch(49% 0.02178 137.84)",
+          "oklch(61% 0.02178 137.84)",
+          "oklch(72% 0.02178 137.84)",
+          "oklch(84% 0.02178 137.84)",
+          "oklch(95% 0.02178 137.84)"
+        ]
+      },
+      "border-color": {
+        "role": "neutral",
+        "displayName": "Border Color",
+        "tonalRamp": [
+          "oklch(15% 0.01910 110.12)",
+          "oklch(26% 0.01910 110.12)",
+          "oklch(38% 0.01910 110.12)",
+          "oklch(49% 0.01910 110.12)",
+          "oklch(61% 0.01910 110.12)",
+          "oklch(72% 0.01910 110.12)",
+          "oklch(84% 0.01910 110.12)",
+          "oklch(95% 0.01910 110.12)"
+        ]
+      },
+      "danger": {
+        "role": "neutral",
+        "displayName": "Danger",
+        "tonalRamp": [
+          "oklch(15% 0.15770 28.32)",
+          "oklch(26% 0.15770 28.32)",
+          "oklch(38% 0.15770 28.32)",
+          "oklch(49% 0.15770 28.32)",
+          "oklch(61% 0.15770 28.32)",
+          "oklch(72% 0.15770 28.32)",
+          "oklch(84% 0.15770 28.32)",
+          "oklch(95% 0.15770 28.32)"
+        ]
+      },
+      "danger-soft": {
+        "role": "neutral",
+        "displayName": "Danger Soft",
+        "tonalRamp": [
+          "oklch(15% 0.01982 37.03)",
+          "oklch(26% 0.01982 37.03)",
+          "oklch(38% 0.01982 37.03)",
+          "oklch(49% 0.01982 37.03)",
+          "oklch(61% 0.01982 37.03)",
+          "oklch(72% 0.01982 37.03)",
+          "oklch(84% 0.01982 37.03)",
+          "oklch(95% 0.01982 37.03)"
+        ]
+      },
+      "panel-ink": {
+        "role": "neutral",
+        "displayName": "Panel Ink",
+        "tonalRamp": [
+          "oklch(15% 0.01717 99.59)",
+          "oklch(26% 0.01717 99.59)",
+          "oklch(38% 0.01717 99.59)",
+          "oklch(49% 0.01717 99.59)",
+          "oklch(61% 0.01717 99.59)",
+          "oklch(72% 0.01717 99.59)",
+          "oklch(84% 0.01717 99.59)",
+          "oklch(95% 0.01717 99.59)"
+        ]
+      },
+      "panel-muted": {
+        "role": "neutral",
+        "displayName": "Panel Muted",
+        "tonalRamp": [
+          "oklch(15% 0.02575 145.36)",
+          "oklch(26% 0.02575 145.36)",
+          "oklch(38% 0.02575 145.36)",
+          "oklch(49% 0.02575 145.36)",
+          "oklch(61% 0.02575 145.36)",
+          "oklch(72% 0.02575 145.36)",
+          "oklch(84% 0.02575 145.36)",
+          "oklch(95% 0.02575 145.36)"
+        ]
+      },
+      "panel-rule": {
+        "role": "neutral",
+        "displayName": "Panel Rule",
+        "tonalRamp": [
+          "oklch(15% 0.04663 156.38)",
+          "oklch(26% 0.04663 156.38)",
+          "oklch(38% 0.04663 156.38)",
+          "oklch(49% 0.04663 156.38)",
+          "oklch(61% 0.04663 156.38)",
+          "oklch(72% 0.04663 156.38)",
+          "oklch(84% 0.04663 156.38)",
+          "oklch(95% 0.04663 156.38)"
+        ]
+      },
+      "assessment-button": {
+        "role": "primary",
+        "displayName": "Assessment Button",
+        "tonalRamp": [
+          "oklch(15% 0.03954 102.44)",
+          "oklch(26% 0.03954 102.44)",
+          "oklch(38% 0.03954 102.44)",
+          "oklch(49% 0.03954 102.44)",
+          "oklch(61% 0.03954 102.44)",
+          "oklch(72% 0.03954 102.44)",
+          "oklch(84% 0.03954 102.44)",
+          "oklch(95% 0.03954 102.44)"
+        ]
+      },
+      "assessment-button-ink": {
+        "role": "primary",
+        "displayName": "Assessment Button Ink",
+        "tonalRamp": [
+          "oklch(15% 0.04765 155.55)",
+          "oklch(26% 0.04765 155.55)",
+          "oklch(38% 0.04765 155.55)",
+          "oklch(49% 0.04765 155.55)",
+          "oklch(61% 0.04765 155.55)",
+          "oklch(72% 0.04765 155.55)",
+          "oklch(84% 0.04765 155.55)",
+          "oklch(95% 0.04765 155.55)"
+        ]
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "Dark Primary",
+        "tonalRamp": [
+          "oklch(15% 0.06399 154.72)",
+          "oklch(26% 0.06399 154.72)",
+          "oklch(38% 0.06399 154.72)",
+          "oklch(49% 0.06399 154.72)",
+          "oklch(61% 0.06399 154.72)",
+          "oklch(72% 0.06399 154.72)",
+          "oklch(84% 0.06399 154.72)",
+          "oklch(95% 0.06399 154.72)"
+        ]
+      },
+      "dark-primary-hover": {
+        "role": "primary",
+        "displayName": "Dark Primary Hover",
+        "tonalRamp": [
+          "oklch(15% 0.04999 154.21)",
+          "oklch(26% 0.04999 154.21)",
+          "oklch(38% 0.04999 154.21)",
+          "oklch(49% 0.04999 154.21)",
+          "oklch(61% 0.04999 154.21)",
+          "oklch(72% 0.04999 154.21)",
+          "oklch(84% 0.04999 154.21)",
+          "oklch(95% 0.04999 154.21)"
+        ]
+      },
+      "dark-primary-light": {
+        "role": "primary",
+        "displayName": "Dark Primary Light",
+        "tonalRamp": [
+          "oklch(15% 0.07767 152.02)",
+          "oklch(26% 0.07767 152.02)",
+          "oklch(38% 0.07767 152.02)",
+          "oklch(49% 0.07767 152.02)",
+          "oklch(61% 0.07767 152.02)",
+          "oklch(72% 0.07767 152.02)",
+          "oklch(84% 0.07767 152.02)",
+          "oklch(95% 0.07767 152.02)"
+        ]
+      },
+      "dark-primary-soft": {
+        "role": "primary",
+        "displayName": "Dark Primary Soft",
+        "tonalRamp": [
+          "oklch(15% 0.03798 157.01)",
+          "oklch(26% 0.03798 157.01)",
+          "oklch(38% 0.03798 157.01)",
+          "oklch(49% 0.03798 157.01)",
+          "oklch(61% 0.03798 157.01)",
+          "oklch(72% 0.03798 157.01)",
+          "oklch(84% 0.03798 157.01)",
+          "oklch(95% 0.03798 157.01)"
+        ]
+      },
+      "dark-bg-main": {
+        "role": "neutral",
+        "displayName": "Dark Bg Main",
+        "tonalRamp": [
+          "oklch(15% 0.02346 162.36)",
+          "oklch(26% 0.02346 162.36)",
+          "oklch(38% 0.02346 162.36)",
+          "oklch(49% 0.02346 162.36)",
+          "oklch(61% 0.02346 162.36)",
+          "oklch(72% 0.02346 162.36)",
+          "oklch(84% 0.02346 162.36)",
+          "oklch(95% 0.02346 162.36)"
+        ]
+      },
+      "dark-white": {
+        "role": "neutral",
+        "displayName": "Dark White",
+        "tonalRamp": [
+          "oklch(15% 0.02881 158.31)",
+          "oklch(26% 0.02881 158.31)",
+          "oklch(38% 0.02881 158.31)",
+          "oklch(49% 0.02881 158.31)",
+          "oklch(61% 0.02881 158.31)",
+          "oklch(72% 0.02881 158.31)",
+          "oklch(84% 0.02881 158.31)",
+          "oklch(95% 0.02881 158.31)"
+        ]
+      },
+      "dark-text-main": {
+        "role": "neutral",
+        "displayName": "Dark Text Main",
+        "tonalRamp": [
+          "oklch(15% 0.02246 106.82)",
+          "oklch(26% 0.02246 106.82)",
+          "oklch(38% 0.02246 106.82)",
+          "oklch(49% 0.02246 106.82)",
+          "oklch(61% 0.02246 106.82)",
+          "oklch(72% 0.02246 106.82)",
+          "oklch(84% 0.02246 106.82)",
+          "oklch(95% 0.02246 106.82)"
+        ]
+      },
+      "dark-text-muted": {
+        "role": "neutral",
+        "displayName": "Dark Text Muted",
+        "tonalRamp": [
+          "oklch(15% 0.02515 135.71)",
+          "oklch(26% 0.02515 135.71)",
+          "oklch(38% 0.02515 135.71)",
+          "oklch(49% 0.02515 135.71)",
+          "oklch(61% 0.02515 135.71)",
+          "oklch(72% 0.02515 135.71)",
+          "oklch(84% 0.02515 135.71)",
+          "oklch(95% 0.02515 135.71)"
+        ]
+      },
+      "dark-border-color": {
+        "role": "neutral",
+        "displayName": "Dark Border Color",
+        "tonalRamp": [
+          "oklch(15% 0.03337 151.23)",
+          "oklch(26% 0.03337 151.23)",
+          "oklch(38% 0.03337 151.23)",
+          "oklch(49% 0.03337 151.23)",
+          "oklch(61% 0.03337 151.23)",
+          "oklch(72% 0.03337 151.23)",
+          "oklch(84% 0.03337 151.23)",
+          "oklch(95% 0.03337 151.23)"
+        ]
+      },
+      "dark-danger": {
+        "role": "neutral",
+        "displayName": "Dark Danger",
+        "tonalRamp": [
+          "oklch(15% 0.08791 31.12)",
+          "oklch(26% 0.08791 31.12)",
+          "oklch(38% 0.08791 31.12)",
+          "oklch(49% 0.08791 31.12)",
+          "oklch(61% 0.08791 31.12)",
+          "oklch(72% 0.08791 31.12)",
+          "oklch(84% 0.08791 31.12)",
+          "oklch(95% 0.08791 31.12)"
+        ]
+      },
+      "dark-danger-soft": {
+        "role": "neutral",
+        "displayName": "Dark Danger Soft",
+        "tonalRamp": [
+          "oklch(15% 0.04823 27.60)",
+          "oklch(26% 0.04823 27.60)",
+          "oklch(38% 0.04823 27.60)",
+          "oklch(49% 0.04823 27.60)",
+          "oklch(61% 0.04823 27.60)",
+          "oklch(72% 0.04823 27.60)",
+          "oklch(84% 0.04823 27.60)",
+          "oklch(95% 0.04823 27.60)"
+        ]
+      },
+      "panel-evergreen": {
+        "role": "primary",
+        "displayName": "Panel Evergreen",
+        "tonalRamp": [
+          "oklch(15% 0.06401 166.25)",
+          "oklch(26% 0.06401 166.25)",
+          "oklch(38% 0.06401 166.25)",
+          "oklch(49% 0.06401 166.25)",
+          "oklch(61% 0.06401 166.25)",
+          "oklch(72% 0.06401 166.25)",
+          "oklch(84% 0.06401 166.25)",
+          "oklch(95% 0.06401 166.25)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home introduction."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Home section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Library course names."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Global text baseline."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Recurring form labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-sm",
+        "value": "none",
+        "purpose": "Ordinary flat surfaces."
+      },
+      {
+        "name": "shadow-md",
+        "value": "0 12px 30px rgb(20 40 28 / 12%)",
+        "purpose": "Settings menu and toast."
+      },
+      {
+        "name": "shadow-lg",
+        "value": "0 20px 60px rgb(20 40 28 / 16%)",
+        "purpose": "Dialogs."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-transition",
+        "value": "background-color .15s, border-color .15s, color .15s",
+        "purpose": "Global button/input/select state changes."
+      },
+      {
+        "name": "progress-transition",
+        "value": "transform .2s ease-out",
+        "purpose": "Assessment progress fill."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "home-compact",
+        "value": "900px"
+      },
+      {
+        "name": "auth-stack",
+        "value": "720px"
+      },
+      {
+        "name": "home-library-stack",
+        "value": "680px"
+      },
+      {
+        "name": "assessment-results-compact",
+        "value": "580px"
+      }
+    ],
+    "source": "Course_Selector/src/design-tokens.css; index.css; FrontendCSS/Home.css, CareerLibrary.css, LoginRegister.css, InterestAssessmentQuiz.css, Results.css",
+    "rampNote": "Tonal ramps are derived display metadata, not application tokens. Dark-prefixed frontmatter colors map to corresponding CSS properties only under the dark theme.",
+    "focus": {
+      "value": "3px solid var(--primary)",
+      "offset": "4px"
+    },
+    "backdrop": "rgb(12 30 20 / 55%)",
+    "reducedMotion": "Animation and transition durations .01ms; animation iteration count 1; scroll-behavior auto."
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Submit and advance actions.",
+      "html": "<button class=\"ds-primary\">Continue</button>",
+      "css": ".ds-primary { font-family: var(--font-body); font-weight: 600; min-height: 48px; padding: .75rem 1rem; border: 1px solid var(--primary); border-radius: 4px; background: var(--primary); color: var(--bg-main); transition: background-color .15s, border-color .15s, color .15s; } .ds-primary:hover { background: var(--primary-hover); } .ds-primary:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; } .ds-primary:disabled { opacity: .5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Understated alternate authentication action.",
+      "html": "<button class=\"ds-secondary\">Continue with Google</button>",
+      "css": ".ds-secondary { font-family: var(--font-body); font-size: .875rem; font-weight: 600; min-height: 48px; padding: .75rem 1rem; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; color: var(--text-main); transition: background-color .15s; } .ds-secondary:hover { background: var(--primary-soft); } .ds-secondary:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }"
+    },
+    {
+      "name": "Search field",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Labeled course search.",
+      "html": "<label class=\"ds-search\">Search courses<input placeholder=\"Try Computer Science\" /></label>",
+      "css": ".ds-search { display: grid; gap: .5rem; color: var(--text-main); font: 600 .875rem var(--font-body); } .ds-search input { width: 100%; min-height: 48px; padding: .7rem 1rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--white); color: var(--text-main); font: 400 .875rem var(--font-body); caret-color: var(--primary); } .ds-search input::placeholder { color: var(--text-muted); } .ds-search input:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }"
+    },
+    {
+      "name": "Header actions",
+      "kind": "nav",
+      "refersTo": "navigation-action",
+      "description": "Inline navigation with soft hover.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#library\">Library</a><button>Guest</button></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 1rem; font-family: var(--font-body); } .ds-nav a, .ds-nav button { display: inline-flex; align-items: center; min-height: 44px; padding: .6rem; background: transparent; border: 0; text-decoration: none; color: var(--text-main); font-size: .875rem; } .ds-nav a:hover, .ds-nav button:hover { background: var(--primary-soft); } .ds-nav a:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; } .ds-nav button:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }"
+    },
+    {
+      "name": "Result tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Secondary assessment domain tag.",
+      "html": "<span class=\"ds-tag\">Arts and Design</span>",
+      "css": ".ds-tag { display: inline-block; padding: .4rem .65rem; margin: .2rem .2rem .2rem 0; background: var(--primary-soft); color: var(--primary); font: .875rem var(--font-body); border-radius: 3px; }"
+    },
+    {
+      "name": "Saved result",
+      "kind": "card",
+      "refersTo": "result-card",
+      "description": "Bordered saved assessment surface.",
+      "html": "<article class=\"ds-result\"><h2>Your strongest field</h2><p>Explore your recommended programs.</p></article>",
+      "css": ".ds-result { padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--white); color: var(--text-main); } .ds-result h2 { margin: 0 0 1rem; font: 400 1.5rem/1.4 var(--font-display); } .ds-result p { margin: 0; color: var(--text-muted); font: .875rem/1.6 var(--font-body); }"
+    },
+    {
+      "name": "Course row",
+      "kind": "custom",
+      "refersTo": "course-row",
+      "description": "Transparent course index entry with title hover.",
+      "html": "<div class=\"ds-course\"><button><h2>Bachelor of Science in Computer Science</h2></button><p>Potential entry-level jobs</p></div>",
+      "css": ".ds-course { padding: 1.5rem 0; border-bottom: 1px solid var(--border-color); color: var(--text-main); } .ds-course button { width: 100%; padding: 0; text-align: left; border: 0; background: transparent; color: inherit; } .ds-course h2 { margin: 0 0 1rem; font: 400 1.35rem/1.4 var(--font-display); } .ds-course button:hover h2 { color: var(--primary); text-decoration: underline; text-underline-offset: 5px; } .ds-course button:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; } .ds-course p { color: var(--text-muted); font: .8rem/1.6 var(--font-body); }"
+    },
+    {
+      "name": "Assessment panel",
+      "kind": "custom",
+      "refersTo": "assessment-panel",
+      "description": "Fixed evergreen home assessment entry.",
+      "html": "<section class=\"ds-assessment\"><h2>Who am I?</h2><p>Start with what interests you.</p><a href=\"#assessment\">Start your assessment</a></section>",
+      "css": ".ds-assessment { background: #245744; color: #fffdf0; padding: clamp(1.5rem, 3vw, 2.5rem); border-radius: 2px; } .ds-assessment h2 { margin: 0 0 1rem; font: 400 2.8rem/1.2 var(--font-display); } .ds-assessment p { color: #d5e4d5; font: .95rem/1.6 var(--font-body); } .ds-assessment a { display: block; margin: 1.5rem 0 .8rem; padding: .85rem 1.2rem; border-radius: 3px; background: #f0edcf; color: #213e2c; text-decoration: none; text-align: center; font: 600 1rem/1.6 var(--font-body); } .ds-assessment a:hover { background: #fffdf0; } .ds-assessment a:focus-visible { outline: 3px solid #fffdf0; outline-offset: 4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The University Prospectus",
+    "overview": "The University Prospectus gives CourseNFound a calm, credible editorial character. Warm paper, evergreen actions, serif headings, and readable sans-serif controls support deliberate exploration. Preserve the CourseNFound name and supplied logo.\n\nHierarchy comes from alignment, generous section spacing, fine rules, and clear labels. Course information reads as a structured index; focused tasks use restrained bordered controls. Dark mode preserves that hierarchy with deep forest surfaces and pale green actions.",
+    "keyCharacteristics": [
+      "Warm paper and forest green, with a fixed evergreen assessment panel.",
+      "Serif editorial headings paired with practical sans-serif controls.",
+      "Ruled lists and tonal surfaces; elevation reserved for overlays.",
+      "Responsive stacking with visible keyboard focus."
+    ],
+    "rules": [
+      {
+        "name": "The Ruled Index Rule",
+        "body": "Organize repeated course information with aligned rows and thin dividers.",
+        "section": "colors"
+      },
+      {
+        "name": "The Editorial Hierarchy Rule",
+        "body": "Use Noto Serif for major headings and course titles; use Open Sans for controls and supporting information.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Surface Rule",
+        "body": "Keep ordinary content flat; reserve shadow elevation for menus, dialogs, and notifications.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do preserve the CourseNFound name and supplied logo.",
+      "Do use semantic CSS properties so controls and surfaces follow the active theme.",
+      "Do keep course lists aligned and separated by fine rules.",
+      "Do provide the visible focus outline and respect reduced motion.",
+      "Do present unavailable modes with their existing coming-soon labels."
+    ],
+    "donts": [
+      "Don't introduce gradients, glass effects, floating course cards, or ornamental statistics.",
+      "Don't replace the supplied logo or add emoji icons.",
+      "Don't use excessive rounding or decorative motion.",
+      "Don't treat the fixed evergreen assessment panel as a theme-changing primary button."
+    ]
+  }
+}

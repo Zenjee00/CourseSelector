@@ -37,6 +37,7 @@ const sections = [
 function Onboarding({ onComplete }) {
 	const navigate = useNavigate();
 	const [isSaving, setIsSaving] = useState(false);
+	const [error, setError] = useState('');
 
 	const handleContinue = async () => {
 		if (!auth.currentUser) {
@@ -45,6 +46,7 @@ function Onboarding({ onComplete }) {
 		}
 
 		setIsSaving(true);
+		setError('');
 		try {
 			await setDoc(doc(db, 'Users', auth.currentUser.uid), {
 				onboardingCompleted: true,
@@ -52,7 +54,8 @@ function Onboarding({ onComplete }) {
 			onComplete();
 			navigate('/home', { replace: true });
 		} catch (error) {
-			console.error('Could not save onboarding status:', error);
+			console.error('Could not save onboarding status:', error.code);
+			setError('Could not save your progress. Check your connection and try again.');
 			setIsSaving(false);
 		}
 	};
@@ -61,7 +64,6 @@ function Onboarding({ onComplete }) {
 		<main className="onboarding-page">
 			<section className="onboarding-shell" aria-labelledby="onboarding-title">
 				<div className="onboarding-heading">
-					<p className="onboarding-kicker">A QUICK START WITH CourseNFound</p>
 					<h1 id="onboarding-title">Before you choose, get to know your direction.</h1>
 					<p className="onboarding-intro">
 						A few things to keep in mind before exploring your course and school recommendations.
@@ -71,8 +73,6 @@ function Onboarding({ onComplete }) {
 				<div className="onboarding-grid">
 					{sections.map((section) => (
 						<article className="onboarding-card" key={section.number}>
-							<span className="onboarding-number">{section.number}</span>
-							<p className="onboarding-label">{section.label}</p>
 							<h2>{section.title}</h2>
 							<p>{section.body}</p>
 						</article>
@@ -80,10 +80,11 @@ function Onboarding({ onComplete }) {
 				</div>
 
 				<div className="onboarding-footer">
+					{error && <p role="alert">{error}</p>}
 					<p>Your answers are personal. Take your time and answer what feels true to you.</p>
 					<button type="button" onClick={handleContinue} disabled={isSaving}>
 						{isSaving ? 'Saving...' : 'Continue to CourseNFound'}
-						<span aria-hidden="true">-&gt;</span>
+
 					</button>
 				</div>
 			</section>

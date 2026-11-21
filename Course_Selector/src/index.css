@@ -1,12 +1,26 @@
-body {
-	user-select: none;
-	-webkit-user-select: none;
-}
-
-input,
-textarea,
-select,
-[contenteditable='true'] {
-	user-select: text;
-	-webkit-user-select: text;
+@import './design-tokens.css';
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg-main); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; }
+html { scroll-behavior: smooth; scrollbar-color: var(--primary-light) var(--bg-main); }
+#root { min-height: 100vh; }
+button, input, select, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+button, input, select { transition: background-color .15s, border-color .15s, color .15s; }
+input, textarea { caret-color: var(--primary); }
+input, select, textarea { min-width: 0; max-width: 100%; }
+img { max-width: 100%; }
+h1, h2, h3, p { margin-top: 0; }
+h1, h2 { text-wrap: balance; }
+a { color: var(--primary); text-underline-offset: 4px; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }
+::selection { background: var(--primary); color: var(--bg-main); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.skip-link { position: fixed; top: -100px; left: 1rem; z-index: 10000; padding: .7rem 1rem; background: var(--primary); color: var(--bg-main); }
+.skip-link:focus { top: 1rem; }
+.app-icon { width: 20px; height: 20px; flex: 0 0 auto; vertical-align: middle; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

@@ -83,8 +83,8 @@ vi.mock('../data/universities', () => ({
   universities: [],
 }))
 
-vi.mock('../FrontendJSX/CareerLibrary', () => ({
-  CareerInfo: ({ programName }) => (
+vi.mock('../components/CareerInfo', () => ({
+  default: ({ programName }) => (
     <div data-testid={`career-${programName}`}>
       Career information for {programName}
     </div>

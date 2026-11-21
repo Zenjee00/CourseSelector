@@ -57,8 +57,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
 
-        // Uses Chrome already installed in Windows.
-        channel: 'chrome',
+
       },
     },
   ],
