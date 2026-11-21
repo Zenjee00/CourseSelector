@@ -5,6 +5,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import App from './App.jsx';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const storedTheme = localStorage.getItem('theme')
 const initialTheme = storedTheme === 'dark' ? 'dark' : 'light'
@@ -13,6 +14,6 @@ document.body.setAttribute('data-theme', initialTheme)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary><App /></ErrorBoundary>
   </StrictMode>,
 )

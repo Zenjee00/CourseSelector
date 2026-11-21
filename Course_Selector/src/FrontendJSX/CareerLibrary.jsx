@@ -6,7 +6,10 @@ import {
   useState,
 } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import Icon from '../components/Icon';
+import CareerInfo from '../components/CareerInfo';
+import { useDialogFocus } from '../hooks/useDialogFocus';
 
 import { auth } from '../BackendFbase/Firebase';
 import {
@@ -59,42 +62,20 @@ function getSchoolTuition(school) {
   return formatTuition(tuitionData);
 }
 
-function CareerInfo({ programName, showDuration = true }) {
-  const { jobs, salary } = getCareerInfo(programName);
-  const { duration, status } = getProgramDetails(programName);
-
-  return (
-    <div className="career-info">
-      <div>
-        <span className="career-info-label">Potential entry-level jobs</span>
-        <p>{jobs.join(' • ')}</p>
-      </div>
-      <div className="career-salary">
-        <span className="career-info-label">Estimated monthly salary</span>
-        <strong>{salary}</strong>
-      </div>
-      {showDuration && (
-        <div className="career-duration">
-          <span className="career-info-label">Program duration</span>
-          <p>{duration}</p>
-          <small>{status}</small>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function CareerLibrary() {
   const navigate = useNavigate();
   const isGuest = !auth.currentUser;
+  const favoritesKey = auth.currentUser ? `course_selector_favorites:${auth.currentUser.uid}` : null;
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
+  const [searchParams] = useSearchParams();
+  const [category, setCategory] = useState(() => categories.find(item => item.label === searchParams.get('field'))?.value || '');
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [favorites, setFavorites] = useState(() => {
     if (!auth.currentUser) return [];
     try {
-      return JSON.parse(localStorage.getItem('course_selector_favorites') || '[]');
+      const stored = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
+      return Array.isArray(stored) ? stored.filter(item => typeof item === 'string') : [];
     } catch {
       return [];
     }
@@ -102,7 +83,7 @@ function CareerLibrary() {
   const [comparePrograms, setComparePrograms] = useState(() => {
     try {
       const storedPrograms = JSON.parse(localStorage.getItem('course_selector_compare') || '[]');
-      return Array.isArray(storedPrograms) ? storedPrograms.slice(-1) : [];
+      return Array.isArray(storedPrograms) ? storedPrograms.filter(item => typeof item === 'string' && careerPrograms.includes(item)).slice(-1) : [];
     } catch {
       return [];
     }
@@ -112,25 +93,12 @@ function CareerLibrary() {
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [showFavoriteGate, setShowFavoriteGate] = useState(false);
 
-  useEffect(() => {
-    if (!selectedProgram && !comparisonOpen && !comparisonLoading) return undefined;
-
-    const handleEscape = (event) => {
-      if (event.key === 'Escape') {
-        setSelectedProgram(null);
-        setComparisonOpen(false);
-        setComparisonLoading(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-    };
-  }, [selectedProgram, comparisonLoading, comparisonOpen]);
+  useDialogFocus(selectedProgram ? 'schools' : comparisonOpen ? 'comparison' : comparisonLoading ? 'loading' : showFavoriteGate ? 'favorite-gate' : null, () => {
+    setSelectedProgram(null);
+    setComparisonOpen(false);
+    setComparisonLoading(false);
+    setShowFavoriteGate(false);
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -148,9 +116,9 @@ function CareerLibrary() {
 
   useEffect(() => {
     if (!isGuest) {
-      localStorage.setItem('course_selector_favorites', JSON.stringify(favorites));
+      localStorage.setItem(favoritesKey, JSON.stringify(favorites));
     }
-  }, [favorites, isGuest]);
+  }, [favorites, isGuest, favoritesKey]);
 
   useEffect(() => {
     localStorage.setItem('course_selector_compare', JSON.stringify(comparePrograms));
@@ -208,7 +176,6 @@ function CareerLibrary() {
       <div className="library-container">
         <header className="library-header">
           <button onClick={() => navigate('/home')} className="library-back-btn">← Back to Dashboard</button>
-          <p className="library-eyebrow">CAREER LIBRARY</p>
           <h1>Courses, jobs, and starting salaries</h1>
           <p>Explore common entry-level roles and estimated monthly pay for every course in CourseNFound.</p>
         </header>
@@ -243,7 +210,7 @@ function CareerLibrary() {
               >
                 <div className="library-card-heading">
                   <h2>{program}</h2>
-                  <span aria-hidden="true">{favorites.includes(getProgramKey(program)) ? '★' : '☆'}</span>
+                  <Icon name="star" fill={favorites.includes(getProgramKey(program)) ? 'currentColor' : 'none'} />
                 </div>
                 <CareerInfo programName={program} showDuration={false} />
               </button>
@@ -336,7 +303,6 @@ function CareerLibrary() {
               >
                 ×
               </button>
-              <p className="library-eyebrow">SAVE YOUR PICKS</p>
               <h2 id="favorite-gate-title">Create an account to favorite courses</h2>
               <p>Sign in or sign up to save courses and access your favorites on your next visit.</p>
               <div className="guest-feature-modal-actions">
@@ -409,5 +375,4 @@ function CareerLibrary() {
   );
 }
 
-export { CareerInfo };
 export default CareerLibrary;

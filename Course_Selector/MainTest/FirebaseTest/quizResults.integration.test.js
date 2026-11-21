@@ -133,13 +133,11 @@ describe('courseRecommendations quiz-result integration', () => {
     expect(saved[0]).toMatchObject({ id: 'alice-1', userId: 'alice', Score: 14 });
   });
 
-  it('returns an empty list when a user tries to query another owner results', async () => {
+  it('rejects when a user tries to query another owner results', async () => {
     await seed('Programs/bob-1', { userId: 'bob', Score: 10 });
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const saved = await getUserSavedPrograms('bob');
-
-    expect(saved).toEqual([]);
+    await expect(getUserSavedPrograms('bob')).rejects.toBeTruthy();
     expect(console.error).toHaveBeenCalled();
   });
 
@@ -163,9 +161,9 @@ describe('courseRecommendations quiz-result integration', () => {
     firebaseMock.db = dbFor('alice', false);
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await saveQuizResults('alice', { q1: 5 }, CATEGORY.EDU, [
+    await expect(saveQuizResults('alice', { q1: 5 }, CATEGORY.EDU, [
       'Bachelor of Early Childhood Education',
-    ]);
+    ])).rejects.toBeTruthy();
 
     let resultCount = 0;
     await testEnv.withSecurityRulesDisabled(async (context) => {

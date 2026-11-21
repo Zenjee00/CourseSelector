@@ -1,30 +1,17 @@
-LocationIQ proxy and local setup
-================================
+# Location and verification API
 
-This project includes a minimal backend proxy to safely call LocationIQ (so your API key is kept off the client bundle).
+Run `npm run start:server` alongside `npm run dev`. Vite forwards `/api` to port 5174. The server uses Node's built-in fetch and never sends server credentials to the browser.
 
-How to use (local development):
+Copy `.env.example` to `.env` and supply LocationIQ and reCAPTCHA credentials. Production requires exact `ALLOWED_ORIGINS`, HTTPS termination, and the appropriate `RECAPTCHA_ALLOWED_HOSTNAMES`. Never prefix server credentials with `VITE_`.
 
-1. Copy `.env.example` to `.env` in the project root and add your key:
+Endpoints: `GET /api/geocode?q=...`, `GET /api/route-distance?fromLat=...&fromLon=...&toLat=...&toLon=...`, and `POST /api/verify-recaptcha` with a JSON `token`. Invalid inputs return 400; oversized bodies 413; throttled calls 429; missing configuration 503; provider failures 502. Responses contain recovery text and a request ID where relevant.
 
-   LOCATIONIQ_KEY=pk.your_real_token_here
-   VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
-   RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key
+The proxy restricts browser origins, caps JSON at 8 KiB, times out provider requests at eight seconds, limits API requests to 60/minute/IP and verification attempts to 10/minute/IP, coalesces identical provider requests, and bounds each successful-result cache to 500 entries with a ten-minute TTL.
 
-2. Install runtime deps for the proxy (run in project root):
+CORS does not authenticate clients. For multiple API instances, replace the default in-memory rate-limit store with a shared store or enforce limits at the gateway. Configure `TRUST_PROXY_HOPS` only for the actual trusted reverse-proxy topology. Do not blindly trust forwarded IP headers.
 
-   npm install express node-fetch cors dotenv
+`GET /healthz` reports process health. `GET /readyz` checks whether the two required server secrets exist; it does not make live provider calls or validate credentials. Logs contain request ID, method, path, status, and duration, without query strings, tokens, passwords, or provider URLs. Send stdout/stderr to your hosting platform's logging system.
 
-3. Start the proxy:
+Browser-side classic reCAPTCHA is a UI gate. It does not prevent someone from calling Firebase Authentication directly. Enforce abuse controls through Firebase-supported protections and provider configuration; the proxy is not an authentication gateway.
 
-   node server/index.js
-
-   The proxy will run by default on `http://localhost:5174` and exposes `/api/geocode?q=SEARCH`.
-
-4. In the frontend, call `/api/geocode?q=University+of+the+Philippines+Los+Banos` to get coords.
-
-Security notes:
-- Never commit `.env` containing `LOCATIONIQ_KEY` to the repo. Keep it local or use a secrets store in production.
-- For production, host the proxy on a secure server and protect it with proper rate limits and auth where needed.
-- The login/register form uses a visible classic reCAPTCHA v2 checkbox. `VITE_RECAPTCHA_SITE_KEY` is public; keep `RECAPTCHA_SECRET_KEY` server-only.
-- Start the Express proxy before using authentication so `/api/verify-recaptcha` can validate each challenge token.
+See `OPERATIONS.md` for staging, monitoring, release, and rollback steps.

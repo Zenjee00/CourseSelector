@@ -6,7 +6,6 @@ import {
   getDoc,
   getDocs,
   query,
-  setDoc,
   where,
 } from 'firebase/firestore';
 
@@ -32,11 +31,11 @@ const recommendations = {
     'Bachelor of Science in Computer Engineering',
     'Bachelor of Library and Information Science',
     'Bachelor of Science in Technical Communication',
-    'Bachelor of Science in Information Technology Ã¢– Mobile and Web Applications',
+    'Bachelor of Science in Information Technology – Mobile and Web Applications',
   ],
   [CATEGORY.BIZ]: [
     'Bachelor of Science in Accountancy',
-    'BSBA Management Ã¢– Business Analytics',
+    'BSBA Management – Business Analytics',
     'Bachelor of Science in Human Capital Development',
     'BSBA Marketing',
     'BSBA Finance',
@@ -45,10 +44,10 @@ const recommendations = {
     'Bachelor of Science in Accounting Technology',
     'Bachelor of Science in Management',
     'Bachelor of Science in Marketing',
-    'Bachelor of Science in Business Administration Ã¢– Marketing Management',
+    'Bachelor of Science in Business Administration – Marketing Management',
     'Bachelor of Science in Office Administration',
     'Bachelor of Science in Management Accounting',
-    'Bachelor of Science in Business Administration Ã¢– Financial Management',
+    'Bachelor of Science in Business Administration – Financial Management',
     'Human Resource Management',
   ],
   [CATEGORY.HEALTH]: [
@@ -58,7 +57,7 @@ const recommendations = {
   ],
   [CATEGORY.EDU]: [
     'Bachelor of Early Childhood Education',
-    'Bachelor of Technology and Livelihood Education Ã¢– Home Economics',
+    'Bachelor of Technology and Livelihood Education – Home Economics',
   ],
   [CATEGORY.SOCSCI]: [
     'BA Psychology',
@@ -103,11 +102,11 @@ const recommendations = {
     'Bachelor of Science in Industrial Engineering',
     'Bachelor of Science in Mechanical Engineering',
     'Bachelor of Science in Chemical Engineering',
-    'Bachelor of Industrial Technology Ã¢– Automotive Technology',
-    'Bachelor of Industrial Technology Ã¢– Drafting Technology',
-    'Bachelor of Industrial Technology Ã¢– Electrical Technology',
-    'Bachelor of Industrial Technology Ã¢– Electronics Technology',
-    'Bachelor of Industrial Technology Ã¢– Food Trades',
+    'Bachelor of Industrial Technology – Automotive Technology',
+    'Bachelor of Industrial Technology – Drafting Technology',
+    'Bachelor of Industrial Technology – Electrical Technology',
+    'Bachelor of Industrial Technology – Electronics Technology',
+    'Bachelor of Industrial Technology – Food Trades',
     'Bachelor of Science in Computer Engineering',
     'Bachelor of Science in Civil Engineering',
     'Bachelor of Science in Architecture',
@@ -149,9 +148,9 @@ export async function getRecommendedPrograms(category) {
       collection(db, 'Programs'),
       where('category', '==', category)
     );
-    
+
     const querySnapshot = await getDocs(q);
-    
+
     if (!querySnapshot.empty) {
       const programs = [];
       querySnapshot.forEach((doc) => {
@@ -177,22 +176,6 @@ export async function getRecommendedPrograms(category) {
   }
 }
 
-// Initialize Programs collection with static data (run once to populate database)
-export async function initializeRecommendationsInFirebase() {
-  try {
-    for (const [category, programs] of Object.entries(recommendations)) {
-      await setDoc(doc(db, 'Programs', category), {
-        category: category,
-        programs: dedupePrograms(programs),
-        lastUpdated: new Date()
-      });
-    }
-    console.log('Programs initialized in Firebase');
-  } catch (error) {
-    console.error('Error initializing Programs data:', error);
-  }
-}
-
 // Function to get field name from category
 function getFieldNameFromCategory(category) {
   const fieldMapping = {
@@ -206,7 +189,7 @@ function getFieldNameFromCategory(category) {
     [CATEGORY.HOSP]: 'Hospitality/Tourism',
     [CATEGORY.SCI]: 'Pure & Applied Sciences',
   };
-  
+
   return fieldMapping[category] || category;
 }
 
@@ -231,7 +214,8 @@ export async function saveQuizResults(userId, answers, recommendedCategory, reco
     });
     console.log('Quiz results saved to Programs collection');
   } catch (error) {
-    console.error('Error saving quiz results to Programs:', error);
+    console.error('Could not save assessment:', error.code);
+    throw error;
   }
 }
 
@@ -242,21 +226,21 @@ export async function getUserSavedPrograms(userId) {
       collection(db, 'Programs'),
       where('userId', '==', userId)
     );
-    
+
     const querySnapshot = await getDocs(q);
     const userPrograms = [];
-    
+
     querySnapshot.forEach((doc) => {
       userPrograms.push({
         id: doc.id,
         ...doc.data()
       });
     });
-    
+
     return userPrograms;
   } catch (error) {
-    console.error('Error fetching user programs:', error);
-    return [];
+    console.error('Could not load saved assessments:', error.code);
+    throw error;
   }
 }
 

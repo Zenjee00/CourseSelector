@@ -81,9 +81,9 @@ test.describe('Mobile layout', () => {
       }),
     ).toBeVisible();
 
-    const modeCards = page.locator('.mode-card');
+    const modeCards = page.locator('.assessment-entry');
 
-    await expect(modeCards).toHaveCount(3);
+    await expect(modeCards).toHaveCount(1);
 
     for (const card of await modeCards.all()) {
       const cardBox = await card.boundingBox();

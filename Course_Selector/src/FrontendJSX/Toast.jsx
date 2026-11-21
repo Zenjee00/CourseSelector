@@ -25,9 +25,6 @@ function Toast({ toast, onClose }) {
 
   return (
     <div className={`toast toast--${type}`} role={type === 'error' || type === 'warning' ? 'alert' : 'status'}>
-      <svg className="toast-wave" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 256C91 136 149 290 240 211S389 116 480 251 640 300 720 168 857 305 960 112 1086 248 1170 138 1330 254 1440 64V320H0Z" />
-      </svg>
       <span className="toast-icon-container" aria-hidden="true">
         <svg className="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           {type === 'warning' ? <path d="M10.3 3.8 1.8 18.4a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z" /> : <circle cx="12" cy="12" r="10" />}

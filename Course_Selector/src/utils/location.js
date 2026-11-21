@@ -27,11 +27,11 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
 
 export const sortUniversitiesByDistance = (universitiesList, userCoords) => {
   if (!userCoords) return universitiesList;
-  const lat = userCoords.latitude || userCoords.lat;
-  const lon = userCoords.longitude || userCoords.lng || userCoords.lon;
+  const lat = userCoords.latitude ?? userCoords.lat;
+  const lon = userCoords.longitude ?? userCoords.lng ?? userCoords.lon;
   return universitiesList
     .map((u) => {
-      const distance = u.lat && u.lon ? getDistanceKm(lat, lon, u.lat, u.lon) : null;
+      const distance = Number.isFinite(u.lat) && Number.isFinite(u.lon) ? getDistanceKm(lat, lon, u.lat, u.lon) : null;
       return { ...u, distance };
     })
     .sort((a, b) => {
@@ -46,14 +46,11 @@ export const sortUniversitiesByDistance = (universitiesList, userCoords) => {
 export const geocodeViaProxy = async (query) => {
   if (!query) return null;
 
-  const baseUrl = import.meta.env.VITE_GEO_PROXY_URL || 'http://localhost:5174';
+  const baseUrl = import.meta.env.VITE_GEO_PROXY_URL || '';
   const endpoint = `${baseUrl}/api/geocode?q=${encodeURIComponent(query)}`;
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
-    const resp = await fetch(endpoint, { signal: controller.signal });
-    clearTimeout(timeoutId);
+    const resp = await fetch(endpoint, { signal: AbortSignal.timeout(12000) });
 
     if (!resp.ok) {
       console.error('Geocode proxy responded with', resp.status);
@@ -74,7 +71,7 @@ export const geocodeViaProxy = async (query) => {
 export const getRoadDistanceViaProxy = async ({ fromLat, fromLon, toLat, toLon }) => {
   if ([fromLat, fromLon, toLat, toLon].some((v) => v == null)) return null;
 
-  const baseUrl = import.meta.env.VITE_GEO_PROXY_URL || 'http://localhost:5174';
+  const baseUrl = import.meta.env.VITE_GEO_PROXY_URL || '';
   const params = new URLSearchParams({
     fromLat: String(fromLat),
     fromLon: String(fromLon),
@@ -84,10 +81,7 @@ export const getRoadDistanceViaProxy = async ({ fromLat, fromLon, toLat, toLon }
   const endpoint = `${baseUrl}/api/route-distance?${params.toString()}`;
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-    const resp = await fetch(endpoint, { signal: controller.signal });
-    clearTimeout(timeoutId);
+    const resp = await fetch(endpoint, { signal: AbortSignal.timeout(15000) });
 
     if (!resp.ok) {
       console.error('Route-distance proxy responded with', resp.status);

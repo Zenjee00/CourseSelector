@@ -5,9 +5,9 @@ import {
   useState,
 } from 'react';
 
-import confetti from 'canvas-confetti';
 import {
   deleteUser,
+  getIdTokenResult,
   onAuthStateChanged,
   signOut,
   updatePassword,
@@ -23,13 +23,21 @@ import {
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
-import folderIcon from '../assets/Photos/Folder.png';
+import courseNFoundLogo from '../assets/Photos/CourseNFound.png';
+import Icon from '../components/Icon';
+import { useDialogFocus } from '../hooks/useDialogFocus';
+import DiscoveryHome from '../components/DiscoveryHome';
+import OrbitLoader from './OrbitLoader';
 import { getUserSavedPrograms } from '../BackendFbase/courseRecommendations';
 import {
   auth,
   db,
 } from '../BackendFbase/Firebase';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
+
+function isSafePhotoUrl(value) {
+    try { return new URL(value).protocol === 'https:'; } catch { return false; }
+}
 
 function Home() {
     const navigate = useNavigate();
@@ -58,7 +66,28 @@ function Home() {
     const [isSavingProfile, setIsSavingProfile] = useState(false);
     const showToast = useToast();
 
+    useDialogFocus(showProfileModal ? 'profile' : showGuestLoginPrompt ? 'guest' : showDeleteConfirm ? 'delete' : showDeletePhrasePrompt ? 'confirm-delete' : showLogoutConfirm ? 'logout' : null, () => {
+        setShowProfileModal(false);
+        setShowGuestLoginPrompt(false);
+        setShowDeleteConfirm(false);
+        setShowDeletePhrasePrompt(false);
+        setShowLogoutConfirm(false);
+    });
+
     useEffect(() => {
+        const fetchSavedPrograms = async (userId) => {
+            setLoadingPrograms(true);
+            try {
+                const programs = await getUserSavedPrograms(userId);
+                setSavedPrograms(programs);
+            } catch (error) {
+                console.error('Could not load saved assessments:', error.code);
+                showToast('Could not load your history. Check your connection and refresh.', 'error');
+            } finally {
+                setLoadingPrograms(false);
+            }
+        };
+
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
@@ -79,7 +108,7 @@ function Home() {
             setIsInitialLoading(false);
         });
         return () => unsubscribe();
-    }, [navigate]);
+    }, [navigate, showToast]);
 
     useEffect(() => {
         localStorage.setItem('theme', theme);
@@ -88,29 +117,6 @@ function Home() {
         document.body.setAttribute('data-theme', theme);
     }, [theme, user?.uid]);
 
-    const fetchSavedPrograms = async (userId) => {
-        setLoadingPrograms(true);
-        try {
-            const programs = await getUserSavedPrograms(userId);
-            setSavedPrograms(programs);
-        } catch (error) {
-            console.error('Error fetching programs:', error);
-        } finally {
-            setLoadingPrograms(false);
-        }
-    };
-
-    const handleStartWhoAmI = () => {
-        setMobileMenuOpen(false);
-        navigate('/who-am-i');
-    };
-
-    const handleStartMode = (path) => {
-        setMobileMenuOpen(false);
-        navigate(path);
-    };
-    
-    // Function to navigate to the Results page
     const handleViewResults = () => {
         if (!user) {
             showToast('Sign in to save and view your history.', 'warning');
@@ -131,19 +137,6 @@ function Home() {
 
     const toggleTheme = () => {
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-    };
-
-    const handleLogoConfetti = () => {
-        const confettiConfig = {
-            particleCount: 150,
-            spread: 120,
-            startVelocity: 55,
-            gravity: 0.95,
-            scalar: 0.9,
-            ticks: 200
-        };
-
-        confetti({ ...confettiConfig, origin: { x: 0.5, y: 0.3 } });
     };
 
     const handleLogoutConfirm = async () => {
@@ -189,12 +182,25 @@ function Home() {
     const handleProfileSave = async (event) => {
         event.preventDefault();
         if (!user) return;
+        const displayName = profileForm.displayName.trim();
+        if (!displayName || displayName.length > 80) {
+            showToast('Enter a name between 1 and 80 characters.', 'warning');
+            return;
+        }
+        if (profileForm.photoURL && !isSafePhotoUrl(profileForm.photoURL)) {
+            showToast('Use an HTTPS link for your profile photo.', 'warning');
+            return;
+        }
+        if (profileForm.newPassword && profileForm.newPassword.length < 6) {
+            showToast('Use at least 6 characters for your new password.', 'warning');
+            return;
+        }
         setIsSavingProfile(true);
 
         try {
             if (profileForm.displayName !== user.displayName || profileForm.photoURL !== user.photoURL) {
                 await updateProfile(user, {
-                    displayName: profileForm.displayName,
+                    displayName,
                     photoURL: profileForm.photoURL,
                 });
                 showToast('Profile updated successfully.', 'success');
@@ -213,7 +219,7 @@ function Home() {
             setProfileForm((prev) => ({ ...prev, newPassword: '' }));
         } catch (error) {
             console.error('Profile update error:', error);
-            showToast(error.message || 'Unable to update profile.', 'error');
+            showToast(error.code === 'auth/requires-recent-login' ? 'Sign in again before changing your password.' : 'Could not update your profile. Please try again.', 'error');
         } finally {
             setIsSavingProfile(false);
         }
@@ -247,6 +253,12 @@ function Home() {
         setIsDeletingAccount(true);
         setDeleteError('');
         try {
+            // Check before removing data: Firebase rejects account deletion after an old login.
+            const token = await getIdTokenResult(currentUser, true);
+            if (Date.now() / 1000 - Number(token.claims.auth_time || 0) > 300) {
+                setDeleteError('Sign in again before deleting your account. No data has been removed.');
+                return;
+            }
             const resultsSnapshot = await getDocs(query(
                 collection(db, 'Programs'),
                 where('userId', '==', currentUser.uid),
@@ -261,7 +273,7 @@ function Home() {
             console.error('Account deletion error:', error);
             setDeleteError(error.code === 'auth/requires-recent-login'
                 ? 'For security, sign in again before deleting your account.'
-                : error.message || 'Unable to delete your account. Please try again.');
+                : 'Unable to finish deleting your account. Please try again.');
         } finally {
             setIsDeletingAccount(false);
         }
@@ -278,52 +290,16 @@ function Home() {
 
     const displayName = user?.displayName || user?.email || 'User';
     const avatarLetter = displayName.charAt(0).toUpperCase();
-    const avatarSrc = user?.photoURL || '';
+    const avatarSrc = isSafePhotoUrl(user?.photoURL) ? user.photoURL : '';
 
-    // Skeleton Loader Component
-    const SkeletonLoader = () => (
-        <div className="home-container skeleton-container">
-            <nav className="home-navbar">
-                <div className="nav-brand">
-                    <div className="skeleton-logo"></div>
-                </div>
-                <div className="user-section visible" style={{ display: 'flex' }}>
-                    <div className="skeleton-icon" style={{ width: '40px', height: '40px' }}></div>
-                    <div className="skeleton-chip" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: 'var(--primary-soft)', borderRadius: '100px' }}>
-                        <div className="skeleton-avatar"></div>
-                        <div className="skeleton-text" style={{ width: '80px', height: '14px' }}></div>
-                    </div>
-                    <div className="skeleton-icon" style={{ width: '32px', height: '32px' }}></div>
-                </div>
-            </nav>
-
-            <div className="home-content">
-                <header className="hero-section">
-                    <div className="skeleton-text" style={{ width: '60%', height: '48px', margin: '0 auto 16px', borderRadius: '12px' }}></div>
-                    <div className="skeleton-text" style={{ width: '40%', height: '20px', margin: '0 auto', borderRadius: '8px' }}></div>
-                </header>
-
-                <div className="action-cards-row">
-                    <div className="card quiz-card" style={{ cursor: 'default' }}>
-                        <div className="skeleton-icon-large" style={{ width: '64px', height: '64px', margin: '0 auto 24px', borderRadius: '16px' }}></div>
-                        <div className="skeleton-text" style={{ width: '50%', height: '24px', margin: '0 auto 16px' }}></div>
-                        <div className="skeleton-text" style={{ width: '80%', height: '14px', margin: '0 auto 24px' }}></div>
-                        <div className="skeleton-button"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-
-    if (isInitialLoading) {
-        return <SkeletonLoader />;
-    }
+    if (isInitialLoading) return <OrbitLoader label="Loading your workspace" />;
 
     return (
         <div className="home-container">
+            <a href="#main-content" className="skip-link">Skip to content</a>
             <nav className="home-navbar" role="navigation" aria-label="Primary">
                 <div className="nav-brand" aria-label="CourseNFound home">
-                    <h2 className="logo" onClick={handleLogoConfetti}>Course<span>NFound</span></h2>
+                    <a href="/home" className="brand-link"><img src={courseNFoundLogo} alt="" /><span>CourseNFound</span></a>
                 </div>
 
                 <button
@@ -344,7 +320,7 @@ function Home() {
                         aria-label={`Saved history (${savedPrograms.length})`}
                         disabled={!user || loadingPrograms || savedPrograms.length === 0}
                     >
-                        <img src={folderIcon} alt="Saved history" />
+                        <Icon name="folder" /><span>History</span>
                         {loadingPrograms ? (
                             <span className="skeleton-circle"></span>
                         ) : (
@@ -352,7 +328,7 @@ function Home() {
                         )}
                     </button>
                     <button className="nav-icon-btn library-btn" onClick={handleViewLibrary} aria-label="Open career library">
-                        <span aria-hidden="true">📚</span>
+                        <Icon name="book" />
                         <span className="library-btn-label">Library</span>
                     </button>
                     <button
@@ -372,22 +348,17 @@ function Home() {
                             aria-expanded={settingsOpen}
                             onClick={handleToggleSettings}
                         >
-                            <span className="gear-icon" aria-hidden="true">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M20.2 9.5h-1.23a.7.7 0 0 1-.66-.48l-.29-.86a.7.7 0 0 1 .16-.71l.87-.87a1 1 0 0 0 0-1.41l-1.43-1.43a1 1 0 0 0-1.41 0l-.87.87a.7.7 0 0 1-.71.16l-.86-.29a.7.7 0 0 1-.48-.66V3.8a1 1 0 0 0-1-1h-2.02a1 1 0 0 0-1 1v1.23a.7.7 0 0 1-.48.66l-.86.29a.7.7 0 0 1-.71-.16l-.87-.87a1 1 0 0 0-1.41 0L4.35 6.38a1 1 0 0 0 0 1.41l.87.87a.7.7 0 0 1 .16.71l-.29.86a.7.7 0 0 1-.66.48H3.2a1 1 0 0 0-1 1v2.02a1 1 0 0 0 1 1h1.23a.7.7 0 0 1 .66.48l.29.86a.7.7 0 0 1-.16.71l-.87.87a1 1 0 0 0 0 1.41l1.43 1.43a1 1 0 0 0 1.41 0l.87-.87a.7.7 0 0 1 .71-.16l.86.29c.3.1.5.38.48.7v1.23a1 1 0 0 0 1 1h2.02a1 1 0 0 0 1-1v-1.23a.7.7 0 0 1 .48-.66l.86-.29a.7.7 0 0 1 .71.16l.87.87a1 1 0 0 0 1.41 0l1.43-1.43a1 1 0 0 0 0-1.41l-.87-.87a.7.7 0 0 1-.16-.71l.29-.86a.7.7 0 0 1 .66-.48h1.23a1 1 0 0 0 1-1V10.5a1 1 0 0 0-1-1Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                            </span>
+                            <Icon name="settings" />
                         </button>
 
                         {settingsOpen && (
                             <div className="settings-menu" role="menu" aria-label="Settings menu">
                                 <button className="settings-item" onClick={() => { toggleTheme(); closeSettings(); }} role="menuitem">
-                                    <span>{theme === 'light' ? '🌙' : '☀️'}</span>
+                                    <Icon name={theme === 'light' ? 'moon' : 'sun'} />
                                     <span>{theme === 'light' ? 'Switch to Dark' : 'Switch to Light'}</span>
                                 </button>
                                 <button className="settings-item danger" onClick={() => { (user ? handleOpenLogout : () => navigate('/login'))(); closeSettings(); }} role="menuitem">
-                                    <span>🚪</span>
+
                                     <span>{user ? 'Logout' : 'Sign in'}</span>
                                 </button>
                             </div>
@@ -396,59 +367,7 @@ function Home() {
                 </div>
             </nav>
 
-            <div className="home-content">
-                <header className="hero-section">
-                    <p className="hero-eyebrow">ACADEMIC PATHFINDER</p>
-                    <h1>Start Your <span>Dream Course</span></h1>
-                    <p>Discover the right path for your future career.</p>
-                </header>
-
-                <section className="home-status-rail" aria-label="CourseNFound overview">
-                    <div className="status-pill">
-                        <span className="status-dot" aria-hidden="true"></span>
-                        <span><strong>{savedPrograms.length}</strong> saved {savedPrograms.length === 1 ? 'result' : 'results'}</span>
-                    </div>
-                    <div className="status-pill">
-                        <span className="status-icon" aria-hidden="true">◎</span>
-                        <span>Personalized course discovery</span>
-                    </div>
-                    <div className="status-pill status-pill-accent">
-                        <span className="status-icon" aria-hidden="true">✦</span>
-                        <span>Explore with confidence</span>
-                    </div>
-                </section>
-
-                {/* ACTION CARDS - ROW LAYOUT */}
-                <div className="action-cards-row mode-cards-row">
-                    <div className="card quiz-card mode-card">
-                        <span className="card-badge">RECOMMENDED START</span>
-                        <div className="card-icon">📝</div>
-                        <h3>Who am I</h3>
-                        <p>Discover your strongest interests and receive personalized course recommendations.</p>
-                        <button onClick={handleStartWhoAmI} className="card-btn primary" aria-label="Start Who am I">
-                            Start Who am I
-                        </button>
-                    </div>
-                    <div className="card mode-card">
-                        <span className="card-badge">DISCOVER</span>
-                        <div className="card-icon">💫</div>
-                        <h3>Swipe Match</h3>
-                        <p>Swipe through work values, environments, and everyday activities.</p>
-                        <button onClick={() => handleStartMode('/swipe-match')} className="card-btn primary" aria-label="Open Swipe Match">
-                            Explore Mode
-                        </button>
-                    </div>
-                    <div className="card mode-card">
-                        <span className="card-badge">PRACTICE</span>
-                        <div className="card-icon">🎬</div>
-                        <h3>Day in a Life</h3>
-                        <p>Respond to real-world career scenarios and workplace challenges.</p>
-                        <button onClick={() => handleStartMode('/day-in-the-life')} className="card-btn primary" aria-label="Open Day in the Life">
-                            Explore Mode
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <DiscoveryHome savedCount={savedPrograms.length} isGuest={!user} />
 
             {showProfileModal && (
                 <div
@@ -462,7 +381,7 @@ function Home() {
                     <div className="modal-card profile-modal">
                         <div className="profile-header">
                             <div className="avatar-preview" aria-hidden="true">
-                                {profileForm.photoURL ? (
+                                {isSafePhotoUrl(profileForm.photoURL) ? (
                                     <img src={profileForm.photoURL} alt="Profile" />
                                 ) : (
                                     <span>{(profileForm.displayName || user?.email || 'U').charAt(0).toUpperCase()}</span>
