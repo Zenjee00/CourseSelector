@@ -23,20 +23,16 @@ import {
   auth,
   db,
 } from './BackendFbase/Firebase';
-import ThemeProvider from './context/ThemeProvider';
 import { ToastProvider } from './context/ToastContext';
-import GuestFeatureGate from './FrontendJSX/GuestFeatureGate';
-import OfflineBanner from './FrontendJSX/OfflineBanner';
-import OrbitLoader from './FrontendJSX/OrbitLoader';
-
+import ThemeProvider from './context/ThemeProvider';
 const CareerLibrary = lazy(() => import('./FrontendJSX/CareerLibrary'));
-
+import GuestFeatureGate from './FrontendJSX/GuestFeatureGate';
 const Home = lazy(() => import('./FrontendJSX/Home'));
 const InterestAssessmentQuiz = lazy(() => import('./FrontendJSX/InterestAssessmentQuiz'));
 const LoginRegister = lazy(() => import('./FrontendJSX/LoginRegister'));
-
+import OfflineBanner from './FrontendJSX/OfflineBanner';
 const Onboarding = lazy(() => import('./FrontendJSX/Onboarding'));
-
+import OrbitLoader from './FrontendJSX/OrbitLoader';
 const Results = lazy(() => import('./FrontendJSX/Results'));
 const Simulator = lazy(() => import('./FrontendJSX/Simulator'));
 const SwipeGame = lazy(() => import('./FrontendJSX/SwipeGame'));

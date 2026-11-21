@@ -468,8 +468,8 @@ function InterestAssessmentQuiz() {
           <p className="question-text">{currentQuestion?.text}</p>
 
           <div className="quiz-scale">
-            <span>Disagree</span>
             <span>Agree</span>
+            <span>Disagree</span>
           </div>
 
           <div className="quiz-options">
