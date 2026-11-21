@@ -312,6 +312,9 @@ function CareerLibrary() {
                 <button type="button" onClick={() => navigate('/login', { state: { mode: 'register' } })}>
                   Sign up
                 </button>
+                <button type="button" onClick={() => setShowFavoriteGate(false)}>
+                  Continue as guest
+                </button>
               </div>
             </section>
           </div>

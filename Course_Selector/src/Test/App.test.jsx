@@ -13,6 +13,7 @@ import {
 } from '@testing-library/react';
 
 import App from '../App';
+import { applyTheme } from '../utils/theme';
 
 const authState = vi.hoisted(() => ({
   callback: null,
@@ -83,10 +84,13 @@ describe('App route protection', () => {
   });
 
   it('shows a session loader while Firebase is checking the user', () => {
+    applyTheme('dark');
     window.history.replaceState({}, '', '/');
     render(<App />);
 
     expect(screen.getByText('Restoring your session')).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(document.body).toHaveAttribute('data-theme', 'light');
   });
 
   it('redirects an unverified user to the login screen', async () => {
@@ -117,4 +121,60 @@ describe('App route protection', () => {
 
     expect(screen.getByText('Home screen')).toBeInTheDocument();
   });
+  it('applies the account theme after sign-in without inheriting the guest theme', async () => {
+    localStorage.setItem('theme:guest', 'dark');
+    window.history.replaceState({}, '', '/home');
+    render(<App />);
+    await act(async () => { authState.callback(null); });
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    await act(async () => { authState.callback({ uid: 'fresh-account', emailVerified: true }); });
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(localStorage.getItem('theme:fresh-account')).toBeNull();
+  });
+
+  it('shows login in light mode after signing out of a dark account', async () => {
+    localStorage.setItem('theme:alice', 'dark');
+    localStorage.setItem('theme:guest', 'dark');
+    window.history.replaceState({}, '', '/home');
+    render(<App />);
+    await act(async () => { authState.callback({ uid: 'alice', emailVerified: true }); });
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    await act(async () => {
+      await authState.callback(null);
+      window.history.pushState({}, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    expect(screen.getByText('Login screen')).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(localStorage.getItem('theme:alice')).toBe('dark');
+    expect(localStorage.getItem('theme:guest')).toBe('dark');
+  });
+
+  it('clears the guest dark theme while the signed-in profile is still loading', async () => {
+    localStorage.setItem('theme:guest', 'dark');
+    window.history.replaceState({}, '', '/home');
+    render(<App />);
+    await act(async () => { await authState.callback(null); });
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+
+    let resolveProfile;
+    firestoreState.getDoc.mockReturnValueOnce(new Promise(resolve => { resolveProfile = resolve; }));
+    let sessionUpdate;
+    await act(async () => {
+      sessionUpdate = authState.callback({ uid: 'new-account', emailVerified: true });
+    });
+    expect(screen.getByText('Restoring your session')).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(document.body).toHaveAttribute('data-theme', 'light');
+
+    await act(async () => {
+      resolveProfile({ exists: () => true, data: () => ({ onboardingCompleted: true }) });
+      await sessionUpdate;
+    });
+    expect(screen.getByText('Home screen')).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(localStorage.getItem('theme:new-account')).toBeNull();
+    expect(localStorage.getItem('theme:guest')).toBe('dark');
+  });
+
 });

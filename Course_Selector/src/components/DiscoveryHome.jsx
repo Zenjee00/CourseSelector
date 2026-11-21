@@ -27,8 +27,18 @@ export default function DiscoveryHome({ savedCount, isGuest }) {
 
       <section className="upcoming-modes" aria-labelledby="upcoming-title">
         <h2 id="upcoming-title">More ways to find your direction.</h2>
-        <div><h3>Swipe Match</h3><p>Explore work values, environments, and everyday activities.</p><span>Coming soon</span></div>
-        <div><h3>Day in a Life</h3><p>Try decisions inspired by everyday career scenarios.</p><span>Coming soon</span></div>
+        <div>
+          <h3>Swipe Match</h3>
+          <p>Explore work values, environments, and everyday activities.</p>
+          <span>Coming soon</span>
+          <Link to="/swipe-match" className="text-link upcoming-mode-link">Preview Swipe Match</Link>
+        </div>
+        <div>
+          <h3>Day in a Life</h3>
+          <p>Try decisions inspired by everyday career scenarios.</p>
+          <span>Coming soon</span>
+          <Link to="/day-in-the-life" className="text-link upcoming-mode-link">Preview Day in a Life</Link>
+        </div>
       </section>
       <footer className="home-footer"><span>CourseNFound</span><p>{isGuest ? 'Exploring as a guest. Sign in to keep your assessment history.' : `${savedCount} saved ${savedCount === 1 ? 'assessment' : 'assessments'} in your history.`}</p><span>Choose with curiosity.</span></footer>
     </main>

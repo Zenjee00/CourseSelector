@@ -34,6 +34,7 @@ import {
   db,
 } from '../BackendFbase/Firebase';
 import { useToast } from '../context/useToast';
+import { useTheme } from '../context/useTheme';
 
 function isSafePhotoUrl(value) {
     try { return new URL(value).protocol === 'https:'; } catch { return false; }
@@ -45,9 +46,7 @@ function Home() {
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [savedPrograms, setSavedPrograms] = useState([]);
     const [loadingPrograms, setLoadingPrograms] = useState(false);
-    const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('theme') || 'light';
-    });
+    const { theme, toggleTheme } = useTheme();
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showGuestLoginPrompt, setShowGuestLoginPrompt] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -91,10 +90,6 @@ function Home() {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
-                const accountTheme = localStorage.getItem(`theme:${currentUser.uid}`);
-                if (accountTheme === 'dark' || accountTheme === 'light') {
-                    setTheme(accountTheme);
-                }
                 setProfileForm({
                     displayName: currentUser.displayName || '',
                     photoURL: currentUser.photoURL || '',
@@ -110,16 +105,15 @@ function Home() {
         return () => unsubscribe();
     }, [navigate, showToast]);
 
-    useEffect(() => {
-        localStorage.setItem('theme', theme);
-        if (user?.uid) localStorage.setItem(`theme:${user.uid}`, theme);
-        document.documentElement.setAttribute('data-theme', theme);
-        document.body.setAttribute('data-theme', theme);
-    }, [theme, user?.uid]);
+    const handleGuestSignInRequest = () => {
+        setMobileMenuOpen(false);
+        setSettingsOpen(false);
+        setShowGuestLoginPrompt(true);
+    };
 
     const handleViewResults = () => {
         if (!user) {
-            showToast('Sign in to save and view your history.', 'warning');
+            handleGuestSignInRequest();
             return;
         }
         if (savedPrograms.length > 0) {
@@ -133,10 +127,6 @@ function Home() {
     const handleViewLibrary = () => {
         setMobileMenuOpen(false);
         navigate('/library');
-    };
-
-    const toggleTheme = () => {
-        setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
 
     const handleLogoutConfirm = async () => {
@@ -163,8 +153,7 @@ function Home() {
 
     const handleProfileChipClick = () => {
         if (!user) {
-            setShowGuestLoginPrompt(true);
-            setMobileMenuOpen(false);
+            handleGuestSignInRequest();
             return;
         }
         handleOpenProfile();
@@ -318,7 +307,7 @@ function Home() {
                         className="nav-icon-btn saved-btn"
                         onClick={handleViewResults}
                         aria-label={`Saved history (${savedPrograms.length})`}
-                        disabled={!user || loadingPrograms || savedPrograms.length === 0}
+                        disabled={Boolean(user) && (loadingPrograms || savedPrograms.length === 0)}
                     >
                         <Icon name="folder" /><span>History</span>
                         {loadingPrograms ? (
@@ -357,7 +346,7 @@ function Home() {
                                     <Icon name={theme === 'light' ? 'moon' : 'sun'} />
                                     <span>{theme === 'light' ? 'Switch to Dark' : 'Switch to Light'}</span>
                                 </button>
-                                <button className="settings-item danger" onClick={() => { (user ? handleOpenLogout : () => navigate('/login'))(); closeSettings(); }} role="menuitem">
+                                <button className={`settings-item${user ? ' danger' : ''}`} onClick={() => { (user ? handleOpenLogout : handleGuestSignInRequest)(); closeSettings(); }} role="menuitem">
 
                                     <span>{user ? 'Logout' : 'Sign in'}</span>
                                 </button>

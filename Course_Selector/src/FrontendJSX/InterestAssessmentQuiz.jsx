@@ -1,7 +1,6 @@
 import '../FrontendCSS/InterestAssessmentQuiz.css';
 
 import {
-  useEffect,
   useState,
 } from 'react';
 
@@ -89,7 +88,6 @@ function InterestAssessmentQuiz() {
   const [tieRound, setTieRound] = useState(0);
   const [baseResults, setBaseResults] = useState(null);
   const [animationClass, setAnimationClass] = useState('');
-  const [theme] = useState(() => localStorage.getItem('theme') || 'light');
   const navigate = useNavigate();
   const showToast = useToast();
 
@@ -155,12 +153,6 @@ function InterestAssessmentQuiz() {
       if (!programName) return [];
       return universities.filter((uni) => uni.programs.includes(programName));
   };
-
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
-    document.body.setAttribute('data-theme', theme);
-  }, [theme]);
 
   const handleBackHome = () => navigate('/home');
 
@@ -476,8 +468,8 @@ function InterestAssessmentQuiz() {
           <p className="question-text">{currentQuestion?.text}</p>
 
           <div className="quiz-scale">
-            <span>Agree</span>
             <span>Disagree</span>
+            <span>Agree</span>
           </div>
 
           <div className="quiz-options">

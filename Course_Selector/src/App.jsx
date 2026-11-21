@@ -23,15 +23,20 @@ import {
   auth,
   db,
 } from './BackendFbase/Firebase';
+import ThemeProvider from './context/ThemeProvider';
 import { ToastProvider } from './context/ToastContext';
-const CareerLibrary = lazy(() => import('./FrontendJSX/CareerLibrary'));
 import GuestFeatureGate from './FrontendJSX/GuestFeatureGate';
+import OfflineBanner from './FrontendJSX/OfflineBanner';
+import OrbitLoader from './FrontendJSX/OrbitLoader';
+
+const CareerLibrary = lazy(() => import('./FrontendJSX/CareerLibrary'));
+
 const Home = lazy(() => import('./FrontendJSX/Home'));
 const InterestAssessmentQuiz = lazy(() => import('./FrontendJSX/InterestAssessmentQuiz'));
 const LoginRegister = lazy(() => import('./FrontendJSX/LoginRegister'));
-import OfflineBanner from './FrontendJSX/OfflineBanner';
+
 const Onboarding = lazy(() => import('./FrontendJSX/Onboarding'));
-import OrbitLoader from './FrontendJSX/OrbitLoader';
+
 const Results = lazy(() => import('./FrontendJSX/Results'));
 const Simulator = lazy(() => import('./FrontendJSX/Simulator'));
 const SwipeGame = lazy(() => import('./FrontendJSX/SwipeGame'));
@@ -41,24 +46,6 @@ function App() {
   const [authSession, setAuthSession] = useState(null);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [authReady, setAuthReady] = useState(false);
-
-  useEffect(() => {
-    if (!authReady) return;
-
-    const theme = user
-      ? (localStorage.getItem('theme') === 'dark' ? 'dark' : 'light')
-      : 'light';
-
-    document.documentElement.setAttribute(
-      'data-theme',
-      theme,
-    );
-
-    document.body.setAttribute(
-      'data-theme',
-      theme,
-    );
-  }, [authReady, user]);
 
   useEffect(() => {
     let isActive = true;
@@ -104,26 +91,21 @@ function App() {
     };
   }, []);
 
-  if (!authReady) {
-    return (
-      <div className="app-session-loader">
-        <OfflineBanner />
-
-        <OrbitLoader label="Restoring your session" />
-      </div>
-    );
-  }
-
   const isUnverifiedUser = Boolean(authSession && !user);
   const onboardingRedirect = user && needsOnboarding;
 
 
   return (
     <ToastProvider>
-      {/* Available globally on every route */}
-      <OfflineBanner />
-
       <Router>
+        {/* Keep theme ownership active while Firebase and lazy routes are loading. */}
+        <ThemeProvider key={user?.uid || 'guest'} userId={user?.uid} ready={authReady}>
+        <OfflineBanner />
+        {!authReady ? (
+          <div className="app-session-loader">
+            <OrbitLoader label="Restoring your session" />
+          </div>
+        ) : (
         <div className="App">
           <Suspense fallback={<OrbitLoader label="Loading page" />}>
           <Routes>
@@ -243,6 +225,8 @@ function App() {
           </Routes>
           </Suspense>
         </div>
+        )}
+        </ThemeProvider>
       </Router>
     </ToastProvider>
   );

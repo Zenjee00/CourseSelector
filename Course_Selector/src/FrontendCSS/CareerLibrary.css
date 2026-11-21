@@ -44,7 +44,7 @@
 .guest-feature-modal { width: min(500px, 100%); position: relative; }
 .guest-feature-modal-close { margin-left: auto; margin-bottom: 1rem; }
 .guest-feature-modal > p { color: var(--text-muted); margin: 1rem 0; }
-.guest-feature-modal-actions { display: flex; gap: 1rem; }
+.guest-feature-modal-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
 .guest-feature-modal-actions button { padding: .7rem 1rem; border: 1px solid var(--primary); border-radius: 4px; background: var(--primary); color: var(--bg-main); }
 .guest-feature-modal-actions button + button { color: var(--primary); background: transparent; }
 .comparison-loading-panel { width: min(400px,100%); }

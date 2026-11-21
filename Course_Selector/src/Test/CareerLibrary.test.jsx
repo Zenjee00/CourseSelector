@@ -17,6 +17,7 @@ import {
 } from '@testing-library/react';
 
 import CareerLibrary from '../FrontendJSX/CareerLibrary';
+import { auth } from '../BackendFbase/Firebase';
 
 vi.mock('../BackendFbase/Firebase', () => ({
   auth: {
@@ -94,6 +95,7 @@ const getProgramWrapper = (programName) => {
 
 describe('CareerLibrary', () => {
   beforeEach(() => {
+    auth.currentUser = { uid: 'test-user-123', emailVerified: true };
     testData.getProgramKey.mockImplementation(
       (programName) => programName.toLowerCase(),
     )
@@ -479,4 +481,32 @@ describe('CareerLibrary', () => {
       testData.navigate,
     ).toHaveBeenCalledWith('/home')
   })
+
+  it('lets a guest decline sign-in and keep their current library search', () => {
+    auth.currentUser = null;
+    render(<CareerLibrary />);
+    fireEvent.change(screen.getByPlaceholderText('Try Computer Science'), {
+      target: { value: 'computer' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Favorite' }));
+    const dialog = screen.getByRole('dialog', { name: 'Create an account to favorite courses' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Continue as guest' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Try Computer Science')).toHaveValue('computer');
+    expect(testData.navigate).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Favorite' })).toBeInTheDocument();
+    expect(localStorage.getItem('course_selector_favorites:test-user-123')).toBeNull();
+  });
+
+  it.each([
+    ['Sign in', ['/login']],
+    ['Sign up', ['/login', { state: { mode: 'register' } }]],
+  ])('keeps the favorite prompt %s action available', (label, destination) => {
+    auth.currentUser = null;
+    render(<CareerLibrary />);
+    fireEvent.click(within(getProgramWrapper(testData.programs[0])).getByRole('button', { name: 'Favorite' }));
+    fireEvent.click(screen.getByRole('button', { name: label }));
+    expect(testData.navigate).toHaveBeenCalledWith(...destination);
+  });
 })

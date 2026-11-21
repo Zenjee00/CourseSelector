@@ -66,6 +66,13 @@ describe('InterestAssessmentQuiz', () => {
     expect(screen.getByText('3%')).toBeInTheDocument();
   });
 
+  it('shows Disagree at score 1 and Agree at score 5', () => {
+    renderQuiz();
+
+    expect(screen.getByText('Disagree')).toBeInTheDocument();
+    expect(screen.getByText('Agree')).toBeInTheDocument();
+  });
+
   it('disables Next until the user selects a score', () => {
     renderQuiz();
 
