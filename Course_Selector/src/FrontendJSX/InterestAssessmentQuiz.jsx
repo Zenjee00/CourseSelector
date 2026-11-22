@@ -1,8 +1,6 @@
 import '../FrontendCSS/InterestAssessmentQuiz.css';
 
-import {
-  useState,
-} from 'react';
+import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -12,9 +10,9 @@ import {
   saveQuizResults,
 } from '../BackendFbase/courseRecommendations';
 import { auth } from '../BackendFbase/Firebase';
+import CareerInfo from '../components/CareerInfo';
 import { useToast } from '../context/useToast';
 import { universities } from '../data/universities';
-import CareerInfo from '../components/CareerInfo';
 
 const quizQuestions = [
   { id: 'q1', text: '1. I enjoy setting up, configuring, and maintaining computer networks or systems.', category: 'COMPUTER / IT / TECHNOLOGY' },
@@ -74,6 +72,48 @@ const makeUniqueScores = (scores) => {
 
 const formatScore = (score) => Number(score).toFixed(3).replace(/0+$/, '').replace(/\.$/, '');
 
+// Keep the loading component stable across quiz renders.
+const QuizSkeletonLoader = () => (
+    <div className="quiz-page">
+        <div className="quiz-container">
+            <div className="back-row" style={{ marginBottom: '20px' }}>
+                <div className="skeleton-text" style={{ width: '120px', height: '40px', borderRadius: '12px' }}></div>
+            </div>
+
+            <div className="progress-wrapper">
+                <div className="progress-info">
+                    <div className="skeleton-text" style={{ width: '150px', height: '16px' }}></div>
+                    <div className="skeleton-text" style={{ width: '60px', height: '32px' }}></div>
+                </div>
+                <div className="progress-bar-bg">
+                    <div className="skeleton-text" style={{ width: '100%', height: '100%', borderRadius: '20px' }}></div>
+                </div>
+            </div>
+
+            <div className="quiz-card" style={{ minHeight: '280px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div className="skeleton-text" style={{ width: '90%', height: '32px', marginBottom: '12px' }}></div>
+                <div className="skeleton-text" style={{ width: '70%', height: '32px', marginBottom: '36px' }}></div>
+
+                <div className="quiz-scale">
+                    <div className="skeleton-text" style={{ width: '120px', height: '12px' }}></div>
+                    <div className="skeleton-text" style={{ width: '150px', height: '12px' }}></div>
+                </div>
+
+                <div className="quiz-options">
+                    {[1, 2, 3, 4, 5].map((val) => (
+                        <div key={val} className="skeleton-text" style={{ flex: 1, height: '78px', borderRadius: '18px' }}></div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="quiz-nav">
+                <div className="skeleton-text" style={{ flex: 1, height: '54px', borderRadius: '14px' }}></div>
+                <div className="skeleton-text" style={{ flex: 1, height: '54px', borderRadius: '14px' }}></div>
+            </div>
+        </div>
+    </div>
+);
+
 function InterestAssessmentQuiz() {
   const [answers, setAnswers] = useState({});
   const [current, setCurrent] = useState(0);
@@ -107,47 +147,6 @@ function InterestAssessmentQuiz() {
     ? (isTieBreaker ? 'Finish tie-breaker' : 'Finish Who am I')
     : 'Next question';
 
-    // Skeleton Loader Component
-    const SkeletonLoader = () => (
-        <div className="quiz-page">
-            <div className="quiz-container">
-                <div className="back-row" style={{ marginBottom: '20px' }}>
-                    <div className="skeleton-text" style={{ width: '120px', height: '40px', borderRadius: '12px' }}></div>
-                </div>
-
-                <div className="progress-wrapper">
-                    <div className="progress-info">
-                        <div className="skeleton-text" style={{ width: '150px', height: '16px' }}></div>
-                        <div className="skeleton-text" style={{ width: '60px', height: '32px' }}></div>
-                    </div>
-                    <div className="progress-bar-bg">
-                        <div className="skeleton-text" style={{ width: '100%', height: '100%', borderRadius: '20px' }}></div>
-                    </div>
-                </div>
-
-                <div className="quiz-card" style={{ minHeight: '280px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div className="skeleton-text" style={{ width: '90%', height: '32px', marginBottom: '12px' }}></div>
-                    <div className="skeleton-text" style={{ width: '70%', height: '32px', marginBottom: '36px' }}></div>
-
-                    <div className="quiz-scale">
-                        <div className="skeleton-text" style={{ width: '120px', height: '12px' }}></div>
-                        <div className="skeleton-text" style={{ width: '150px', height: '12px' }}></div>
-                    </div>
-
-                    <div className="quiz-options">
-                        {[1, 2, 3, 4, 5].map((val) => (
-                            <div key={val} className="skeleton-text" style={{ flex: 1, height: '78px', borderRadius: '18px' }}></div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="quiz-nav">
-                    <div className="skeleton-text" style={{ flex: 1, height: '54px', borderRadius: '14px' }}></div>
-                    <div className="skeleton-text" style={{ flex: 1, height: '54px', borderRadius: '14px' }}></div>
-                </div>
-            </div>
-        </div>
-    );
 
   const getUniversitiesForProgram = (programName) => {
       if (!programName) return [];
@@ -435,7 +434,7 @@ function InterestAssessmentQuiz() {
   }
 
     if (!currentQuestion) {
-        return <SkeletonLoader />;
+        return <QuizSkeletonLoader />;
     }
 
   return (

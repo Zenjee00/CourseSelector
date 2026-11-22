@@ -127,14 +127,6 @@ function LoginRegister() {
         return needsOnboarding;
     };
 
-    const SkeletonLoader = () => (
-        <div className="login-register-container">
-            <div className="form-wrapper auth-loading">
-                <OrbitLoader label={loadingLabel} />
-            </div>
-        </div>
-    );
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -243,7 +235,13 @@ function LoginRegister() {
     };
 
     if (loading) {
-        return <SkeletonLoader />;
+        return (
+            <div className="login-register-container">
+                <div className="form-wrapper auth-loading">
+                    <OrbitLoader label={loadingLabel} />
+                </div>
+            </div>
+        );
     }
 
     return (
